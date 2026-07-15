@@ -1,0 +1,31 @@
+app:
+  name: "ELAN AI INVEST"
+  version: "0.3.0"
+  environment: "development"
+
+market:
+  provider: "yahoo"
+  period: "2y"
+  interval: "1d"
+  minimum_history: 210
+  benchmark: "SPY"
+
+scoring:
+  trend_weight: 0.40
+  momentum_weight: 0.35
+  volatility_weight: 0.15
+  drawdown_weight: 0.10
+
+backtest:
+  lookback: 63
+  top_n: 3
+  rebalance_days: 21
+
+storage:
+  database_path: "data/elan_ai_invest.db"
+
+logging:
+  level: "INFO"
+  file_path: "logs/elan_ai_invest.log"
+  max_bytes: 2000000
+  backup_count: 5

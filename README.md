@@ -38,3 +38,36 @@ git push -u origin develop
 ## Aviso
 
 Los datos de yfinance son adecuados para prototipos e investigación, no para ejecución profesional. El backtest no incluye todos los costes y no garantiza resultados futuros.
+
+## Versión 0.3 — Core Engine
+
+La aplicación utiliza ahora un núcleo independiente de la interfaz. La configuración principal está en `config/settings.yaml`, los registros se guardan en `logs/elan_ai_invest.log` y los proveedores de datos se conectan mediante una interfaz común.
+
+Para actualizar dependencias y ejecutar pruebas en Windows:
+
+```text
+update_to_v03.bat
+```
+
+## Actualización 0.3.1
+
+Esta versión convierte ELAN AI INVEST en un paquete Python instalable. Después de copiar los archivos en la carpeta del proyecto, ejecuta:
+
+```powershell
+.\update_to_v031.bat
+```
+
+El instalador crea o reutiliza `.venv`, instala el proyecto en modo editable y ejecuta las pruebas. Después inicia la plataforma con:
+
+```powershell
+.\start_windows.bat
+```
+
+También puede hacerse manualmente:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev]"
+python -m pytest
+python -m streamlit run app.py
+```

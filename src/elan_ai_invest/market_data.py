@@ -1,16 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Iterable
 
 import pandas as pd
 import yfinance as yf
 
-
-@dataclass
-class DownloadResult:
-    prices: pd.DataFrame
-    errors: dict[str, str]
+from elan_ai_invest.providers.base import DownloadResult
 
 
 def _extract_close(frame: pd.DataFrame, symbol: str) -> pd.Series:
