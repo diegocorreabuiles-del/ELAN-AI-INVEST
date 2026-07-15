@@ -1,8 +1,8 @@
-# ELAN Quantum v0.4
+# ELAN Quantum v0.5
 
 AI Investment Platform para análisis cuantitativo, riesgo y backtesting.
 
-## Novedades v0.4
+## Novedades v0.5
 
 - Risk Engine independiente.
 - VaR y CVaR históricos al 95% y 99%.
@@ -20,3 +20,7 @@ AI Investment Platform para análisis cuantitativo, riesgo y backtesting.
 4. Ejecutar `start_windows.bat`.
 
 Herramienta educativa. No constituye asesoramiento financiero.
+
+
+## v0.5 Portfolio Engine
+Capital inicial por defecto: 100.000 EUR. Perfil por defecto: moderado. Incluye asignacion, liquidez minima, limites por posicion y curva simulada contra SPY.

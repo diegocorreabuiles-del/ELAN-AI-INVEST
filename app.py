@@ -11,6 +11,7 @@ from elan_ai_invest.backtest import momentum_backtest, performance_stats
 from elan_ai_invest.core.bootstrap import build_core_engine
 from elan_ai_invest.core.models import AnalysisRequest
 from elan_ai_invest.risk import calculate_risk_report, suggested_position_size_pct
+from elan_ai_invest.portfolio import build_portfolio, portfolio_equity_curve
 from elan_ai_invest.storage import read_history
 
 ROOT = Path(__file__).resolve().parent
@@ -32,7 +33,7 @@ watchlist = pd.read_csv(ROOT / "config" / "watchlist.csv")
 name_map = dict(zip(watchlist["symbol"], watchlist["name"]))
 
 st.title("ELAN Quantum")
-st.caption("AI Investment Platform · v0.4 Risk Engine · investigación, no asesoramiento financiero")
+st.caption("AI Investment Platform · v0.5 Portfolio Engine · investigación, no asesoramiento financiero")
 
 with st.sidebar:
     st.header("Configuración")
@@ -78,8 +79,8 @@ m3.metric("Riesgo cartera", risk_report.risk_level)
 m4.metric("Volatilidad", f"{risk_report.annual_volatility_pct:.1f}%")
 m5.metric("VaR 95% diario", f"{risk_report.var_95_pct:.2f}%", f"€{capital * risk_report.var_95_pct / 100:,.0f}")
 
-tab_market, tab_ranking, tab_risk, tab_backtest, tab_history = st.tabs(
-    ["Mercado", "Ranking", "Riesgo", "Backtesting", "Histórico"]
+tab_market, tab_ranking, tab_risk, tab_portfolio, tab_backtest, tab_history = st.tabs(
+    ["Mercado", "Ranking", "Riesgo", "Cartera", "Backtesting", "Histórico"]
 )
 
 with tab_market:
@@ -162,6 +163,43 @@ with tab_risk:
         labels={"risk_contribution_pct": "% riesgo", "symbol": "Activo"},
     )
     st.plotly_chart(contribution, use_container_width=True)
+
+
+with tab_portfolio:
+    st.subheader("Portfolio Engine")
+    profile = st.selectbox("Perfil", ["conservador", "moderado", "agresivo"], index=1)
+    plan = build_portfolio(
+        ranking,
+        risk_report.asset_risk,
+        capital=capital,
+        profile=profile,
+        min_score=55.0,
+        max_positions=8,
+        max_position_pct=ENGINE.settings.risk.max_position_pct,
+        min_cash_pct=20.0,
+    )
+    p1, p2, p3, p4 = st.columns(4)
+    p1.metric("Capital", f"€{capital:,.0f}")
+    p2.metric("Invertido", f"{plan.invested_weight_pct:.1f}%")
+    p3.metric("Liquidez", f"{plan.cash_weight_pct:.1f}%")
+    p4.metric("Riesgo estimado", plan.risk_level)
+
+    if plan.allocations.empty:
+        st.info("No hay activos con score suficiente. ELAN mantiene liquidez.")
+    else:
+        st.dataframe(plan.allocations, use_container_width=True, hide_index=True)
+        pie_data = plan.allocations[["symbol", "weight_pct"]].copy()
+        pie_data.loc[len(pie_data)] = ["CASH", plan.cash_weight_pct]
+        st.plotly_chart(
+            px.pie(pie_data, names="symbol", values="weight_pct", title="Distribución propuesta"),
+            use_container_width=True,
+        )
+        curve = portfolio_equity_curve(prices, plan.allocations, capital)
+        if not curve.empty:
+            st.plotly_chart(
+                px.line(curve, title="Cartera simulada vs SPY"),
+                use_container_width=True,
+            )
 
 with tab_backtest:
     a, b, c = st.columns(3)
