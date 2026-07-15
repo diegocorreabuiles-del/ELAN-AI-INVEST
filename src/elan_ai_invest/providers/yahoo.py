@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable
+from collections.abc import Iterable
 
 from elan_ai_invest.market_data import download_adjusted_close
 from elan_ai_invest.providers.base import DownloadResult, MarketDataProvider

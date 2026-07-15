@@ -28,12 +28,9 @@ class ScoringConfig(BaseModel):
     drawdown_weight: float = 0.10
 
     @model_validator(mode="after")
-    def validate_weights(self) -> "ScoringConfig":
+    def validate_weights(self) -> ScoringConfig:
         total = (
-            self.trend_weight
-            + self.momentum_weight
-            + self.volatility_weight
-            + self.drawdown_weight
+            self.trend_weight + self.momentum_weight + self.volatility_weight + self.drawdown_weight
         )
         if abs(total - 1.0) > 1e-9:
             raise ValueError("Los pesos de scoring deben sumar 1.0")
@@ -54,6 +51,24 @@ class RiskConfig(BaseModel):
     max_portfolio_volatility_pct: float = Field(default=20.0, gt=0)
 
 
+class PortfolioConfig(BaseModel):
+    initial_capital: float = Field(default=100_000.0, gt=0)
+    profile: str = "moderado"
+    min_score: float = Field(default=55.0, ge=0, le=100)
+    max_positions: int = Field(default=8, ge=1)
+    max_position_pct: float = Field(default=15.0, gt=0, le=100)
+    min_cash_pct: float = Field(default=20.0, ge=0, le=100)
+
+
+class PaperTradingConfig(BaseModel):
+    enabled: bool = True
+    initial_capital: float = Field(default=100_000.0, gt=0)
+    commission_pct: float = Field(default=0.10, ge=0, le=5)
+    stop_loss_pct: float = Field(default=8.0, gt=0, le=100)
+    max_open_positions: int = Field(default=8, ge=1)
+    database_path: str = "data/paper_trading.db"
+
+
 class StorageConfig(BaseModel):
     database_path: str = "data/elan_ai_invest.db"
 
@@ -71,6 +86,8 @@ class Settings(BaseModel):
     scoring: ScoringConfig = ScoringConfig()
     backtest: BacktestConfig = BacktestConfig()
     risk: RiskConfig = RiskConfig()
+    portfolio: PortfolioConfig = PortfolioConfig()
+    paper_trading: PaperTradingConfig = PaperTradingConfig()
     storage: StorageConfig = StorageConfig()
     logging: LoggingConfig = LoggingConfig()
 

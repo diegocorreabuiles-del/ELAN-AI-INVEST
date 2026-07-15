@@ -10,9 +10,11 @@ import streamlit as st
 from elan_ai_invest.backtest import momentum_backtest, performance_stats
 from elan_ai_invest.core.bootstrap import build_core_engine
 from elan_ai_invest.core.models import AnalysisRequest
-from elan_ai_invest.risk import calculate_risk_report, suggested_position_size_pct
+from elan_ai_invest.paper_trading import PaperTradingEngine
 from elan_ai_invest.portfolio import build_portfolio, portfolio_equity_curve
+from elan_ai_invest.risk import calculate_risk_report, suggested_position_size_pct
 from elan_ai_invest.storage import read_history
+from elan_ai_invest.system_status import collect_system_status
 
 ROOT = Path(__file__).resolve().parent
 st.set_page_config(page_title="ELAN Quantum", page_icon="📈", layout="wide")
@@ -30,10 +32,10 @@ st.markdown(
 ENGINE = build_core_engine(ROOT)
 DB_PATH = ROOT / ENGINE.settings.storage.database_path
 watchlist = pd.read_csv(ROOT / "config" / "watchlist.csv")
-name_map = dict(zip(watchlist["symbol"], watchlist["name"]))
+name_map = dict(zip(watchlist["symbol"], watchlist["name"], strict=True))
 
 st.title("ELAN Quantum")
-st.caption("AI Investment Platform · v0.5 Portfolio Engine · investigación, no asesoramiento financiero")
+st.caption("AI Investment Platform · v0.7 Foundation · simulación, no asesoramiento financiero")
 
 with st.sidebar:
     st.header("Configuración")
@@ -43,16 +45,20 @@ with st.sidebar:
         default=watchlist["symbol"].tolist(),
     )
     period = st.selectbox("Historial", ["1y", "2y", "5y"], index=1)
-    capital = st.number_input("Capital simulado (€)", min_value=1_000.0, value=100_000.0, step=5_000.0)
+    capital = st.number_input(
+        "Capital simulado (€)", min_value=1_000.0, value=100_000.0, step=5_000.0
+    )
     refresh = st.button("Actualizar mercado", type="primary", use_container_width=True)
 
 if not selected:
     st.warning("Selecciona al menos un activo.")
     st.stop()
 
+
 @st.cache_data(ttl=3600, show_spinner=False)
 def run_analysis(symbols: tuple[str, ...], selected_period: str):
     return ENGINE.run_analysis(AnalysisRequest(symbols=list(symbols), period=selected_period))
+
 
 if refresh:
     run_analysis.clear()
@@ -67,6 +73,19 @@ if prices.empty or ranking.empty:
     st.stop()
 ranking["name"] = ranking["symbol"].map(name_map).fillna(ranking["symbol"])
 
+paper_engine = PaperTradingEngine(
+    ROOT / ENGINE.settings.paper_trading.database_path,
+    initial_capital=ENGINE.settings.paper_trading.initial_capital,
+    commission_pct=ENGINE.settings.paper_trading.commission_pct,
+    stop_loss_pct=ENGINE.settings.paper_trading.stop_loss_pct,
+    max_open_positions=ENGINE.settings.paper_trading.max_open_positions,
+)
+latest_prices = {
+    symbol: float(prices[symbol].dropna().iloc[-1])
+    for symbol in prices.columns
+    if not prices[symbol].dropna().empty
+}
+
 risk_report = calculate_risk_report(
     prices,
     annualisation_days=ENGINE.settings.risk.annualisation_days,
@@ -77,10 +96,32 @@ m1.metric("Régimen", analysis.market_regime)
 m2.metric("Score medio", f"{analysis.average_score:.1f}/100")
 m3.metric("Riesgo cartera", risk_report.risk_level)
 m4.metric("Volatilidad", f"{risk_report.annual_volatility_pct:.1f}%")
-m5.metric("VaR 95% diario", f"{risk_report.var_95_pct:.2f}%", f"€{capital * risk_report.var_95_pct / 100:,.0f}")
+m5.metric(
+    "VaR 95% diario",
+    f"{risk_report.var_95_pct:.2f}%",
+    f"€{capital * risk_report.var_95_pct / 100:,.0f}",
+)
 
-tab_market, tab_ranking, tab_risk, tab_portfolio, tab_backtest, tab_history = st.tabs(
-    ["Mercado", "Ranking", "Riesgo", "Cartera", "Backtesting", "Histórico"]
+(
+    tab_market,
+    tab_ranking,
+    tab_risk,
+    tab_portfolio,
+    tab_paper,
+    tab_backtest,
+    tab_history,
+    tab_system,
+) = st.tabs(
+    [
+        "Mercado",
+        "Ranking",
+        "Riesgo",
+        "Cartera",
+        "Paper Trading",
+        "Backtesting",
+        "Histórico",
+        "Sistema",
+    ]
 )
 
 with tab_market:
@@ -110,7 +151,19 @@ with tab_market:
 
 with tab_ranking:
     st.dataframe(
-        ranking[["symbol", "name", "score", "confidence", "signal", "price", "return_3m_pct", "volatility_pct", "drawdown_pct"]],
+        ranking[
+            [
+                "symbol",
+                "name",
+                "score",
+                "confidence",
+                "signal",
+                "price",
+                "return_3m_pct",
+                "volatility_pct",
+                "drawdown_pct",
+            ]
+        ],
         use_container_width=True,
         hide_index=True,
     )
@@ -132,9 +185,7 @@ with tab_risk:
     r5.metric("Diversificación", f"{risk_report.diversification_ratio:.2f}x")
 
     st.caption("VaR/CVaR históricos diarios. La cartera simulada usa pesos iguales.")
-    risk_table = risk_report.asset_risk.merge(
-        ranking[["symbol", "score"]], on="symbol", how="left"
-    )
+    risk_table = risk_report.asset_risk.merge(ranking[["symbol", "score"]], on="symbol", how="left")
     risk_table["suggested_position_pct"] = risk_table["volatility_pct"].apply(
         lambda value: suggested_position_size_pct(
             value,
@@ -201,10 +252,134 @@ with tab_portfolio:
                 use_container_width=True,
             )
 
+with tab_paper:
+    st.subheader("Paper Trading Engine")
+    st.caption("Solo simulación. No existe conexión con broker ni dinero real.")
+
+    stop_results = paper_engine.apply_stop_losses(latest_prices)
+    for result in stop_results:
+        if result.success:
+            st.warning(result.message + " por stop-loss")
+
+    valuation = paper_engine.valuation(latest_prices)
+    t1, t2, t3, t4 = st.columns(4)
+    t1.metric("Patrimonio", f"€{valuation['equity']:,.2f}")
+    t2.metric("Liquidez", f"€{valuation['cash']:,.2f}")
+    t3.metric("Posiciones", f"€{valuation['positions_value']:,.2f}")
+    t4.metric("Rentabilidad", f"{valuation['total_return_pct']:+.2f}%")
+
+    buy_col, sell_col = st.columns(2)
+    with buy_col:
+        st.markdown("#### Compra simulada")
+        buy_symbol = st.selectbox("Activo a comprar", selected, key="paper_buy_symbol")
+        buy_price = latest_prices.get(buy_symbol, 0.0)
+        buy_amount = st.number_input(
+            "Importe (€)", min_value=100.0, value=5_000.0, step=500.0, key="paper_buy_amount"
+        )
+        st.caption(
+            f"Precio usado: {buy_price:,.2f} · comisión {ENGINE.settings.paper_trading.commission_pct:.2f}%"
+        )
+        if st.button("Comprar en simulador", type="primary", use_container_width=True):
+            result = paper_engine.buy(buy_symbol, buy_amount, buy_price, reason="manual_dashboard")
+            if result.success:
+                st.success(result.message)
+                st.rerun()
+            else:
+                st.error(result.message)
+
+    positions = paper_engine.positions(latest_prices)
+    with sell_col:
+        st.markdown("#### Venta simulada")
+        if positions.empty:
+            st.info("No hay posiciones abiertas.")
+        else:
+            sell_symbol = st.selectbox(
+                "Activo a vender", positions["symbol"].tolist(), key="paper_sell_symbol"
+            )
+            row = positions.loc[positions["symbol"] == sell_symbol].iloc[0]
+            sell_quantity = st.number_input(
+                "Cantidad",
+                min_value=0.000001,
+                max_value=float(row["quantity"]),
+                value=float(row["quantity"]),
+                format="%.6f",
+                key="paper_sell_quantity",
+            )
+            st.caption(
+                f"Precio usado: {row['current_price']:,.2f} · posición: {row['quantity']:.6f}"
+            )
+            if st.button("Vender en simulador", use_container_width=True):
+                result = paper_engine.sell(
+                    sell_symbol,
+                    sell_quantity,
+                    float(row["current_price"]),
+                    reason="manual_dashboard",
+                )
+                if result.success:
+                    st.success(result.message)
+                    st.rerun()
+                else:
+                    st.error(result.message)
+
+    st.markdown("#### Posiciones abiertas")
+    positions = paper_engine.positions(latest_prices)
+    if positions.empty:
+        st.info("Cartera simulada vacía.")
+    else:
+        st.dataframe(
+            positions[
+                [
+                    "symbol",
+                    "quantity",
+                    "average_price",
+                    "current_price",
+                    "stop_price",
+                    "market_value",
+                    "unrealised_pnl",
+                    "return_pct",
+                ]
+            ],
+            use_container_width=True,
+            hide_index=True,
+        )
+
+    controls, snapshot_col = st.columns(2)
+    with controls:
+        if st.button("Reiniciar simulador", use_container_width=True):
+            paper_engine.reset()
+            st.success("Simulador reiniciado.")
+            st.rerun()
+    with snapshot_col:
+        if st.button("Guardar valoración", use_container_width=True):
+            paper_engine.save_snapshot(latest_prices)
+            st.success("Valoración guardada.")
+
+    history_equity = paper_engine.equity_history()
+    if not history_equity.empty:
+        st.plotly_chart(
+            px.line(
+                history_equity,
+                x="created_at",
+                y="equity",
+                title="Evolución del patrimonio simulado",
+            ),
+            use_container_width=True,
+        )
+
+    st.markdown("#### Operaciones")
+    orders = paper_engine.orders()
+    if orders.empty:
+        st.info("Sin operaciones todavía.")
+    else:
+        st.dataframe(orders, use_container_width=True, hide_index=True)
+
+
 with tab_backtest:
     a, b, c = st.columns(3)
     lookback = a.selectbox("Momentum", [21, 63, 126], index=1)
-    top_n = b.slider("Número de activos", 1, min(8, len(prices.columns)), min(3, len(prices.columns)))
+    top_n = b.slider(
+        "Número de activos", 1, min(8, len(prices.columns)), min(3, len(prices.columns))
+    )
     rebalance = c.selectbox("Rebalanceo", [5, 21, 63], index=1)
     bt = momentum_backtest(prices, lookback=lookback, top_n=top_n, rebalance=rebalance)
     if not bt.empty:
@@ -218,13 +393,29 @@ with tab_backtest:
 
 with tab_history:
     if st.button("Guardar fotografía actual"):
-        ENGINE.run_analysis(AnalysisRequest(symbols=list(selected), period=period, save_snapshot=True))
+        ENGINE.run_analysis(
+            AnalysisRequest(symbols=list(selected), period=period, save_snapshot=True)
+        )
         st.success("Fotografía guardada.")
     history = read_history(DB_PATH)
     if history.empty:
         st.info("Sin histórico todavía.")
     else:
         st.dataframe(history, use_container_width=True, hide_index=True)
+
+with tab_system:
+    st.subheader("Estado del sistema")
+    status = collect_system_status(ROOT, ENGINE.settings)
+    s1, s2, s3, s4 = st.columns(4)
+    s1.metric("Versión", status.version)
+    s2.metric("Python", status.python_version)
+    s3.metric("Proveedor", status.market_provider)
+    s4.metric("Entorno", status.environment)
+    st.dataframe(status.as_dataframe(), use_container_width=True, hide_index=True)
+    if status.ok:
+        st.success("Sistema listo.")
+    else:
+        st.warning("Hay comprobaciones pendientes. Ejecuta update.bat.")
 
 if analysis.errors:
     with st.expander("Errores de descarga"):

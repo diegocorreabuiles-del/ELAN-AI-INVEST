@@ -8,7 +8,7 @@ from elan_ai_invest.core.config import ScoringConfig, load_settings
 def test_settings_file_loads():
     root = Path(__file__).resolve().parents[1]
     settings = load_settings(root / "config" / "settings.yaml")
-    assert settings.app.version == "0.5.0"
+    assert settings.app.version == "0.7.0"
     assert settings.market.provider == "yahoo"
 
 

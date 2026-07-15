@@ -1,3 +1,14 @@
+# Changelog
+
+## 0.7.0
+- Scripts únicos: `install.bat`, `update.bat` y `run.bat`.
+- Añadido `MASTER_PLAN.md` como hoja de ruta principal.
+- Añadido estado del sistema en el dashboard.
+- Añadido health check ejecutable.
+- Añadida integración continua con GitHub Actions.
+- Añadido Dependabot para dependencias.
+- Añadidas pruebas del estado del sistema.
+
 ## v0.5.0
 - Portfolio Engine.
 - Cartera simulada de 100.000 EUR.
@@ -29,3 +40,10 @@
 - Risk Engine con VaR, CVaR, volatilidad, drawdown y correlaciones.
 - Contribución al riesgo y tamaño orientativo de posición.
 - Nueva pestaña de riesgo en el dashboard.
+
+## 0.6.0
+- Añadido Paper Trading Engine persistente en SQLite.
+- Compras y ventas simuladas con comisión.
+- Stop-loss automático y límite de posiciones.
+- Valoración, P&L e historial de operaciones.
+- Nueva pestaña Paper Trading y pruebas automáticas.

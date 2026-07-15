@@ -1,6 +1,6 @@
 app:
   name: "ELAN Quantum"
-  version: "0.5.0"
+  version: "0.7.0"
   environment: "development"
 
 market:
@@ -44,3 +44,11 @@ portfolio:
   max_positions: 8
   max_position_pct: 15.0
   min_cash_pct: 20.0
+
+paper_trading:
+  enabled: true
+  initial_capital: 100000
+  commission_pct: 0.10
+  stop_loss_pct: 8.0
+  max_open_positions: 8
+  database_path: "data/paper_trading.db"
