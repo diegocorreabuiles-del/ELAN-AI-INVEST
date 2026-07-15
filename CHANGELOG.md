@@ -1,3 +1,10 @@
+## v0.5.0
+- Portfolio Engine.
+- Cartera simulada de 100.000 EUR.
+- Perfil moderado por defecto.
+- Limites por posicion y liquidez minima.
+- Comparacion historica con SPY.
+
 # Changelog
 
 ## 0.3.0

@@ -1,6 +1,6 @@
 app:
-  name: "ELAN AI INVEST"
-  version: "0.3.0"
+  name: "ELAN Quantum"
+  version: "0.5.0"
   environment: "development"
 
 market:
@@ -36,3 +36,11 @@ risk:
   risk_budget_per_position_pct: 0.50
   max_position_pct: 15.0
   max_portfolio_volatility_pct: 20.0
+
+portfolio:
+  initial_capital: 100000
+  profile: "moderado"
+  min_score: 55
+  max_positions: 8
+  max_position_pct: 15.0
+  min_cash_pct: 20.0
