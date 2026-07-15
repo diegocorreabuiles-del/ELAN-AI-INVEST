@@ -16,3 +16,9 @@
 - Añadidas configuraciones de pytest, Ruff y Black.
 - Mejorados los scripts de actualización e inicio para Windows.
 - Eliminados archivos de caché del paquete distribuido.
+
+## 0.4.0
+- Nuevo nombre: ELAN Quantum.
+- Risk Engine con VaR, CVaR, volatilidad, drawdown y correlaciones.
+- Contribución al riesgo y tamaño orientativo de posición.
+- Nueva pestaña de riesgo en el dashboard.

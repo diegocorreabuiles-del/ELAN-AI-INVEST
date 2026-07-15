@@ -5,7 +5,7 @@ cd /d "%~dp0"
 if not exist ".venv\Scripts\python.exe" (
     echo No existe el entorno virtual.
     echo Ejecutando primero la instalacion de la version 0.3.1...
-    call update_to_v031.bat
+    call update_to_v04.bat
     if errorlevel 1 exit /b 1
 )
 
@@ -23,6 +23,6 @@ exit /b 0
 
 :error
 echo.
-echo No se pudo iniciar ELAN AI INVEST.
+echo No se pudo iniciar ELAN Quantum.
 pause
 exit /b 1

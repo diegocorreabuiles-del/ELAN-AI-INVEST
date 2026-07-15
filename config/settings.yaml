@@ -29,3 +29,10 @@ logging:
   file_path: "logs/elan_ai_invest.log"
   max_bytes: 2000000
   backup_count: 5
+
+risk:
+  confidence_levels: [0.95, 0.99]
+  annualisation_days: 252
+  risk_budget_per_position_pct: 0.50
+  max_position_pct: 15.0
+  max_portfolio_volatility_pct: 20.0

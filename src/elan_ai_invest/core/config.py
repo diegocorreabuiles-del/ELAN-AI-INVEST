@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field, model_validator
 
 class AppConfig(BaseModel):
     name: str = "ELAN AI INVEST"
-    version: str = "0.3.0"
+    version: str = "0.4.0"
     environment: str = "development"
 
 
@@ -46,6 +46,14 @@ class BacktestConfig(BaseModel):
     rebalance_days: int = Field(default=21, ge=1)
 
 
+class RiskConfig(BaseModel):
+    confidence_levels: list[float] = [0.95, 0.99]
+    annualisation_days: int = Field(default=252, ge=200, le=366)
+    risk_budget_per_position_pct: float = Field(default=0.50, gt=0, le=5)
+    max_position_pct: float = Field(default=15.0, gt=0, le=100)
+    max_portfolio_volatility_pct: float = Field(default=20.0, gt=0)
+
+
 class StorageConfig(BaseModel):
     database_path: str = "data/elan_ai_invest.db"
 
@@ -62,6 +70,7 @@ class Settings(BaseModel):
     market: MarketConfig = MarketConfig()
     scoring: ScoringConfig = ScoringConfig()
     backtest: BacktestConfig = BacktestConfig()
+    risk: RiskConfig = RiskConfig()
     storage: StorageConfig = StorageConfig()
     logging: LoggingConfig = LoggingConfig()
 
