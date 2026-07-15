@@ -7,33 +7,47 @@ import pandas as pd
 import yfinance as yf
 
 
-@dataclass(frozen=True)
-class MarketDataResult:
+@dataclass
+class DownloadResult:
     prices: pd.DataFrame
     errors: dict[str, str]
 
 
-def download_adjusted_close(symbols: Iterable[str], period: str = "2y") -> MarketDataResult:
+def _extract_close(frame: pd.DataFrame, symbol: str) -> pd.Series:
+    if frame.empty:
+        raise ValueError("sin datos")
+    if isinstance(frame.columns, pd.MultiIndex):
+        for field in ("Adj Close", "Close"):
+            if field in frame.columns.get_level_values(0):
+                data = frame[field]
+                if isinstance(data, pd.DataFrame):
+                    if symbol in data.columns:
+                        return data[symbol]
+                    return data.iloc[:, 0]
+    for field in ("Adj Close", "Close"):
+        if field in frame.columns:
+            return frame[field]
+    raise ValueError("no se encontro la columna de cierre")
+
+
+def download_adjusted_close(symbols: Iterable[str], period: str = "2y") -> DownloadResult:
     series: list[pd.Series] = []
     errors: dict[str, str] = {}
-
     for symbol in symbols:
         try:
-            frame = yf.download(symbol, period=period, auto_adjust=True, progress=False)
-            if frame.empty:
-                errors[symbol] = "No se recibieron datos."
-                continue
-
-            close = frame["Close"]
-            if isinstance(close, pd.DataFrame):
-                close = close.iloc[:, 0]
-            close = close.rename(symbol).dropna()
-            if close.empty:
-                errors[symbol] = "La serie de cierre esta vacia."
-                continue
+            frame = yf.download(
+                symbol,
+                period=period,
+                interval="1d",
+                auto_adjust=True,
+                progress=False,
+                threads=False,
+            )
+            close = _extract_close(frame, symbol).rename(symbol).dropna()
+            if len(close) < 60:
+                raise ValueError("historial insuficiente")
             series.append(close)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:  # provider/network errors are shown in the UI
             errors[symbol] = str(exc)
-
     prices = pd.concat(series, axis=1).sort_index() if series else pd.DataFrame()
-    return MarketDataResult(prices=prices, errors=errors)
+    return DownloadResult(prices=prices, errors=errors)

@@ -4,3 +4,6 @@ Otros/
 .venv/
 __pycache__/
 *.pyc
+.streamlit/
+data/*.db
+data/*.sqlite

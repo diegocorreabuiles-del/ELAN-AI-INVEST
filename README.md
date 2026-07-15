@@ -1,45 +1,40 @@
-# ELAN AI INVEST v0.1
+# ELAN AI INVEST v0.2
 
-Primera version del observador de mercado. Descarga precios diarios, calcula un ranking basico y muestra un panel local.
+Segunda versión del observador cuantitativo. Esta versión no envía órdenes reales.
 
-## Lo que hace
+## Novedades
 
-- Analiza una lista inicial de ETF, acciones y Bitcoin.
-- Calcula tendencia, momentum y volatilidad.
-- Genera una puntuacion de 0 a 100.
-- Muestra un ranking y un grafico.
-- No envia ordenes y no utiliza dinero real.
+- Dashboard con régimen de mercado, amplitud, score medio y volatilidad.
+- Ranking V2: tendencia, momentum, volatilidad y drawdown.
+- Explicación básica de cada activo.
+- Gráficos de medias móviles.
+- Backtest educativo de momentum.
+- Base SQLite local para guardar fotografías del ranking.
+- Interfaz organizada por pestañas.
 
-## Instalacion en Windows 11
+## Instalación sencilla en Windows 11
 
-1. Abre PowerShell dentro de esta carpeta.
-2. Crea el entorno virtual:
+1. Copia el contenido de esta carpeta sobre tu proyecto local.
+2. Conserva la carpeta `.git` de tu proyecto; no la borres.
+3. Haz doble clic en `start_windows.bat`.
+4. La primera ejecución instalará o actualizará dependencias.
 
-```powershell
-py -m venv .venv
-```
-
-3. Activalo:
+También puede ejecutarse desde PowerShell:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
-```
-
-4. Instala las dependencias:
-
-```powershell
-python -m pip install --upgrade pip
 pip install -r requirements.txt
-```
-
-5. Ejecuta el panel:
-
-```powershell
 python -m streamlit run app.py
 ```
 
-El navegador deberia abrir el panel automaticamente.
+## Subir la versión a la rama develop
 
-## Avisos
+```powershell
+git add .
+git commit -m "Versión 0.2 - Dashboard, histórico y backtesting"
+git push -u origin develop
+```
 
-Los datos de yfinance son adecuados para investigacion y prototipos, no para una futura ejecucion profesional. Antes de conectar un broker se incorporaran datos licenciados, backtesting robusto, control de riesgo y paper trading.
+## Aviso
+
+Los datos de yfinance son adecuados para prototipos e investigación, no para ejecución profesional. El backtest no incluye todos los costes y no garantiza resultados futuros.
