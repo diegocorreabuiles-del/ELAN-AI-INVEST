@@ -1,0 +1,6 @@
+Otros/
+*.zip
+*.exe
+.venv/
+__pycache__/
+*.pyc

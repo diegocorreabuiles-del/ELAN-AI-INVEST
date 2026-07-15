@@ -1,0 +1,13 @@
+symbol,name,asset_type
+SPY,S&P 500 ETF,ETF
+QQQ,Nasdaq 100 ETF,ETF
+IWM,Russell 2000 ETF,ETF
+VGK,Europe ETF,ETF
+EEM,Emerging Markets ETF,ETF
+TLT,US Treasury 20Y ETF,ETF
+GLD,Gold ETF,ETF
+BTC-USD,Bitcoin,Crypto
+AAPL,Apple,Stock
+MSFT,Microsoft,Stock
+NVDA,Nvidia,Stock
+ASML,ASML,Stock
