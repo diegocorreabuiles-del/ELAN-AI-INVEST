@@ -3,6 +3,8 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from elan_ai_invest.core.config import ScoringConfig
+
 
 def _bounded(value: float, low: float = 0.0, high: float = 100.0) -> float:
     return float(np.clip(value, low, high))
@@ -18,7 +20,8 @@ def _signal(score: float) -> str:
     return "Debil"
 
 
-def score_assets(prices: pd.DataFrame) -> pd.DataFrame:
+def score_assets(prices: pd.DataFrame, config: ScoringConfig | None = None) -> pd.DataFrame:
+    config = config or ScoringConfig()
     rows: list[dict[str, float | str]] = []
     for symbol in prices.columns:
         s = prices[symbol].dropna()
@@ -44,10 +47,10 @@ def score_assets(prices: pd.DataFrame) -> pd.DataFrame:
         volatility_points = _bounded(100 - vol * 140)
         drawdown_points = _bounded(100 + drawdown * 250)
         score = (
-            trend_points * 0.40
-            + momentum_points * 0.35
-            + volatility_points * 0.15
-            + drawdown_points * 0.10
+            trend_points * config.trend_weight
+            + momentum_points * config.momentum_weight
+            + volatility_points * config.volatility_weight
+            + drawdown_points * config.drawdown_weight
         )
         confidence = _bounded(55 + abs(score - 50) * 0.75)
         rows.append(

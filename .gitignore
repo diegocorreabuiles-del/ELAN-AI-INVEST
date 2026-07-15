@@ -3,7 +3,14 @@ Otros/
 *.exe
 .venv/
 __pycache__/
-*.pyc
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
 .streamlit/
+*.egg-info/
+build/
+dist/
 data/*.db
 data/*.sqlite
+logs/*.log

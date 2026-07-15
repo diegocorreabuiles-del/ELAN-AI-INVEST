@@ -13,9 +13,9 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from elan_ai_invest.backtest import momentum_backtest, performance_stats
-from elan_ai_invest.market_data import download_adjusted_close
-from elan_ai_invest.scoring import score_assets
-from elan_ai_invest.storage import read_history, save_snapshot
+from elan_ai_invest.core.bootstrap import build_core_engine
+from elan_ai_invest.core.models import AnalysisRequest
+from elan_ai_invest.storage import read_history
 
 st.set_page_config(page_title="ELAN AI INVEST", page_icon="📈", layout="wide")
 
@@ -27,7 +27,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-DB_PATH = ROOT / "data" / "elan_ai_invest.db"
+ENGINE = build_core_engine(ROOT)
+DB_PATH = ROOT / ENGINE.settings.storage.database_path
 watchlist = pd.read_csv(ROOT / "config" / "watchlist.csv")
 name_map = dict(zip(watchlist["symbol"], watchlist["name"]))
 
@@ -59,14 +60,14 @@ if refresh:
 
 with st.spinner("Descargando datos y calculando señales..."):
     result = load_data(tuple(selected), period)
-prices = result.prices
+prices = analysis.prices
 if prices.empty:
     st.error("No se pudieron descargar datos de mercado.")
-    if result.errors:
-        st.json(result.errors)
+    if analysis.errors:
+        st.json(analysis.errors)
     st.stop()
 
-ranking = score_assets(prices)
+ranking = analysis.ranking
 if ranking.empty:
     st.error("No hay suficiente historial para calcular el ranking. Prueba con 2y o 5y.")
     st.stop()
@@ -183,7 +184,8 @@ with tab_backtest:
 with tab_history:
     st.subheader("Histórico local de análisis")
     if st.button("Guardar fotografía actual"):
-        count = save_snapshot(DB_PATH, ranking, datetime.now().isoformat(timespec="seconds"))
+        snapshot_result = ENGINE.run_analysis(AnalysisRequest(symbols=list(selected), period=period, save_snapshot=True))
+        count = len(snapshot_result.ranking)
         st.success(f"Se guardaron {count} registros en la base de datos local.")
     history = read_history(DB_PATH)
     if history.empty:
@@ -191,9 +193,9 @@ with tab_history:
     else:
         st.dataframe(history, use_container_width=True, hide_index=True)
 
-if result.errors:
+if analysis.errors:
     with st.expander("Activos con errores de descarga"):
-        st.json(result.errors)
+        st.json(analysis.errors)
 
 st.divider()
 st.caption("ELAN AI INVEST v0.2 · Herramienta educativa y de investigación. No constituye asesoramiento financiero.")
