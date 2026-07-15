@@ -28,11 +28,15 @@ class CoreEngine:
         self.logger = logger
 
     def run_analysis(self, request: AnalysisRequest) -> AnalysisResult:
-        symbols = list(dict.fromkeys(symbol.strip().upper() for symbol in request.symbols if symbol.strip()))
+        symbols = list(
+            dict.fromkeys(symbol.strip().upper() for symbol in request.symbols if symbol.strip())
+        )
         if not symbols:
             raise ValueError("Debes indicar al menos un activo")
 
-        self.logger.info("Inicio de análisis | activos=%s | periodo=%s", len(symbols), request.period)
+        self.logger.info(
+            "Inicio de análisis | activos=%s | periodo=%s", len(symbols), request.period
+        )
         downloaded = self.provider.download_prices(symbols=symbols, period=request.period)
         if downloaded.prices.empty:
             self.logger.error("El proveedor no devolvió datos válidos")

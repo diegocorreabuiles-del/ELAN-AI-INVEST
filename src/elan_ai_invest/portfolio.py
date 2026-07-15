@@ -56,7 +56,7 @@ def build_portfolio(
     cap_pct = min(max_position_pct, profile_cap.get(profile_key, max_position_pct))
     investable_pct = 100.0 - cash_pct
 
-    score_strength = (merged["score"].clip(lower=min_score) - min_score + 5.0)
+    score_strength = merged["score"].clip(lower=min_score) - min_score + 5.0
     inverse_vol = 1.0 / merged["volatility_pct"].clip(lower=5.0)
     raw = score_strength * inverse_vol
     weights = raw / raw.sum() * investable_pct

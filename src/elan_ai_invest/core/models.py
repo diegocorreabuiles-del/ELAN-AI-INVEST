@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pandas as pd
 
@@ -21,7 +21,7 @@ class AnalysisResult:
     market_regime: str
     breadth_pct: float
     average_score: float
-    captured_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    captured_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     @property
     def successful_symbols(self) -> int:

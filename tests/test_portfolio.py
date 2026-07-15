@@ -23,7 +23,9 @@ def test_build_portfolio_moderate_respects_limits():
     assert plan.invested_weight_pct <= 80.0001
     assert plan.cash_weight_pct >= 19.9999
     assert plan.allocations["weight_pct"].max() <= 15.0001
-    assert abs(plan.allocations["amount_eur"].sum() - 100_000 * plan.invested_weight_pct / 100) < 0.01
+    assert (
+        abs(plan.allocations["amount_eur"].sum() - 100_000 * plan.invested_weight_pct / 100) < 0.01
+    )
 
 
 def test_portfolio_equity_curve_returns_data():

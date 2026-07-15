@@ -4,7 +4,9 @@ import numpy as np
 import pandas as pd
 
 
-def momentum_backtest(prices: pd.DataFrame, lookback: int = 63, top_n: int = 3, rebalance: int = 21) -> pd.DataFrame:
+def momentum_backtest(
+    prices: pd.DataFrame, lookback: int = 63, top_n: int = 3, rebalance: int = 21
+) -> pd.DataFrame:
     """Simple educational long-only momentum backtest with monthly rebalancing."""
     clean = prices.dropna(how="all").ffill()
     if clean.empty or len(clean) <= lookback + rebalance:

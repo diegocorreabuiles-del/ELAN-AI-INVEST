@@ -2,7 +2,10 @@
 setlocal
 cd /d "%~dp0"
 
-echo === ELAN Quantum v0.4 ===
+echo ==========================================
+echo ELAN Quantum - Instalacion
+ echo ==========================================
+
 if not exist ".venv\Scripts\python.exe" (
     py -m venv .venv
     if errorlevel 1 goto :error
@@ -13,16 +16,20 @@ python -m pip install --upgrade pip
 if errorlevel 1 goto :error
 python -m pip install -e ".[dev]"
 if errorlevel 1 goto :error
+if not exist data mkdir data
+if not exist logs mkdir logs
+python scripts\healthcheck.py
+if errorlevel 1 goto :error
 python -m pytest
 if errorlevel 1 goto :error
 
 echo.
-echo ACTUALIZACION COMPLETADA CORRECTAMENTE
+echo INSTALACION COMPLETADA
 pause
 exit /b 0
 
 :error
 echo.
-echo ERROR EN ACTUALIZACION
+echo ERROR EN INSTALACION
 pause
 exit /b 1

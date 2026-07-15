@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pandas as pd
 
-
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS analysis_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,8 +33,15 @@ def save_snapshot(path: Path, ranking: pd.DataFrame, captured_at: str) -> int:
         return 0
     init_db(path)
     columns = [
-        "symbol", "price", "score", "confidence", "signal", "return_1m_pct",
-        "return_3m_pct", "volatility_pct", "drawdown_pct",
+        "symbol",
+        "price",
+        "score",
+        "confidence",
+        "signal",
+        "return_1m_pct",
+        "return_3m_pct",
+        "volatility_pct",
+        "drawdown_pct",
     ]
     payload = ranking[columns].copy()
     payload.insert(0, "captured_at", captured_at)
