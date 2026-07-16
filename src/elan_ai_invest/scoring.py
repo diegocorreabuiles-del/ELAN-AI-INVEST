@@ -95,4 +95,8 @@ def score_assets(
 
     if not rows:
         return pd.DataFrame()
-    return pd.DataFrame(rows).sort_values(["score", "confidence"], ascending=False).reset_index(drop=True)
+    return (
+        pd.DataFrame(rows)
+        .sort_values(["score", "confidence"], ascending=False)
+        .reset_index(drop=True)
+    )

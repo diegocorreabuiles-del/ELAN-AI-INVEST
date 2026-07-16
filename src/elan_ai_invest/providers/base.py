@@ -15,5 +15,11 @@ class DownloadResult:
 
 class MarketDataProvider(ABC):
     @abstractmethod
-    def download_prices(self, symbols: Iterable[str], period: str) -> DownloadResult:
+    def download_prices(
+        self,
+        symbols: Iterable[str],
+        period: str,
+        interval: str = "1d",
+        minimum_history: int = 60,
+    ) -> DownloadResult:
         raise NotImplementedError

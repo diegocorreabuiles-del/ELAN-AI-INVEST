@@ -72,7 +72,9 @@ def _statistics(returns: pd.DataFrame, weights: np.ndarray) -> tuple[float, floa
     sharpe = annual_return / annual_volatility if annual_volatility > 0 else 0.0
     asset_volatility = np.sqrt(np.clip(np.diag(covariance), 0, None))
     weighted_asset_volatility = float(weights @ asset_volatility)
-    diversification = weighted_asset_volatility / annual_volatility if annual_volatility > 0 else 1.0
+    diversification = (
+        weighted_asset_volatility / annual_volatility if annual_volatility > 0 else 1.0
+    )
     return annual_return * 100, annual_volatility * 100, sharpe, diversification
 
 

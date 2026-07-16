@@ -17,4 +17,9 @@ def calculate_trend(data: pd.DataFrame) -> dict[str, float]:
         score += 30
     if close.iloc[-1] > ema200:
         score += 15
-    return {"ema20": round(float(ema20), 2), "ema50": round(float(ema50), 2), "ema200": round(float(ema200), 2), "score": score}
+    return {
+        "ema20": round(float(ema20), 2),
+        "ema50": round(float(ema50), 2),
+        "ema200": round(float(ema200), 2),
+        "score": score,
+    }

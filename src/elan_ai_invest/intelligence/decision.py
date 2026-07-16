@@ -7,7 +7,9 @@ def make_decision(
     risk: RiskResult,
     market: MarketResult,
 ) -> Decision:
-    score = trend.score * 0.35 + momentum.score * 0.35 + risk.score * 0.20 + market.confidence * 0.10
+    score = (
+        trend.score * 0.35 + momentum.score * 0.35 + risk.score * 0.20 + market.confidence * 0.10
+    )
     if market.regime == "RISK_OFF":
         action = DecisionType.WAIT if score >= 45 else DecisionType.REDUCE
     elif score >= 82:

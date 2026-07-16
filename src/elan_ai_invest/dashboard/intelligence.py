@@ -19,7 +19,7 @@ def render_intelligence_tab(ranking):
         "trend_quality_factor",
     ]
     available = [column for column in columns if column in ranking.columns]
-    st.dataframe(ranking[available], use_container_width=True, hide_index=True)
+    st.dataframe(ranking[available], width="stretch", hide_index=True)
 
     selected = st.selectbox(
         "Explicación profesional",
@@ -62,4 +62,4 @@ def render_intelligence_tab(ranking):
         range_x=[0, 100],
         title="Descomposición multifactor",
     )
-    st.plotly_chart(chart, use_container_width=True)
+    st.plotly_chart(chart, width="stretch")

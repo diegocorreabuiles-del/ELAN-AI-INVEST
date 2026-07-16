@@ -1,6 +1,6 @@
-from .recommendations import build_recommendation
-from .ranking import rank_assets
 from .explanations import explain
+from .ranking import rank_assets
+from .recommendations import build_recommendation
 
 
 class AIAdvisor:
@@ -14,8 +14,6 @@ class AIAdvisor:
             portfolio,
         )
 
-        recommendation["explanation"] = explain(
-            recommendation
-        )
+        recommendation["explanation"] = explain(recommendation)
 
         return recommendation
