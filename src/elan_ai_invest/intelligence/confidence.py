@@ -1,9 +1,4 @@
-from .models import (
-    MarketResult,
-    MomentumResult,
-    RiskResult,
-    TrendResult,
-)
+from .models import MarketResult, MomentumResult, RiskResult, TrendResult
 
 
 def calculate_confidence(
@@ -13,12 +8,6 @@ def calculate_confidence(
     market: MarketResult,
 ) -> float:
     return round(
-        (
-            trend.confidence
-            + momentum.confidence
-            + risk.confidence
-            + market.confidence
-        )
-        / 4,
+        (trend.confidence + momentum.confidence + risk.confidence + market.confidence) / 4,
         1,
     )

@@ -1,9 +1,2 @@
-def build_report(
-    equity,
-    metrics,
-):
-
-    return {
-        "equity": equity,
-        "metrics": metrics,
-    }
+def build_report(equity, metrics):
+    return {"equity": equity, "metrics": metrics}

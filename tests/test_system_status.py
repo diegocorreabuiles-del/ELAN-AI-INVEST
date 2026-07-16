@@ -14,4 +14,4 @@ def test_system_status_reports_required_files(tmp_path: Path):
     )
     status = collect_system_status(tmp_path, Settings())
     assert status.ok
-    assert status.version == "0.7.0"
+    assert status.version == "1.2.1"
