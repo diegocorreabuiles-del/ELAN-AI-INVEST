@@ -1,9 +1,2 @@
-import pandas as pd
-
-
-def apply_costs(
-    returns: pd.Series,
-    commission=0.001,
-):
-
+def apply_costs(returns, commission: float = 0.001):
     return returns - commission

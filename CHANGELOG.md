@@ -47,3 +47,33 @@
 - Stop-loss automático y límite de posiciones.
 - Valoración, P&L e historial de operaciones.
 - Nueva pestaña Paper Trading y pruebas automáticas.
+
+## 1.0.0-alpha
+- Dashboard modular.
+- Intelligence, indicators, decision and backtesting packages.
+- Stable portfolio compatibility layer.
+- Integrated test suite.
+
+## 1.1.0 Professional
+- Nuevo Quant Factor Engine.
+- Fuerza relativa frente al benchmark.
+- Rentabilidad ajustada por riesgo y calidad de tendencia.
+- Decisiones COMPRAR/VIGILAR/NEUTRAL/EVITAR.
+- Explicaciones automáticas y pestaña Inteligencia.
+
+## 1.2.0 Institutional
+
+- Fundamental Engine con scoring de calidad, crecimiento, valoración, balance y caja.
+- Proveedor fundamental Yahoo con carga bajo demanda y caché de Streamlit.
+- Portfolio Optimizer Institutional: paridad de riesgo, mínima varianza, máxima diversificación y pesos iguales.
+- Nuevas pestañas Fundamental e Institucional.
+- Pruebas unitarias del motor fundamental y del optimizador institucional.
+
+## 1.2.1 Stability
+
+- Protección de arranque y análisis.
+- Aislamiento de errores por pestaña.
+- Healthcheck ampliado.
+- Importaciones opcionales más robustas.
+- Configuración de tests independiente de la instalación editable.
+- Sincronización de versión.

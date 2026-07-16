@@ -1,1 +1,3 @@
-__version__ = "0.7.0"
+"""ELAN Quantum investment platform."""
+
+__version__ = "1.2.1"

@@ -1,11 +1,4 @@
-from .models import (
-    Decision,
-    DecisionType,
-    MarketResult,
-    MomentumResult,
-    RiskResult,
-    TrendResult,
-)
+from .models import Decision, DecisionType, MarketResult, MomentumResult, RiskResult, TrendResult
 
 
 def make_decision(
@@ -14,44 +7,17 @@ def make_decision(
     risk: RiskResult,
     market: MarketResult,
 ) -> Decision:
-
-    score = (
-        trend.score * 0.35
-        + momentum.score * 0.35
-        + risk.score * 0.20
-        + market.confidence * 0.10
-    )
-
+    score = trend.score * 0.35 + momentum.score * 0.35 + risk.score * 0.20 + market.confidence * 0.10
     if market.regime == "RISK_OFF":
-        action = DecisionType.WAIT
-
-    elif score >= 85:
+        action = DecisionType.WAIT if score >= 45 else DecisionType.REDUCE
+    elif score >= 82:
         action = DecisionType.BUY
-
-    elif score >= 70:
+    elif score >= 68:
         action = DecisionType.HOLD
-
-    elif score >= 50:
+    elif score >= 48:
         action = DecisionType.WAIT
-
     elif score >= 30:
         action = DecisionType.REDUCE
-
     else:
         action = DecisionType.SELL
-
-    return Decision(
-        action=action,
-        score=round(score, 1),
-        confidence=round(
-            (
-                trend.confidence
-                + momentum.confidence
-                + risk.confidence
-                + market.confidence
-            )
-            / 4,
-            1,
-        ),
-        explanation="Pendiente del Explain Engine",
-    )
+    return Decision(action=action, score=round(score, 1), confidence=0.0, explanation="")

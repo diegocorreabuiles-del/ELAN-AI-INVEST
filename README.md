@@ -1,33 +1,31 @@
-# ELAN Quantum v0.7
+# ELAN Quantum v1.2 Institutional
 
-Plataforma educativa de análisis cuantitativo, riesgo, cartera y paper trading.
+Plataforma local de análisis cuantitativo, fundamental, riesgo, cartera, paper trading y backtesting.
 
-## Primera instalación
+## Novedades v1.2
 
-```powershell
-.\install.bat
-```
+- Fundamental Engine con score 0-100.
+- Análisis de calidad, crecimiento, valoración, balance y flujo de caja.
+- Portfolio Optimizer Institutional con cuatro métodos de asignación.
+- Dashboard modular con pestañas Fundamental e Institucional.
+- 25 pruebas automáticas.
 
-## Iniciar
-
-```powershell
-.\run.bat
-```
-
-## Actualizar dependencias y probar
+## Instalar o actualizar en Windows
 
 ```powershell
 .\update.bat
 ```
 
-## Flujo Git
+## Ejecutar
 
 ```powershell
-git add .
-git commit -m "Descripción"
-git push origin nombre-de-rama
+.\run.bat
 ```
 
-La hoja de ruta completa está en `MASTER_PLAN.md`.
+## Pruebas
 
-> Simulación educativa. No es asesoramiento financiero ni conecta con un broker real.
+```powershell
+pytest
+```
+
+ELAN Quantum es una herramienta educativa y de simulación. No constituye asesoramiento financiero ni garantiza resultados.
