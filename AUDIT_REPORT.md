@@ -1,5 +1,56 @@
 # Auditoría integral de ELAN Quantum
 
+> Actualización v1.2.2 Core Cleanup (16 de julio de 2026): la sección siguiente reemplaza el estado operativo del baseline; el resto del documento se conserva como evidencia “antes”.
+
+## Estado después de la Fase 1
+
+La rama local `feature/core-cleanup` parte del commit de respaldo `942640a`. El P0 financiero se corrigió en `a9717aa` y la consolidación inicial del core en `a910738`. No se hizo push, merge ni tag.
+
+| Hallazgo del baseline | Antes | Después v1.2.2 |
+|---|---|---|
+| TD-001 Ruff | Fallaba | Pasa en todo el árbol |
+| TD-002 Black | Rechazaba 36 archivos | Pasa en 107 archivos |
+| TD-003 `max_weight` | Podía incumplirse silenciosamente | Cap garantizado o error de inviabilidad explícito; regresión parametrizada |
+| TD-004 trazabilidad Git | Trabajo mezclado y no consolidado | Baseline preservado y commits temáticos locales |
+| TD-005/006 Portfolio | Colisión `portfolio.py`/`portfolio/` | Una API canónica en `portfolio.engine`; anterior preservada en `legacy/` |
+| TD-007 pipeline | Dos pipelines sin autoridad clara | `CoreEngine` canónico; `InvestmentPipeline` congelado como legacy con compatibilidad temporal |
+| TD-008 backtest | UI y paquete usaban rutas distintas | UI y adaptadores delegan en `BacktestEngine` |
+| TD-012 configuración | Valores relevantes ignorados | Mercado, cartera, backtest y flag de paper conectados |
+| TD-024 Streamlit | API de ancho obsoleta | Reemplazada; pestañas costosas condicionales y cachés acotadas |
+| TD-028/029 CI/EOL | Sin Python 3.14 ni política EOL | Matriz 3.11–3.14 y `.gitattributes` |
+
+El inventario canónico y el flujo actualizado están en `ELAN_ARCHITECTURE.md`. Se preservan 85 submódulos importables, incluidos los adaptadores y módulos legacy; el import-all de esta rama termina con 0 fallos.
+
+### Resultado de validación de esta rama
+
+- `pytest`: 46 pruebas tras añadir las regresiones de estabilización.
+- `ruff check .`: correcto.
+- `black --check .`: correcto.
+- `python scripts/healthcheck.py`: correcto, versión 1.2.2.
+- Import-all: 85 submódulos, 0 fallos.
+- Streamlit temporal: `/_stcore/health` devuelve HTTP 200 y `ok`.
+
+La validación usa `PYTHONPATH=src`: el `.venv` recibido contiene un editable 1.2.1 dirigido a `C:\Users\elanv\Desktop\ELAN AI INVESTMENT`. No se modificó `.venv` para respetar la salvaguarda solicitada.
+
+### P1 que permanecen abiertos
+
+- Integrar y probar costes, slippage y metodología de benchmark del backtest.
+- Hacer atómicas las operaciones SQLite de paper trading y probar concurrencia/rollback.
+- Añadir timeout, retry/backoff y caché segura al proveedor de mercado.
+- Incorporar lockfile, cobertura cuantificada y type checking gradual.
+- Completar la matriz de todos los campos de configuración, incluido el límite de volatilidad de cartera.
+- Retirar legacy solo tras un ciclo de deprecación y verificación de consumidores externos.
+
+### Orden exacto de corrección restante
+
+1. Backtest: costes, slippage, benchmark y pruebas anti-look-ahead.
+2. Paper trading: transacciones atómicas, snapshots y stop-loss explícito.
+3. Cliente de mercado: timeout, retry/backoff, caché segura y dobles de prueba.
+4. Configuración: cubrir cada campo con un cambio observable.
+5. Calidad: cobertura, tipos y dependencias reproducibles.
+6. Seguridad/UI: evitar excepciones internas y pickle no confiable.
+7. Solo después: retirar adaptadores legacy en commits dedicados.
+
 Fecha: 16 de julio de 2026  
 Proyecto auditado: contenido actual de `ELAN AI INVESTMENT.zip`, extraído sin eliminar archivos  
 Rama observada: `feature/dashboard-integration`  
