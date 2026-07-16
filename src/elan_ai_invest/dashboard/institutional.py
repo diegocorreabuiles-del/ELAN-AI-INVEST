@@ -6,7 +6,6 @@ import streamlit as st
 
 from elan_ai_invest.institutional import optimize_portfolio
 
-
 _METHODS = {
     "Paridad de riesgo": "risk_parity",
     "Mínima varianza": "minimum_variance",
@@ -52,10 +51,10 @@ def render_institutional_tab(prices: pd.DataFrame, capital: float):
 
     st.dataframe(
         allocation[["symbol", "weight_pct", "amount_eur"]],
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
     st.plotly_chart(
         px.pie(allocation, names="symbol", values="weight_pct", title=method_label),
-        use_container_width=True,
+        width="stretch",
     )

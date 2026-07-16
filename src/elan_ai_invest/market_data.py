@@ -30,6 +30,8 @@ def _extract_close(frame: pd.DataFrame, symbol: str) -> pd.Series:
 def download_adjusted_close(
     symbols: Iterable[str],
     period: str = "2y",
+    interval: str = "1d",
+    minimum_history: int = 60,
 ) -> DownloadResult:
     try:
         import yfinance as yf
@@ -46,14 +48,16 @@ def download_adjusted_close(
             frame = yf.download(
                 symbol,
                 period=period,
-                interval="1d",
+                interval=interval,
                 auto_adjust=True,
                 progress=False,
                 threads=False,
             )
             close = _extract_close(frame, symbol).rename(symbol).dropna()
-            if len(close) < 60:
-                raise ValueError("historial insuficiente")
+            if len(close) < minimum_history:
+                raise ValueError(
+                    f"historial insuficiente: {len(close)} < {minimum_history} sesiones"
+                )
             series.append(close)
         except Exception as exc:
             errors[symbol] = str(exc)

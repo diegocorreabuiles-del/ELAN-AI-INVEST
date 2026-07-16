@@ -1,3 +1,5 @@
+"""Legacy market pipeline kept for ``InvestmentPipeline`` compatibility."""
+
 from .providers import ProviderManager
 from .validator import validate_market_data
 

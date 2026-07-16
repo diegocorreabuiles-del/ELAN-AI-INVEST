@@ -12,7 +12,6 @@ from .risk import render_risk_tab
 from .safe import safe_render
 from .system import render_system_tab
 
-
 __all__ = [
     "configure_page",
     "render_backtesting_tab",

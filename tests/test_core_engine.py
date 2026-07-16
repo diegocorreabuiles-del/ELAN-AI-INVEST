@@ -10,10 +10,22 @@ from elan_ai_invest.providers.base import DownloadResult, MarketDataProvider
 
 
 class FakeProvider(MarketDataProvider):
-    def download_prices(self, symbols, period):
+    def __init__(self):
+        self.request = None
+
+    def download_prices(self, symbols, period, interval="1d", minimum_history=60):
+        self.request = {
+            "symbols": list(symbols),
+            "period": period,
+            "interval": interval,
+            "minimum_history": minimum_history,
+        }
         idx = pd.date_range("2024-01-01", periods=260, freq="B")
         prices = pd.DataFrame(
-            {symbol: np.linspace(100, 150 + i, len(idx)) for i, symbol in enumerate(symbols)},
+            {
+                symbol: np.linspace(100, 150 + i, len(idx))
+                for i, symbol in enumerate(self.request["symbols"])
+            },
             index=idx,
         )
         return DownloadResult(prices=prices, errors={})
@@ -28,8 +40,15 @@ class NullLogger:
 
 
 def test_core_engine_orchestrates_analysis(tmp_path: Path):
-    engine = CoreEngine(Settings(), FakeProvider(), tmp_path, NullLogger())
+    provider = FakeProvider()
+    engine = CoreEngine(Settings(), provider, tmp_path, NullLogger())
     result = engine.run_analysis(AnalysisRequest(symbols=["SPY", "QQQ"], period="2y"))
     assert result.successful_symbols == 2
     assert not result.ranking.empty
     assert result.market_regime in {"Alcista", "Mixto", "Defensivo"}
+    assert provider.request == {
+        "symbols": ["SPY", "QQQ"],
+        "period": "2y",
+        "interval": "1d",
+        "minimum_history": 210,
+    }

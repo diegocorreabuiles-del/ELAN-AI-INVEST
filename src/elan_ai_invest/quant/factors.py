@@ -57,7 +57,9 @@ def calculate_factor_table(
         ret_12m = _safe_return(series, 252)
         volatility = float(series.pct_change().dropna().tail(63).std() * np.sqrt(252))
         downside = series.pct_change().dropna().tail(126)
-        downside_vol = float(downside[downside < 0].std() * np.sqrt(252)) if (downside < 0).any() else 0.0
+        downside_vol = (
+            float(downside[downside < 0].std() * np.sqrt(252)) if (downside < 0).any() else 0.0
+        )
         max_drawdown = float((series / series.cummax() - 1.0).min())
 
         trend_score = 0.0

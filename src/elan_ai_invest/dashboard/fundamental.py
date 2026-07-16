@@ -7,7 +7,7 @@ import streamlit as st
 from elan_ai_invest.fundamental import YahooFundamentalProvider, analyze_fundamentals
 
 
-@st.cache_data(ttl=21600, show_spinner=False)
+@st.cache_data(ttl=21600, max_entries=50, show_spinner=False)
 def _load_fundamental(symbol: str):
     snapshot = YahooFundamentalProvider().get_snapshot(symbol)
     return analyze_fundamentals(snapshot)
@@ -73,7 +73,7 @@ def render_fundamental_tab(ranking: pd.DataFrame):
             range_x=[0, 100],
             title="Descomposición fundamental",
         ),
-        use_container_width=True,
+        width="stretch",
     )
 
     metrics = pd.DataFrame(
@@ -97,4 +97,4 @@ def render_fundamental_tab(ranking: pd.DataFrame):
         ],
         columns=["Métrica", "Valor"],
     )
-    st.dataframe(metrics, use_container_width=True, hide_index=True)
+    st.dataframe(metrics, width="stretch", hide_index=True)

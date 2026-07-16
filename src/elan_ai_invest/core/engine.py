@@ -37,7 +37,12 @@ class CoreEngine:
         self.logger.info(
             "Inicio de análisis | activos=%s | periodo=%s", len(symbols), request.period
         )
-        downloaded = self.provider.download_prices(symbols=symbols, period=request.period)
+        downloaded = self.provider.download_prices(
+            symbols=symbols,
+            period=request.period,
+            interval=self.settings.market.interval,
+            minimum_history=self.settings.market.minimum_history,
+        )
         if downloaded.prices.empty:
             self.logger.error("El proveedor no devolvió datos válidos")
             raise RuntimeError("No se pudieron descargar datos válidos")

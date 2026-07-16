@@ -25,10 +25,7 @@ def configure_page() -> None:
 
 def render_header(version: str) -> None:
     st.title("ELAN Quantum")
-    st.caption(
-        f"AI Investment Platform · v{version} · "
-        "simulación, no asesoramiento financiero"
-    )
+    st.caption(f"AI Investment Platform · v{version} · " "simulación, no asesoramiento financiero")
 
 
 def render_main_metrics(
