@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from math import ceil
 
 import numpy as np
 import pandas as pd
@@ -22,21 +23,45 @@ def _clean_returns(prices: pd.DataFrame) -> pd.DataFrame:
 
 
 def _normalise(weights: np.ndarray, max_weight: float) -> np.ndarray:
-    weights = np.clip(np.asarray(weights, dtype=float), 0, max_weight)
-    for _ in range(20):
-        total = weights.sum()
-        if total <= 0:
-            weights = np.full_like(weights, 1 / len(weights))
+    raw = np.maximum(np.asarray(weights, dtype=float), 0.0)
+    asset_count = len(raw)
+    if asset_count == 0:
+        raise ValueError("No hay activos para normalizar")
+    if not 0 < max_weight <= 1:
+        raise ValueError("max_weight debe estar entre 0 y 1")
+    if asset_count * max_weight < 1 - 1e-12:
+        minimum_assets = ceil(1 / max_weight)
+        raise ValueError(
+            "Restricción max_weight inviable: "
+            f"{asset_count} activos no pueden sumar el 100% con un máximo de "
+            f"{max_weight:.2%}; se necesitan al menos {minimum_assets} activos"
+        )
+
+    result = np.zeros(asset_count, dtype=float)
+    active = np.ones(asset_count, dtype=bool)
+    remaining = 1.0
+
+    while active.any():
+        active_raw = raw[active]
+        if active_raw.sum() <= 0:
+            allocation = np.full(active.sum(), remaining / active.sum())
         else:
-            weights = weights / total
-        excess = np.maximum(weights - max_weight, 0)
-        if excess.sum() < 1e-10:
+            allocation = remaining * active_raw / active_raw.sum()
+
+        capped = allocation > max_weight + 1e-12
+        if not capped.any():
+            result[active] = allocation
             break
-        weights = np.minimum(weights, max_weight)
-        room = np.maximum(max_weight - weights, 0)
-        if room.sum() > 0:
-            weights += excess.sum() * room / room.sum()
-    return weights / weights.sum()
+
+        active_indexes = np.flatnonzero(active)
+        capped_indexes = active_indexes[capped]
+        result[capped_indexes] = max_weight
+        active[capped_indexes] = False
+        remaining = 1.0 - float(result.sum())
+
+    if abs(float(result.sum()) - 1.0) > 1e-9 or float(result.max()) > max_weight + 1e-9:
+        raise RuntimeError("No se pudo construir una cartera que respete max_weight")
+    return result
 
 
 def _statistics(returns: pd.DataFrame, weights: np.ndarray) -> tuple[float, float, float, float]:
