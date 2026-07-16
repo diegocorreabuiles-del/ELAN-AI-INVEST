@@ -1,11 +1,12 @@
 import plotly.express as px
 import streamlit as st
 
-from elan_ai_invest.backtesting import momentum_backtest, performance_stats
+from elan_ai_invest.backtesting import BacktestEngine
 from elan_ai_invest.core.config import BacktestConfig
 
 
 def render_backtesting_tab(prices, config: BacktestConfig):
+    engine = BacktestEngine()
     a, b, c = st.columns(3)
     lookback_options = sorted({21, 63, 126, config.lookback})
     lookback = a.selectbox(
@@ -19,11 +20,11 @@ def render_backtesting_tab(prices, config: BacktestConfig):
         rebalance_options,
         index=rebalance_options.index(config.rebalance_days),
     )
-    bt = momentum_backtest(prices, lookback=lookback, top_n=top_n, rebalance=rebalance)
+    bt = engine.run_momentum(prices, lookback=lookback, top_n=top_n, rebalance=rebalance)
     if bt.empty:
         st.info("No hay datos suficientes para el backtest.")
         return
-    stats = performance_stats(bt["strategy"])
+    stats = engine.performance_stats(bt["strategy"])
     cols = st.columns(4)
     cols[0].metric("Rentabilidad", f"{stats['total_return_pct']:.1f}%")
     cols[1].metric("CAGR", f"{stats['cagr_pct']:.1f}%")
