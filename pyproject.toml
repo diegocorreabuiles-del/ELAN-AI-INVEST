@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "elan-ai-invest"
-version = "0.7.0"
+version = "1.2.1"
 description = "Plataforma profesional de analisis cuantitativo y gestion de inversiones."
 readme = "README.md"
 requires-python = ">=3.11"

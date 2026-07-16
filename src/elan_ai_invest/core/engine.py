@@ -42,7 +42,11 @@ class CoreEngine:
             self.logger.error("El proveedor no devolvió datos válidos")
             raise RuntimeError("No se pudieron descargar datos válidos")
 
-        ranking = score_assets(downloaded.prices, self.settings.scoring)
+        ranking = score_assets(
+            downloaded.prices,
+            self.settings.scoring,
+            benchmark=self.settings.market.benchmark,
+        )
         breadth = float(ranking["above_ma200"].mean() * 100) if not ranking.empty else 0.0
         avg_score = float(ranking["score"].mean()) if not ranking.empty else 0.0
         regime = self._detect_regime(ranking, breadth, avg_score)
