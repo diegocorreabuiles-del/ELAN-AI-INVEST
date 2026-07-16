@@ -1,5 +1,7 @@
 # Plan de release propuesto — ELAN Quantum v1.3
 
+> v1.3 sigue sin crearse. La rama actual prepara exclusivamente v1.2.2 Core Cleanup. Los gates resueltos aquí son prerrequisitos; los P1 restantes de backtest, paper trading, mercado, reproducibilidad y seguridad deben completarse antes de reconsiderar v1.3.
+
 Estado: **propuesta; v1.3 no ha sido creada**.
 
 ## Objetivo
@@ -126,4 +128,3 @@ No publicar v1.3 si ocurre cualquiera de estos puntos:
 ## Entregable final esperado
 
 Un ZIP o paquete limpio con código, configuración de ejemplo, documentación, lockfile y scripts; sin `.git`, `.venv`, logs ni bases de usuario. Debe poder instalarse desde cero, ejecutar healthcheck,  tests y Streamlit con resultados reproducibles.
-

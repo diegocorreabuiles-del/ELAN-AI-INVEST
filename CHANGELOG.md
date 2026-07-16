@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.2 — Core Cleanup
+
+- Corregido el cumplimiento de `max_weight` y los casos inviables del optimizador institucional.
+- Seleccionados `CoreEngine`, `portfolio.engine` y `BacktestEngine` como implementaciones canónicas.
+- Preservadas las implementaciones anteriores bajo `legacy/` y mediante adaptadores.
+- Conectada configuración efectiva de mercado, cartera, backtest y paper trading.
+- CI, Ruff, Black, Python 3.14 y política LF/CRLF estabilizados.
+- Detalle completo en `CHANGELOG_V1_2_2.md`.
+
 ## 0.7.0
 - Scripts únicos: `install.bat`, `update.bat` y `run.bat`.
 - Añadido `MASTER_PLAN.md` como hoja de ruta principal.
