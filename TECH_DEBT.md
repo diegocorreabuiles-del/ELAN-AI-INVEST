@@ -1,5 +1,7 @@
 # Deuda técnica de ELAN Quantum
 
+> Estado v1.2.2: TD-001, TD-002, TD-003, TD-004, TD-005, TD-006 y TD-008 quedan resueltos en Fase 1. TD-007 queda mitigado con `CoreEngine` canónico y legacy congelado. TD-012, TD-024, TD-028, TD-029 y TD-034 quedan parcial o totalmente tratados según `AUDIT_REPORT.md`. El resto permanece abierto; no debe interpretarse como incluido en v1.2.2.
+
 Escala: P0 bloquea/rompe; P1 importante; P2 mejora; P3 futuro.
 
 ## Registro de hallazgos
@@ -77,4 +79,3 @@ Antes de retirar cualquiera: buscar consumidores externos, añadir aviso de depr
 - Streamlit AppTest con proveedor falso y sin red.
 - Yahoo: timeout, errores parciales, columnas MultiIndex y rate limiting con mocks.
 - Seguridad: no exponer detalles y no cargar pickle no confiable.
-

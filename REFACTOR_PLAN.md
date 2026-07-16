@@ -1,5 +1,19 @@
 # Plan de refactorización seguro y reversible
 
+## Progreso v1.2.2 Core Cleanup
+
+| Fase | Estado | Evidencia |
+|---|---|---|
+| 0 — baseline | Completada | Rama `feature/core-cleanup` y commit de respaldo `942640a` |
+| 1 — P0 | Completada | Cap institucional corregido; pytest, Ruff y Black verdes |
+| 2 — cartera | Completada para estabilización | `portfolio.engine` canónico, legacy preservado, tests de invariantes/import |
+| 3 — pipeline/backtest | Completada para selección canónica | `CoreEngine` y `BacktestEngine`; adaptadores temporales |
+| 4 — configuración | Parcial | Mercado, cartera, backtest, paper y versión conectados; quedan campos secundarios |
+| 5 — Streamlit | Parcial | Render condicional, cachés acotadas y API de ancho actualizada; falta AppTest y medición |
+| 6–8 | Pendientes | Fuera del alcance de v1.2.2 |
+
+No se retirará legacy en v1.2.2. La siguiente fase debe empezar por los P1 abiertos enumerados en `AUDIT_REPORT.md`, manteniendo un commit reversible por riesgo.
+
 Este plan no autoriza una refactorización inmediata. Cada fase debe ejecutarse en un commit o PR separado, con tests antes y después. No se borra código en las primeras fases.
 
 ## Reglas de ejecución
@@ -150,4 +164,3 @@ prueba de regresión -> cambio mínimo -> pytest focalizado -> pytest completo
 - Usar datos de mercado en vivo como única prueba.
 - Activar trading real o almacenar credenciales en el repositorio.
 - Reescribir historia Git, hacer merge o push sin autorización explícita.
-

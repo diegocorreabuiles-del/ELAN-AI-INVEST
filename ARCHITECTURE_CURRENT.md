@@ -1,5 +1,7 @@
 # Arquitectura actual de ELAN Quantum
 
+> Documento histórico: fotografía anterior a v1.2.2 Core Cleanup. La arquitectura canónica vigente está en `ELAN_ARCHITECTURE.md`; las colisiones y flujos paralelos descritos abajo son el estado “antes”.
+
 Este documento describe el sistema **tal como existe**, no la arquitectura objetivo.
 
 ## Vista general
@@ -155,4 +157,3 @@ Python resuelve el segundo. El primero no es accesible con el nombre público es
 ## Arquitectura verificable frente a arquitectura declarada
 
 `docs/architecture.md` documenta una versión anterior centrada en Core, providers, scoring y storage. No recoge Quant, Fundamental, Institutional, los dos pipelines, la colisión de cartera, los dos backtests ni la modularización actual del dashboard. Este archivo debe considerarse la fotografía “as-is” hasta que se ejecute el plan de refactorización.
-
