@@ -24,3 +24,18 @@ def test_portfolio_package_resolves_to_the_canonical_engine():
 
 def test_backtest_compatibility_path_delegates_to_canonical_package():
     assert compatibility_momentum_backtest is momentum_backtest
+
+
+def test_momentum_adapter_delegates_to_canonical_backtest_engine():
+    import pandas as pd
+
+    from elan_ai_invest.backtesting import BacktestEngine
+
+    prices = pd.DataFrame(
+        {"AAA": range(100, 200), "BBB": range(200, 300)},
+        index=pd.date_range("2025-01-01", periods=100, freq="D"),
+    )
+
+    expected = BacktestEngine().run_momentum(prices, lookback=21, top_n=1, rebalance=5)
+    actual = momentum_backtest(prices, lookback=21, top_n=1, rebalance=5)
+    pd.testing.assert_frame_equal(actual, expected)
