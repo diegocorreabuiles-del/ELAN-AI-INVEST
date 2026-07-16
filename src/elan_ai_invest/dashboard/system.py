@@ -10,5 +10,5 @@ def render_system_tab(root, settings):
     cols[1].metric("Python", status.python_version)
     cols[2].metric("Proveedor", status.market_provider)
     cols[3].metric("Entorno", status.environment)
-    st.dataframe(status.as_dataframe(), use_container_width=True, hide_index=True)
+    st.dataframe(status.as_dataframe(), width="stretch", hide_index=True)
     st.success("Sistema listo.") if status.ok else st.warning("Hay comprobaciones pendientes.")

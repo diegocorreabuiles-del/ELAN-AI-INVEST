@@ -39,9 +39,7 @@ try:
     required_columns = {"symbol", "name"}
     missing_columns = required_columns.difference(watchlist.columns)
     if missing_columns:
-        raise ValueError(
-            "Faltan columnas en watchlist.csv: " + ", ".join(sorted(missing_columns))
-        )
+        raise ValueError("Faltan columnas en watchlist.csv: " + ", ".join(sorted(missing_columns)))
 except Exception as exc:
     st.error("ELAN Quantum no pudo iniciar correctamente.")
     st.info("Ejecuta update.bat y vuelve a abrir la aplicación.")
@@ -59,17 +57,24 @@ with st.sidebar:
         watchlist["symbol"].tolist(),
         default=watchlist["symbol"].tolist(),
     )
-    period = st.selectbox("Historial", ["1y", "2y", "5y"], index=1)
+    period_options = ["1y", "2y", "5y"]
+    if ENGINE.settings.market.period not in period_options:
+        period_options.append(ENGINE.settings.market.period)
+    period = st.selectbox(
+        "Historial",
+        period_options,
+        index=period_options.index(ENGINE.settings.market.period),
+    )
     capital = st.number_input(
         "Capital simulado (€)",
         min_value=1_000.0,
-        value=100_000.0,
+        value=float(ENGINE.settings.portfolio.initial_capital),
         step=5_000.0,
     )
     refresh = st.button(
         "Actualizar mercado",
         type="primary",
-        use_container_width=True,
+        width="stretch",
     )
 
 if not selected:
@@ -77,7 +82,7 @@ if not selected:
     st.stop()
 
 
-@st.cache_data(ttl=3600, show_spinner=False)
+@st.cache_data(ttl=3600, max_entries=20, show_spinner=False)
 def run_analysis(symbols: tuple[str, ...], selected_period: str):
     request = AnalysisRequest(
         symbols=list(symbols),
@@ -110,14 +115,6 @@ if prices.empty or ranking.empty:
     st.stop()
 
 ranking["name"] = ranking["symbol"].map(name_map).fillna(ranking["symbol"])
-
-paper_engine = PaperTradingEngine(
-    ROOT / ENGINE.settings.paper_trading.database_path,
-    initial_capital=ENGINE.settings.paper_trading.initial_capital,
-    commission_pct=ENGINE.settings.paper_trading.commission_pct,
-    stop_loss_pct=ENGINE.settings.paper_trading.stop_loss_pct,
-    max_open_positions=ENGINE.settings.paper_trading.max_open_positions,
-)
 
 latest_prices = {
     symbol: float(prices[symbol].dropna().iloc[-1])
@@ -152,46 +149,67 @@ tabs = st.tabs(
         "Backtesting",
         "Histórico",
         "Sistema",
-    ]
+    ],
+    on_change="rerun",
 )
 
-with tabs[0]:
-    safe_render("Mercado", render_market_tab, ranking)
-with tabs[1]:
-    safe_render("Inteligencia", render_intelligence_tab, ranking)
-with tabs[2]:
-    safe_render("Fundamental", render_fundamental_tab, ranking)
-with tabs[3]:
-    safe_render("Ranking", render_ranking_tab, ranking, prices)
-with tabs[4]:
-    safe_render("Riesgo", render_risk_tab, risk_report, ranking, capital, ENGINE.settings)
-with tabs[5]:
-    safe_render(
-        "Cartera",
-        render_portfolio_tab,
-        ranking,
-        risk_report,
-        prices,
-        capital,
-        ENGINE.settings,
-    )
-with tabs[6]:
-    safe_render("Institucional", render_institutional_tab, prices, capital)
-with tabs[7]:
-    safe_render(
-        "Paper Trading",
-        render_paper_trading_tab,
-        paper_engine,
-        latest_prices,
-        selected,
-        ENGINE.settings,
-    )
-with tabs[8]:
-    safe_render("Backtesting", render_backtesting_tab, prices)
-with tabs[9]:
-    safe_render("Histórico", render_history_tab, ENGINE, DB_PATH, selected, period)
-with tabs[10]:
-    safe_render("Sistema", render_system_tab, ROOT, ENGINE.settings)
+if tabs[0].open:
+    with tabs[0]:
+        safe_render("Mercado", render_market_tab, ranking)
+if tabs[1].open:
+    with tabs[1]:
+        safe_render("Inteligencia", render_intelligence_tab, ranking)
+if tabs[2].open:
+    with tabs[2]:
+        safe_render("Fundamental", render_fundamental_tab, ranking)
+if tabs[3].open:
+    with tabs[3]:
+        safe_render("Ranking", render_ranking_tab, ranking, prices)
+if tabs[4].open:
+    with tabs[4]:
+        safe_render("Riesgo", render_risk_tab, risk_report, ranking, capital, ENGINE.settings)
+if tabs[5].open:
+    with tabs[5]:
+        safe_render(
+            "Cartera",
+            render_portfolio_tab,
+            ranking,
+            risk_report,
+            prices,
+            capital,
+            ENGINE.settings,
+        )
+if tabs[6].open:
+    with tabs[6]:
+        safe_render("Institucional", render_institutional_tab, prices, capital)
+if tabs[7].open:
+    with tabs[7]:
+        paper_engine = None
+        if ENGINE.settings.paper_trading.enabled:
+            paper_engine = PaperTradingEngine(
+                ROOT / ENGINE.settings.paper_trading.database_path,
+                initial_capital=ENGINE.settings.paper_trading.initial_capital,
+                commission_pct=ENGINE.settings.paper_trading.commission_pct,
+                stop_loss_pct=ENGINE.settings.paper_trading.stop_loss_pct,
+                max_open_positions=ENGINE.settings.paper_trading.max_open_positions,
+            )
+        safe_render(
+            "Paper Trading",
+            render_paper_trading_tab,
+            paper_engine,
+            latest_prices,
+            selected,
+            ENGINE.settings,
+        )
+if tabs[8].open:
+    with tabs[8]:
+        safe_render("Backtesting", render_backtesting_tab, prices, ENGINE.settings.backtest)
+if tabs[9].open:
+    with tabs[9]:
+        safe_render("Histórico", render_history_tab, ENGINE, DB_PATH, selected, period)
+if tabs[10].open:
+    with tabs[10]:
+        safe_render("Sistema", render_system_tab, ROOT, ENGINE.settings)
 
 if analysis.errors:
     with st.expander("Errores parciales de descarga"):

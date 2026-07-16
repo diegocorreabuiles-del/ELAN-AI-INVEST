@@ -27,11 +27,24 @@ def build_portfolio(
 ) -> PortfolioPlan:
     if capital <= 0:
         raise ValueError("El capital debe ser mayor que cero")
+    if max_positions <= 0:
+        raise ValueError("max_positions debe ser mayor que cero")
+    if not 0 < max_position_pct <= 100:
+        raise ValueError("max_position_pct debe estar entre 0 y 100")
+    if not 0 <= min_cash_pct <= 100:
+        raise ValueError("min_cash_pct debe estar entre 0 y 100")
     if ranking.empty or asset_risk.empty:
         raise ValueError("Se necesitan ranking y riesgo por activo")
 
+    ranking = ranking.copy()
+    if "signal" not in ranking.columns:
+        ranking["signal"] = "Neutral"
+    risk_data = asset_risk.copy()
+    if "risk_contribution_pct" not in risk_data.columns:
+        risk_data["risk_contribution_pct"] = 0.0
+
     merged = ranking.merge(
-        asset_risk[["symbol", "volatility_pct", "risk_contribution_pct"]],
+        risk_data[["symbol", "volatility_pct", "risk_contribution_pct"]],
         on="symbol",
         how="inner",
     )
@@ -127,5 +140,5 @@ def portfolio_equity_curve(
     if "SPY" in prices.columns:
         spy = prices["SPY"].reindex(result.index).ffill().dropna()
         if not spy.empty:
-            result["benchmark_spy"] = initial_capital * spy / spy.iloc[0]
+            result["SPY"] = initial_capital * spy / spy.iloc[0]
     return result.dropna(how="all")

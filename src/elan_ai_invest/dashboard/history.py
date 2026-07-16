@@ -6,7 +6,13 @@ from elan_ai_invest.storage import read_history
 
 def render_history_tab(engine, db_path, selected, period):
     if st.button("Guardar fotografía actual"):
-        engine.run_analysis(AnalysisRequest(symbols=list(selected), period=period, save_snapshot=True))
+        engine.run_analysis(
+            AnalysisRequest(symbols=list(selected), period=period, save_snapshot=True)
+        )
         st.success("Fotografía guardada.")
     history = read_history(db_path)
-    st.info("Sin histórico todavía.") if history.empty else st.dataframe(history, use_container_width=True, hide_index=True)
+    (
+        st.info("Sin histórico todavía.")
+        if history.empty
+        else st.dataframe(history, width="stretch", hide_index=True)
+    )

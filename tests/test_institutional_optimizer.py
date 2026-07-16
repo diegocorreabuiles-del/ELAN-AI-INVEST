@@ -40,9 +40,7 @@ def test_infeasible_max_weight_fails_clearly(asset_count: int, max_weight: float
     [(1, 1.0), (3, 0.34), (4, 0.25), (10, 0.1), (12, 0.1)],
 )
 def test_feasible_max_weight_is_always_respected(asset_count: int, max_weight: float):
-    result = optimize_portfolio(
-        _prices(asset_count), method="equal_weight", max_weight=max_weight
-    )
+    result = optimize_portfolio(_prices(asset_count), method="equal_weight", max_weight=max_weight)
 
     assert abs(result.weights.sum() - 1) < 1e-9
     assert result.weights.max() <= max_weight + 1e-9

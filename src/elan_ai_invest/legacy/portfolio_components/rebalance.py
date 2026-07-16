@@ -7,8 +7,6 @@ def rebalance(portfolio: pd.DataFrame, target_weights: dict):
 
     portfolio["target_weight"] = portfolio["symbol"].map(target_weights)
 
-    portfolio["rebalance"] = (
-        portfolio["target_weight"] - portfolio["weight"]
-    )
+    portfolio["rebalance"] = portfolio["target_weight"] - portfolio["weight"]
 
     return portfolio

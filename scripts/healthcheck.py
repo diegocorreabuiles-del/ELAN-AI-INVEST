@@ -6,7 +6,6 @@ from pathlib import Path
 from elan_ai_invest.core.config import load_settings
 from elan_ai_invest.system_status import collect_system_status
 
-
 REQUIRED_MODULES = (
     "pandas",
     "numpy",

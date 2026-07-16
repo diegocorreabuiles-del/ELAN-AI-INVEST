@@ -99,11 +99,7 @@ def analyze_fundamentals(snapshot: FundamentalSnapshot) -> FundamentalAnalysis:
     balance = _balance_sheet(snapshot)
     cash_flow = _cash_flow(snapshot)
     score = _bounded(
-        quality * 0.28
-        + growth * 0.22
-        + valuation * 0.22
-        + balance * 0.14
-        + cash_flow * 0.14
+        quality * 0.28 + growth * 0.22 + valuation * 0.22 + balance * 0.14 + cash_flow * 0.14
     )
 
     values = list(snapshot.as_dict().values())[4:]
@@ -138,7 +134,9 @@ def analyze_fundamentals(snapshot: FundamentalSnapshot) -> FundamentalAnalysis:
     if growth < 40:
         risks.append("crecimiento insuficiente")
 
-    explanation = "Fortalezas: " + (", ".join(strengths) if strengths else "sin ventaja clara") + "."
+    explanation = (
+        "Fortalezas: " + (", ".join(strengths) if strengths else "sin ventaja clara") + "."
+    )
     if risks:
         explanation += " Riesgos: " + ", ".join(risks) + "."
 

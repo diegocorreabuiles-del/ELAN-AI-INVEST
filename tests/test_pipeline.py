@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from elan_ai_invest.core.pipeline import InvestmentPipeline
 
@@ -21,7 +22,8 @@ class FakeProvider:
 
 
 def test_pipeline_analyzes_symbol():
-    pipeline = InvestmentPipeline(provider=FakeProvider())
+    with pytest.warns(DeprecationWarning, match="CoreEngine"):
+        pipeline = InvestmentPipeline(provider=FakeProvider())
 
     result = pipeline.analyze_symbol("TEST")
 
@@ -37,11 +39,10 @@ def test_pipeline_analyzes_symbol():
 
 
 def test_pipeline_analyzes_universe():
-    pipeline = InvestmentPipeline(provider=FakeProvider())
+    with pytest.warns(DeprecationWarning, match="CoreEngine"):
+        pipeline = InvestmentPipeline(provider=FakeProvider())
 
-    ranking = pipeline.analyze_universe(
-        ["AAA", "BBB", "CCC"]
-    )
+    ranking = pipeline.analyze_universe(["AAA", "BBB", "CCC"])
 
     assert len(ranking) == 3
     assert "score" in ranking.columns

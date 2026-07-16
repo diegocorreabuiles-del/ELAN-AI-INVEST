@@ -4,7 +4,6 @@ from typing import Any
 
 from .models import FundamentalSnapshot
 
-
 _FIELD_MAP = {
     "sector": "sector",
     "industry": "industry",
@@ -48,10 +47,7 @@ class YahooFundamentalProvider:
         except Exception:
             info = ticker.info
 
-        values = {
-            field: _value(info, source)
-            for field, source in _FIELD_MAP.items()
-        }
+        values = {field: _value(info, source) for field, source in _FIELD_MAP.items()}
 
         return FundamentalSnapshot(
             symbol=symbol.upper(),
