@@ -31,3 +31,4 @@ jobs:
       - run: python -m black --check .
       - run: python -m pytest
       - run: python scripts/build_distribution.py --output dist/elan-quantum-ci.zip
+      - run: python scripts/build_distribution.py --verify dist/elan-quantum-ci.zip
