@@ -16,6 +16,10 @@ python -m pip install --upgrade "pip==26.1.2"
 if errorlevel 1 goto :error
 python -m pip install -r requirements.txt
 if errorlevel 1 goto :error
+python scripts\check_lock.py
+if errorlevel 1 goto :error
+python -m pip check
+if errorlevel 1 goto :error
 if not exist data mkdir data
 if not exist logs mkdir logs
 python scripts\healthcheck.py
