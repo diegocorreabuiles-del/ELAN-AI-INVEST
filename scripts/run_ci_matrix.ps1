@@ -28,6 +28,8 @@ apt-get update -qq
 apt-get install -y -qq --no-install-recommends git >/dev/null
 rm -rf /var/lib/apt/lists/*
 git config --global --add safe.directory /workspace
+git clone --quiet --no-hardlinks /workspace /work
+cd /work
 python -m pip install --quiet --upgrade "pip==26.1.2"
 python -m pip install --quiet -r requirements.txt
 python scripts/check_git_flow.py
@@ -55,7 +57,7 @@ foreach ($version in $requestedVersions) {
 
     docker run --rm `
         --mount $mount `
-        --workdir /workspace `
+        --workdir /tmp `
         --env PYTHONDONTWRITEBYTECODE=1 `
         --env COVERAGE_FILE=/tmp/.coverage `
         $image sh -lc $containerCommand
