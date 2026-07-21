@@ -14,7 +14,9 @@
 - Cerradas correctamente las conexiones SQLite creadas por los tests de atomicidad.
 - Publicada la rama recuperada mediante el PR #1 hacia `develop`; CI remota Python 3.11–3.14 verde.
 - Protegidas `develop` y `main` con PR y checks obligatorios, historial lineal y bloqueo de force-push/borrado.
-- No se ha publicado una release, un tag, un merge ni un artefacto.
+- Integrado el PR #1 en `develop` mediante rebase, con la matriz posterior al merge verde.
+- Actualizadas las Actions oficiales a `checkout@v7` y `setup-python@v7`, ambas sobre Node 24.
+- No se ha integrado `develop` en `main` ni publicado una release, un tag o un artefacto.
 
 ## 1.2.2 — Core Cleanup
 
