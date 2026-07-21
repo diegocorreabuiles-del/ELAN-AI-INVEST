@@ -27,6 +27,8 @@ def render_risk_tab(risk_report, ranking, capital, settings):
             text_auto=".2f",
             zmin=-1,
             zmax=1,
+            color_continuous_midpoint=0,
+            color_continuous_scale=["#FF6B7A", "#34386F", "#D8B511"],
             aspect="auto",
             title="Correlaciones",
         ),

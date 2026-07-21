@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=69", "wheel"]
+requires = ["setuptools==83.0.0", "wheel==0.47.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -25,6 +25,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "pytest>=8.0",
+  "pytest-cov>=7.1",
   "ruff>=0.9",
   "black>=24.10",
 ]
@@ -37,7 +38,17 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q --cov --cov-branch --cov-report=term-missing:skip-covered --cov-fail-under=75"
+
+[tool.coverage.run]
+source = ["."]
+source_pkgs = ["elan_ai_invest"]
+omit = ["tests/*", "scripts/*"]
+
+[tool.coverage.report]
+precision = 1
+show_missing = true
+skip_covered = true
 
 [tool.black]
 line-length = 100

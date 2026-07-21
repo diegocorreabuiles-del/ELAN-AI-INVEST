@@ -2,11 +2,67 @@ import plotly.express as px
 import streamlit as st
 
 
+def _render_risk_control(paper_engine, positions, latest_prices):
+    st.subheader("Control de riesgo simulado")
+    st.caption(
+        "Revisión manual con los últimos precios disponibles. No es tiempo real, "
+        "no envía órdenes a brokers y no se ejecuta automáticamente."
+    )
+    if positions.empty:
+        st.info("No hay posiciones abiertas. Puedes guardar igualmente un snapshot manual.")
+    else:
+        watch = positions[["symbol", "current_price", "stop_price"]].copy()
+        watch["distancia_stop_pct"] = (watch["current_price"] / watch["stop_price"] - 1.0) * 100.0
+        watch = watch.rename(
+            columns={
+                "symbol": "Activo",
+                "current_price": "Precio actual",
+                "stop_price": "Stop",
+                "distancia_stop_pct": "Distancia al stop (%)",
+            }
+        )
+        st.dataframe(
+            watch,
+            width="stretch",
+            hide_index=True,
+            column_config={
+                "Precio actual": st.column_config.NumberColumn(format="%.2f"),
+                "Stop": st.column_config.NumberColumn(format="%.2f"),
+                "Distancia al stop (%)": st.column_config.NumberColumn(format="%+.2f%%"),
+            },
+        )
+
+    with st.form("paper_risk_review_form", border=True):
+        confirmed = st.checkbox("Confirmo que esta acción solo afecta a la cartera simulada")
+        submitted = st.form_submit_button(
+            "Revisar stops y guardar snapshot",
+            type="primary",
+            icon=":material/shield:",
+            width="stretch",
+        )
+    if not submitted:
+        return
+    if not confirmed:
+        st.warning("Confirma el alcance simulado antes de ejecutar la revisión.")
+        return
+
+    result = paper_engine.review_risk_and_snapshot(latest_prices)
+    if not result.success:
+        st.error(result.message)
+        return
+    st.session_state["paper_risk_review_feedback"] = result.message
+    st.rerun()
+
+
 def render_paper_trading_tab(paper_engine, latest_prices, selected, settings):
     st.caption("Solo simulación. No existe conexión con broker ni dinero real.")
     if not settings.paper_trading.enabled or paper_engine is None:
         st.info("Paper trading está desactivado en config/settings.yaml.")
         return
+    feedback = st.session_state.pop("paper_risk_review_feedback", None)
+    if feedback:
+        st.success(feedback)
+
     valuation = paper_engine.valuation(latest_prices)
     cols = st.columns(4)
     cols[0].metric("Patrimonio", f"€{valuation['equity']:,.2f}")
@@ -53,6 +109,15 @@ def render_paper_trading_tab(paper_engine, latest_prices, selected, settings):
         if not positions.empty
         else st.info("Cartera simulada vacía.")
     )
+    _render_risk_control(paper_engine, positions, latest_prices)
+
+    orders = paper_engine.orders(limit=50)
+    with st.expander("Trazabilidad de órdenes simuladas"):
+        if orders.empty:
+            st.info("Todavía no hay órdenes simuladas.")
+        else:
+            st.dataframe(orders, width="stretch", hide_index=True)
+
     history = paper_engine.equity_history()
     if not history.empty:
         st.plotly_chart(
