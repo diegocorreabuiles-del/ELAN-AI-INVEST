@@ -4,8 +4,8 @@ Plataforma local de análisis cuantitativo, fundamental, riesgo, cartera, paper 
 
 ## Estado recuperado en este PC
 
-- La aplicación y su suite funcional se ejecutan en Python 3.12.
-- Hay 115 pruebas automáticas superadas, además de Ruff y Black.
+- La aplicación local se ejecuta en Python 3.12; la suite y los gates pasan en Python 3.11–3.14 sobre Linux.
+- Hay 116 pruebas automáticas superadas, además de Ruff y Black.
 - El cierre de dependencias está verificado en una instalación limpia: 76 pins activos y `pip check` sin conflictos.
 - La política Git local aplica `trabajo -> develop -> main`; la rama de recuperación todavía no se ha publicado ni integrado.
 - El gate global de cobertura pasa con 80,6 %, por encima del 75 % configurado.
@@ -42,7 +42,15 @@ Gate completo configurado por el proyecto:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-El segundo comando exige al menos 75 % de cobertura; el baseline local validado es 80,6 %.
+El segundo comando exige al menos 75 % de cobertura; el baseline validado es 80,6 % con 116 pruebas.
+
+## Matriz Python 3.11–3.14
+
+Con Docker Desktop iniciado, este comando reproduce en contenedores Linux los mismos gates de CI. La fuente se monta en solo lectura y cada versión trabaja sobre un clon temporal limpio de `HEAD`.
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\run_ci_matrix.ps1
+```
 
 ## Dependencias reproducibles
 
@@ -78,6 +86,6 @@ Las protecciones remotas requieren configuración y autorización en GitHub. Nin
 
 ## Próximo bloque
 
-Ejecutar la matriz CI real en Python 3.11–3.14 y preparar la integración hacia `develop`, sin publicar nada hasta recibir autorización.
+Con autorización explícita, publicar `recovery/pc-migration-20260721`, abrir un PR hacia `develop` y verificar allí la CI y las protecciones de GitHub. No integrar todavía en `main`.
 
 ELAN Quantum es una herramienta educativa y de simulación. No constituye asesoramiento financiero ni garantiza resultados.

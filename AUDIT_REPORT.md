@@ -1,6 +1,6 @@
 # Auditoría integral de ELAN Quantum
 
-> **Corrección de estado tras la migración (21 de julio de 2026).** Esta copia recuperada ya vuelve a disponer de política Git, lock reproducible, empaquetado seguro y AppTest sin red ni bases reales. Pasan 115 pruebas y la cobertura actual es 80,6 % frente al umbral del 75 %; el lock valida 76 distribuciones en una instalación Python 3.12 limpia y `pip check` no detecta conflictos. La matriz remota Python 3.11–3.14 y las protecciones GitHub siguen sin verificarse, por lo que todavía no se declara una release. No se ha realizado push, merge, tag ni publicación.
+> **Corrección de estado tras la migración (21 de julio de 2026).** Esta copia recuperada dispone de política Git, lock reproducible, empaquetado seguro y AppTest sin red ni bases reales. La matriz local en contenedores Linux pasa en Python 3.11–3.14: 116 pruebas, cobertura de 80,6–80,7 %, 76 pins activos, `pip check`, Ruff, Black y ZIP reproducible. La ejecución remota de GitHub Actions y las protecciones de ramas siguen sin verificarse, por lo que todavía no se declara una release. No se ha realizado push, merge, tag ni publicación.
 
 > Actualización v1.2.2 Core Cleanup (18 de julio de 2026): la sección siguiente reemplaza el estado operativo del baseline; el resto del documento se conserva como evidencia “antes”.
 
