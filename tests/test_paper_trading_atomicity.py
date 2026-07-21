@@ -1,6 +1,7 @@
 import sqlite3
 import time
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 from pathlib import Path
 from threading import Barrier
 
@@ -103,7 +104,7 @@ def test_waiting_buy_reads_cash_after_writer_commits(tmp_path):
 def test_buy_rolls_back_if_order_insert_fails(tmp_path):
     database_path = tmp_path / "paper.db"
     engine = build_engine(database_path)
-    with sqlite3.connect(database_path) as connection:
+    with closing(sqlite3.connect(database_path)) as connection, connection:
         connection.execute("""
             CREATE TRIGGER fail_buy_order
             BEFORE INSERT ON paper_orders
@@ -127,7 +128,7 @@ def test_sell_rolls_back_if_order_insert_fails(tmp_path):
     engine = build_engine(database_path)
     assert engine.buy("SPY", amount_eur=10_000, price=500).success
     cash_before = engine.account()["cash"]
-    with sqlite3.connect(database_path) as connection:
+    with closing(sqlite3.connect(database_path)) as connection, connection:
         connection.execute("""
             CREATE TRIGGER fail_sell_order
             BEFORE INSERT ON paper_orders
@@ -150,7 +151,7 @@ def test_sell_rolls_back_if_account_is_missing(tmp_path):
     database_path = tmp_path / "paper.db"
     engine = build_engine(database_path)
     assert engine.buy("SPY", amount_eur=10_000, price=500).success
-    with sqlite3.connect(database_path) as connection:
+    with closing(sqlite3.connect(database_path)) as connection, connection:
         connection.execute("DELETE FROM paper_account")
 
     result = engine.sell("SPY", quantity=20, price=510)
@@ -165,7 +166,7 @@ def test_reset_rolls_back_if_account_is_missing(tmp_path):
     database_path = tmp_path / "paper.db"
     engine = build_engine(database_path)
     assert engine.buy("SPY", amount_eur=10_000, price=500).success
-    with sqlite3.connect(database_path) as connection:
+    with closing(sqlite3.connect(database_path)) as connection, connection:
         connection.execute("DELETE FROM paper_account")
 
     with pytest.raises(sqlite3.IntegrityError, match="account missing"):
@@ -253,7 +254,7 @@ def test_risk_review_fails_closed_with_invalid_stop(tmp_path):
     database_path = tmp_path / "paper.db"
     engine = build_engine(database_path)
     assert engine.buy("SPY", amount_eur=10_000, price=500).success
-    with sqlite3.connect(database_path) as connection:
+    with closing(sqlite3.connect(database_path)) as connection, connection:
         connection.execute("UPDATE paper_positions SET stop_price = NULL WHERE symbol = 'SPY'")
 
     result = engine.review_risk_and_snapshot({"SPY": 450})
@@ -270,7 +271,7 @@ def test_risk_review_rolls_back_stop_if_snapshot_insert_fails(tmp_path):
     engine = build_engine(database_path)
     assert engine.buy("SPY", amount_eur=10_000, price=500).success
     cash_before = engine.account()["cash"]
-    with sqlite3.connect(database_path) as connection:
+    with closing(sqlite3.connect(database_path)) as connection, connection:
         connection.execute("""
             CREATE TRIGGER fail_risk_snapshot
             BEFORE INSERT ON paper_equity_snapshots
