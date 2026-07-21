@@ -5,10 +5,11 @@ Plataforma local de análisis cuantitativo, fundamental, riesgo, cartera, paper 
 ## Estado recuperado en este PC
 
 - La aplicación y su suite funcional se ejecutan en Python 3.12.
-- Hay 107 pruebas funcionales superadas, además de Ruff y Black.
+- Hay 115 pruebas automáticas superadas, además de Ruff y Black.
 - El cierre de dependencias está verificado en una instalación limpia: 76 pins activos y `pip check` sin conflictos.
 - La política Git local aplica `trabajo -> develop -> main`; la rama de recuperación todavía no se ha publicado ni integrado.
-- El gate global de cobertura sigue pendiente: el código recuperado está en 61,8 %, por debajo del 75 % configurado.
+- El gate global de cobertura pasa con 80,6 %, por encima del 75 % configurado.
+- AppTest recorre las once vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
 - El empaquetador seguro está reconstruido y cubierto por pruebas de integridad, rutas y reproducibilidad.
 
 Este es un proyecto de simulación y paper trading. No se conecta a brokers ni opera con dinero real.
@@ -41,7 +42,7 @@ Gate completo configurado por el proyecto:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-El segundo comando exige al menos 75 % de cobertura y actualmente debe considerarse bloqueado hasta reconstruir las pruebas de aplicación que faltan.
+El segundo comando exige al menos 75 % de cobertura; el baseline local validado es 80,6 %.
 
 ## Dependencias reproducibles
 
@@ -77,6 +78,6 @@ Las protecciones remotas requieren configuración y autorización en GitHub. Nin
 
 ## Próximo bloque
 
-Recuperar las pruebas Streamlit/AppTest necesarias para elevar la cobertura del 61,8 % al mínimo del 75 % antes de preparar una release.
+Ejecutar la matriz CI real en Python 3.11–3.14 y preparar la integración hacia `develop`, sin publicar nada hasta recibir autorización.
 
 ELAN Quantum es una herramienta educativa y de simulación. No constituye asesoramiento financiero ni garantiza resultados.

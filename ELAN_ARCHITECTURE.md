@@ -1,6 +1,6 @@
 # Arquitectura canónica de ELAN Quantum v1.2.2
 
-> **Estado recuperado en el nuevo PC (21 de julio de 2026).** Los bloques de integración Git, dependencias reproducibles y distribución segura están reconstruidos y verificados. La suite funcional actual pasa 107 pruebas, pero el gate global de cobertura permanece en 61,8 % frente al 75 % exigido. `scripts/build_distribution.py` construye desde los blobs de `HEAD`, genera un manifiesto SHA-256 y verifica el contenido exacto sin extraerlo. La rama activa es `recovery/pc-migration-20260721`, sin push, merge, tag ni publicación.
+> **Estado recuperado en el nuevo PC (21 de julio de 2026).** Los bloques de integración Git, dependencias reproducibles, distribución segura y AppTest están reconstruidos y verificados. La suite actual pasa 115 pruebas y alcanza 80,6 % de cobertura frente al 75 % exigido. `scripts/build_distribution.py` construye desde los blobs de `HEAD`, genera un manifiesto SHA-256 y verifica el contenido exacto sin extraerlo. La rama activa es `recovery/pc-migration-20260721`, sin push, merge, tag ni publicación.
 
 Estado: arquitectura vigente tras la Fase 1 de estabilización. `ARCHITECTURE_CURRENT.md` conserva la fotografía anterior a la limpieza.
 
@@ -92,7 +92,7 @@ No se borró ninguna implementación. Su retirada requiere búsqueda de consumid
 
 - Pytest mide líneas y ramas de `app.py` y de todo `elan_ai_invest`, incluidos módulos legacy no ejecutados; CI bloquea cualquier resultado inferior a 75 %.
 - AppTest sustituye el Core Engine y los fundamentales por datos deterministas, prohíbe llamadas Yahoo y renderiza tanto el flujo inicial como todas las vistas.
-- El baseline local validado es 77,5 %. El umbral debe aumentar solo junto con pruebas que cubran riesgo real, sin excluir legacy para inflar el porcentaje.
+- El baseline local validado es 80,6 % con 115 pruebas. El umbral debe aumentar solo junto con pruebas que cubran riesgo real, sin excluir legacy para inflar el porcentaje.
 
 ## Frontera de integración
 

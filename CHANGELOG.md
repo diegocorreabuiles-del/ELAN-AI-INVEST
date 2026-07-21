@@ -8,6 +8,8 @@
 - Los instaladores verifican el lock y ejecutan `pip check` después de instalar.
 - Reconstruido el empaquetador desde `HEAD`, con manifiesto SHA-256 y verificación segura sin extracción.
 - Añadidas regresiones para reproducibilidad, estado local, rutas, credenciales, enlaces y manipulación del ZIP.
+- Recuperado AppTest sin red para el flujo principal, las once vistas y las acciones paper simuladas.
+- Elevado el baseline de cobertura local a 80,6 % con 115 pruebas, superando el gate del 75 %.
 - No se ha publicado una release, un tag, un merge ni un artefacto.
 
 ## 1.2.2 — Core Cleanup
