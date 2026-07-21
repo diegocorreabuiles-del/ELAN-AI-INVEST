@@ -1,6 +1,6 @@
 # Deuda técnica de ELAN Quantum
 
-> **Revisión tras la migración de PC (21 de julio de 2026).** TD-016 y la parte local de TD-019 vuelven a estar verificadas: el lock y el gate Git han sido reconstruidos. TD-017 se reabre porque `scripts/build_distribution.py` no está en la copia recuperada. TD-018 también se reabre: pasan 99 pruebas funcionales, pero la cobertura es 61,8 % y faltan las pruebas Streamlit/AppTest históricas. Las afirmaciones posteriores se conservan como registro del ordenador anterior, no como evidencia vigente.
+> **Revisión tras la migración de PC (21 de julio de 2026).** TD-016, TD-017 y la parte local de TD-019 vuelven a estar verificadas: el lock, el empaquetador seguro y el gate Git han sido reconstruidos. TD-018 sigue reabierta: pasan 107 pruebas funcionales, pero la cobertura es 61,8 % y faltan las pruebas Streamlit/AppTest históricas. Las afirmaciones posteriores se conservan como registro del ordenador anterior y solo coinciden con el estado actual cuando esta nota las confirma.
 
 > Estado v1.2.2: TD-001, TD-002, TD-003, TD-004, TD-005, TD-006, TD-008, TD-009, TD-011, TD-013, TD-014, TD-016, TD-017, TD-018 y TD-022 quedan resueltos. TD-007 queda mitigado con `CoreEngine` canónico y legacy congelado; TD-019 queda mitigado con política y gate `trabajo -> develop -> main`, a la espera de integración autorizada. TD-012, TD-024, TD-025, TD-028, TD-029 y TD-034 quedan parcial o totalmente tratados según `AUDIT_REPORT.md`. El resto sigue pendiente.
 

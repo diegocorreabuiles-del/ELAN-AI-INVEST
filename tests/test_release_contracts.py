@@ -12,6 +12,8 @@ def test_ci_uses_recovered_git_and_lock_gates() -> None:
     assert "python scripts/check_git_flow.py" in workflow
     assert "python -m pip install -r requirements.txt" in workflow
     assert "python scripts/check_lock.py" in workflow
+    assert "python scripts/build_distribution.py --output dist/elan-quantum-ci.zip" in workflow
+    assert "python scripts/build_distribution.py --verify dist/elan-quantum-ci.zip" in workflow
     assert workflow.index("python -m pip install -r requirements.txt") < workflow.index(
         "python scripts/check_lock.py"
     )
@@ -33,5 +35,6 @@ def test_documented_release_tooling_paths_exist() -> None:
         "requirements.lock",
         "scripts/check_git_flow.py",
         "scripts/check_lock.py",
+        "scripts/build_distribution.py",
     ):
         assert (ROOT / relative_path).is_file(), relative_path

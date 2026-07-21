@@ -6,7 +6,9 @@
 - Añadido un gate local/CI que valida nombres de rama y transiciones permitidas.
 - Reconstruido el cierre reproducible de dependencias para Python 3.11–3.14.
 - Los instaladores verifican el lock y ejecutan `pip check` después de instalar.
-- No se ha creado una release, un tag, un merge ni un artefacto de distribución.
+- Reconstruido el empaquetador desde `HEAD`, con manifiesto SHA-256 y verificación segura sin extracción.
+- Añadidas regresiones para reproducibilidad, estado local, rutas, credenciales, enlaces y manipulación del ZIP.
+- No se ha publicado una release, un tag, un merge ni un artefacto.
 
 ## 1.2.2 — Core Cleanup
 
