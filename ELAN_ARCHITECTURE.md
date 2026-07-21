@@ -1,6 +1,6 @@
 # Arquitectura canónica de ELAN Quantum v1.2.2
 
-> **Estado recuperado en el nuevo PC (22 de julio de 2026).** Los bloques de integración Git, dependencias reproducibles, distribución segura, AppTest y matriz Python están reconstruidos y verificados. La rama `recovery/pc-migration-20260721` está publicada mediante el PR #1 hacia `develop`; las matrices remotas Python 3.11–3.14 están verdes y `develop`/`main` protegidas. No se ha realizado merge, tag, release ni despliegue.
+> **Estado recuperado en el nuevo PC (22 de julio de 2026).** El PR #1 integró la recuperación en `develop` mediante rebase; la matriz posterior al merge pasa en Python 3.11–3.14 y `develop`/`main` siguen protegidas. Esta rama actualiza las Actions a runtimes nativos de Node 24. No se ha integrado `develop` en `main` ni creado tag, release o despliegue.
 
 Estado: arquitectura vigente tras la Fase 1 de estabilización. `ARCHITECTURE_CURRENT.md` conserva la fotografía anterior a la limpieza.
 
@@ -98,8 +98,8 @@ No se borró ninguna implementación. Su retirada requiere búsqueda de consumid
 
 - `scripts/check_git_flow.py` admite únicamente ramas de trabajo hacia `develop` y `develop` hacia `main`.
 - CI valida la transición del pull request; Dependabot usa `develop` como destino.
-- `recovery/pc-migration-20260721` desciende de `develop`, está publicada y seguida por el PR #1. No se ha hecho merge ni tag.
-- Las protecciones remotas verificadas y la secuencia operativa están en `GIT_WORKFLOW.md`; el PR #1 está listo para revisión, todavía sin merge.
+- El PR #1 integró `recovery/pc-migration-20260721` en `develop` mediante rebase; la rama de recuperación se conserva como referencia temporal.
+- Las protecciones remotas verificadas y la secuencia operativa están en `GIT_WORKFLOW.md`; el siguiente salto permitido es un PR independiente de `develop` hacia `main`.
 
 ## Ciclo de riesgo de paper trading
 

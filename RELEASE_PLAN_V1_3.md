@@ -84,7 +84,7 @@ v1.3 debe ser una release de consolidación y fiabilidad, no una expansión de f
 
 ## Estrategia Git propuesta
 
-Estado: política y protecciones implementadas; rama publicada mediante el PR #1, integración todavía no ejecutada.
+Estado: política y protecciones implementadas; PR #1 integrado en `develop`, integración `develop -> main` todavía no ejecutada.
 
 1. No publicar desde un working tree: la candidata debe ser un commit limpio.
 2. Crear ramas pequeñas `feature/`, `fix/`, `chore/` o `docs/`.
