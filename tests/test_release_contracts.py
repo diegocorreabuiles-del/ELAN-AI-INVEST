@@ -9,6 +9,8 @@ def test_ci_uses_recovered_git_and_lock_gates() -> None:
     workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
 
     assert '"recovery/**"' in workflow
+    assert "actions/checkout@v7" in workflow
+    assert "actions/setup-python@v7" in workflow
     assert "python scripts/check_git_flow.py" in workflow
     assert "python -m pip install -r requirements.txt" in workflow
     assert "python scripts/check_lock.py" in workflow

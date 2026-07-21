@@ -1,6 +1,6 @@
 # Auditoría integral de ELAN Quantum
 
-> **Corrección de estado tras la migración (22 de julio de 2026).** La rama recuperada está publicada en el PR #1 hacia `develop`, lista para revisión y sin merge. Las matrices remotas de `push` y `pull_request` pasan en Python 3.11–3.14; `develop` y `main` exigen PR, los cuatro checks, rama actualizada, conversaciones resueltas e historial lineal, y bloquean force-push/borrado. No se ha realizado merge, tag, release ni despliegue.
+> **Corrección de estado tras la migración (22 de julio de 2026).** El PR #1 se integró mediante rebase en `develop` (`913ee99`) y su matriz posterior al merge pasó en Python 3.11–3.14; `main` permanece intacta. Esta rama de mantenimiento actualiza las Actions oficiales a `checkout@v7` y `setup-python@v7`, ambas con Node 24. No se ha realizado merge a `main`, tag, release ni despliegue.
 
 > Actualización v1.2.2 Core Cleanup (18 de julio de 2026): la sección siguiente reemplaza el estado operativo del baseline; el resto del documento se conserva como evidencia “antes”.
 
