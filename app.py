@@ -51,9 +51,10 @@ name_map = dict(zip(watchlist["symbol"], watchlist["name"], strict=True))
 render_header(ENGINE.settings.app.version)
 
 with st.sidebar:
-    st.header("Configuración")
+    st.subheader(":material/tune: Espacio de trabajo")
+    st.caption("Configura el universo y el horizonte del análisis.")
     selected = st.multiselect(
-        "Activos",
+        "Universo de activos",
         watchlist["symbol"].tolist(),
         default=watchlist["symbol"].tolist(),
     )
@@ -61,7 +62,7 @@ with st.sidebar:
     if ENGINE.settings.market.period not in period_options:
         period_options.append(ENGINE.settings.market.period)
     period = st.selectbox(
-        "Historial",
+        "Horizonte histórico",
         period_options,
         index=period_options.index(ENGINE.settings.market.period),
     )
@@ -72,10 +73,12 @@ with st.sidebar:
         step=5_000.0,
     )
     refresh = st.button(
-        "Actualizar mercado",
+        "Actualizar datos",
         type="primary",
+        icon=":material/refresh:",
         width="stretch",
     )
+    st.caption(":green-badge[Paper trading] · Sin conexión a brokers")
 
 if not selected:
     st.warning("Selecciona al menos un activo.")
@@ -95,7 +98,7 @@ if refresh:
     run_analysis.clear()
 
 try:
-    with st.spinner("ELAN analiza mercado y riesgo..."):
+    with st.spinner("Actualizando mercado y riesgo...", show_time=True):
         analysis = run_analysis(tuple(selected), period)
 except Exception as exc:
     st.error("No se pudo completar el análisis de mercado.")

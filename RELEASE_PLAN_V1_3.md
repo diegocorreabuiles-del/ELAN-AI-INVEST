@@ -1,6 +1,6 @@
 # Plan de release propuesto — ELAN Quantum v1.3
 
-> v1.3 sigue sin crearse. La rama actual prepara exclusivamente v1.2.2 Core Cleanup. Los gates resueltos aquí son prerrequisitos; los P1 restantes de healthcheck, tipos y seguridad deben completarse antes de reconsiderar v1.3. Distribución y cobertura quedan resueltas por TD-017 y TD-018.
+> v1.3 sigue sin crearse. La rama actual aplica una renovación visual acotada sobre el baseline v1.2.2, sin cambiar arquitectura ni lógica financiera y sin formar parte del alcance funcional de v1.3. Los P1 restantes de healthcheck, tipos y seguridad deben completarse antes de reconsiderar v1.3; distribución y cobertura quedan resueltas por TD-017 y TD-018.
 
 Estado: **propuesta; v1.3 no ha sido creada**.
 
@@ -84,7 +84,7 @@ v1.3 debe ser una release de consolidación y fiabilidad, no una expansión de f
 
 ## Estrategia Git propuesta
 
-Estado: política y protecciones implementadas; PR #1 integrado en `develop`, integración `develop -> main` todavía no ejecutada.
+Estado: política y protecciones implementadas; PR #1 y PR #2 integrados en `develop`, rama visual pendiente de PR y transición `develop -> main` todavía no ejecutada.
 
 1. No publicar desde un working tree: la candidata debe ser un commit limpio.
 2. Crear ramas pequeñas `feature/`, `fix/`, `chore/` o `docs/`.

@@ -292,7 +292,7 @@ def test_app_renders_every_view_and_simulated_actions(app_environment: FakeEngin
         _select_tab(app, tab_widget_id, label)
 
     calls_before_refresh = len(app_environment.requests)
-    _button(app, "Actualizar mercado").click().run(timeout=20)
+    _button(app, "Actualizar datos").click().run(timeout=20)
     assert len(app_environment.requests) > calls_before_refresh
     _assert_no_ui_failure(app, "refresh")
 

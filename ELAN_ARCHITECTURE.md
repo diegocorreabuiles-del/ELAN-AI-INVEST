@@ -1,6 +1,6 @@
 # Arquitectura canónica de ELAN Quantum v1.2.2
 
-> **Estado recuperado en el nuevo PC (22 de julio de 2026).** El PR #1 integró la recuperación en `develop` mediante rebase; la matriz posterior al merge pasa en Python 3.11–3.14 y `develop`/`main` siguen protegidas. Esta rama actualiza las Actions a runtimes nativos de Node 24. No se ha integrado `develop` en `main` ni creado tag, release o despliegue.
+> **Estado recuperado en el nuevo PC (22 de julio de 2026).** Los PR #1 y #2 integraron en `develop` la recuperación y las Actions con Node 24; ambas matrices posteriores al merge pasan en Python 3.11–3.14 y `develop`/`main` siguen protegidas. La rama visual actual renueva únicamente la presentación Streamlit. No se ha integrado `develop` en `main` ni creado tag, release o despliegue.
 
 Estado: arquitectura vigente tras la Fase 1 de estabilización. `ARCHITECTURE_CURRENT.md` conserva la fotografía anterior a la limpieza.
 
@@ -92,14 +92,14 @@ No se borró ninguna implementación. Su retirada requiere búsqueda de consumid
 
 - Pytest mide líneas y ramas de `app.py` y de todo `elan_ai_invest`, incluidos módulos legacy no ejecutados; CI bloquea cualquier resultado inferior a 75 %.
 - AppTest sustituye el Core Engine y los fundamentales por datos deterministas, prohíbe llamadas Yahoo y renderiza tanto el flujo inicial como todas las vistas.
-- El baseline validado es 80,6–80,7 % con 116 pruebas en Python 3.11–3.14. El umbral debe aumentar solo junto con pruebas que cubran riesgo real, sin excluir legacy para inflar el porcentaje.
+- El baseline local de la rama visual es 80,7 % con 118 pruebas en Python 3.12; la matriz de `develop` mantiene 116 pruebas verdes en Python 3.11–3.14 hasta integrar esta rama. El umbral debe aumentar solo junto con pruebas que cubran riesgo real, sin excluir legacy para inflar el porcentaje.
 
 ## Frontera de integración
 
 - `scripts/check_git_flow.py` admite únicamente ramas de trabajo hacia `develop` y `develop` hacia `main`.
 - CI valida la transición del pull request; Dependabot usa `develop` como destino.
-- El PR #1 integró `recovery/pc-migration-20260721` en `develop` mediante rebase; la rama de recuperación se conserva como referencia temporal.
-- Las protecciones remotas verificadas y la secuencia operativa están en `GIT_WORKFLOW.md`; el siguiente salto permitido es un PR independiente de `develop` hacia `main`.
+- El PR #1 integró `recovery/pc-migration-20260721` y el PR #2 integró el mantenimiento Node 24 en `develop`, ambos mediante rebase; sus ramas se conservan como referencia temporal.
+- Las protecciones remotas verificadas y la secuencia operativa están en `GIT_WORKFLOW.md`; primero debe integrarse la rama visual en `develop` y después preparar un PR independiente de `develop` hacia `main`.
 
 ## Ciclo de riesgo de paper trading
 
