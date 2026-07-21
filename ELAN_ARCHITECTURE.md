@@ -1,5 +1,7 @@
 # Arquitectura canónica de ELAN Quantum v1.2.2
 
+> **Estado recuperado en el nuevo PC (21 de julio de 2026).** Los bloques de integración Git y dependencias reproducibles están reconstruidos y verificados. La suite funcional actual pasa 99 pruebas, pero el gate global de cobertura permanece en 61,8 % frente al 75 % exigido. `scripts/build_distribution.py` y las pruebas Streamlit/AppTest descritas históricamente más abajo no están presentes en esta copia y deben reconstruirse antes de una release. La rama activa es `recovery/pc-migration-20260721`, sin push, merge, tag ni upstream.
+
 Estado: arquitectura vigente tras la Fase 1 de estabilización. `ARCHITECTURE_CURRENT.md` conserva la fotografía anterior a la limpieza.
 
 ## Flujo de producción
