@@ -1,6 +1,6 @@
 # Auditoría integral de ELAN Quantum
 
-> **Corrección de estado tras la migración (22 de julio de 2026).** El PR #1 se integró mediante rebase en `develop` (`913ee99`) y su matriz posterior al merge pasó en Python 3.11–3.14; `main` permanece intacta. Esta rama de mantenimiento actualiza las Actions oficiales a `checkout@v7` y `setup-python@v7`, ambas con Node 24. No se ha realizado merge a `main`, tag, release ni despliegue.
+> **Corrección de estado tras la migración (22 de julio de 2026).** Los PR #1 y #2 se integraron mediante rebase en `develop`; el segundo dejó `develop` en `8f306a1` y su matriz posterior al merge pasó en Python 3.11–3.14 sin avisos de Node 20. La rama `feature/trading-workspace-ui` renueva de forma acotada el tema y el layout Streamlit, sin modificar lógica financiera. `main` permanece intacta; no se ha creado tag, release ni despliegue.
 
 > Actualización v1.2.2 Core Cleanup (18 de julio de 2026): la sección siguiente reemplaza el estado operativo del baseline; el resto del documento se conserva como evidencia “antes”.
 
@@ -28,7 +28,7 @@ La rama local `feature/core-cleanup` parte del commit de respaldo `aca57e7`. El 
 | TD-019 ramas | `main` en 0.1 y ninguna ruta de integración exigible | Gate y política `trabajo → develop → main`; feature lineal, consolidada y 19 commits por delante de `develop`, sin push ni merge |
 | TD-022 caché pickle | `read_pickle` aceptaba objetos ejecutables | Sustituido por CSV inerte; los `.pkl` antiguos no se leen |
 | TD-024 Streamlit | API de ancho obsoleta | Reemplazada; pestañas costosas condicionales y cachés acotadas |
-| TD-025 tema Streamlit | Colores sin identidad nativa y CSS como única personalización | Tema nativo versionado con navy `#141654`, oro `#D8B511` y paleta común de gráficos; el CSS restante solo ajusta espaciado/tamaño |
+| TD-025 tema Streamlit | Colores sin identidad nativa y CSS como única personalización | Tema nativo grafito con verde/rojo semánticos, layout responsive y paleta común de gráficos; retirado el CSS inyectado |
 | TD-028/029 CI/EOL | Sin Python 3.14 ni política EOL | Matriz 3.11–3.14 y `.gitattributes` |
 
 El inventario canónico y el flujo actualizado están en `ELAN_ARCHITECTURE.md`. Se preservan 85 submódulos importables, incluidos los adaptadores y módulos legacy; el import-all de esta rama termina con 0 fallos.

@@ -5,10 +5,10 @@ Plataforma local de análisis cuantitativo, fundamental, riesgo, cartera, paper 
 ## Estado recuperado en este PC
 
 - La aplicación local se ejecuta en Python 3.12; la suite y los gates pasan en Python 3.11–3.14 sobre Linux.
-- Hay 116 pruebas automáticas superadas, además de Ruff y Black.
+- Hay 118 pruebas automáticas superadas en la rama visual, además de Ruff y Black.
 - El cierre de dependencias está verificado en una instalación limpia: 76 pins activos y `pip check` sin conflictos.
-- La política Git aplica `trabajo -> develop -> main`; el PR #1 integró la recuperación en `develop` y `main` permanece sin cambios.
-- El gate global de cobertura pasa con 80,6 %, por encima del 75 % configurado.
+- La política Git aplica `trabajo -> develop -> main`; los PR #1 y #2 integraron la recuperación y el mantenimiento Node 24 en `develop`, mientras `main` permanece sin cambios.
+- El gate global de cobertura pasa con 80,7 %, por encima del 75 % configurado.
 - AppTest recorre las once vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
 - El empaquetador seguro está reconstruido y cubierto por pruebas de integridad, rutas y reproducibilidad.
 
@@ -42,7 +42,7 @@ Gate completo configurado por el proyecto:
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-El segundo comando exige al menos 75 % de cobertura; el baseline validado es 80,6 % con 116 pruebas.
+El segundo comando exige al menos 75 % de cobertura; el baseline local de esta rama es 80,7 % con 118 pruebas.
 
 ## Matriz Python 3.11–3.14
 
@@ -86,6 +86,6 @@ La política canónica está en `GIT_WORKFLOW.md`. Las ramas de trabajo y recupe
 
 ## Próximo bloque
 
-Integrar el mantenimiento de Actions sobre `develop` cuando su CI esté verde. Después se preparará un PR independiente de `develop` hacia `main`, siempre con autorización explícita; no se ha creado ninguna release ni tag.
+Revisar e integrar la renovación visual mediante un PR independiente hacia `develop`. Solo después se preparará otro PR de `develop` hacia `main`, siempre con autorización explícita; no se ha creado ninguna release ni tag.
 
 ELAN Quantum es una herramienta educativa y de simulación. No constituye asesoramiento financiero ni garantiza resultados.

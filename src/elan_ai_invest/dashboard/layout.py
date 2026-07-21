@@ -10,22 +10,22 @@ def configure_page() -> None:
         page_title="ELAN Quantum",
         page_icon=":material/finance_mode:",
         layout="wide",
-    )
-    st.markdown(
-        """
-        <style>
-        .block-container {padding-top: 1.2rem; padding-bottom: 2rem;}
-        [data-testid='stMetricValue'] {font-size: 1.75rem;}
-        </style>
-        """,
-        unsafe_allow_html=True,
+        initial_sidebar_state="auto",
     )
 
 
 def render_header(version: str) -> None:
-    st.title("ELAN Quantum", anchor=False)
-    st.caption("Inteligencia cuantitativa para invertir con disciplina.")
-    st.caption(f"v{version} · Simulación, no asesoramiento financiero")
+    with st.container(
+        horizontal=True,
+        horizontal_alignment="distribute",
+        vertical_alignment="center",
+        gap="small",
+    ):
+        st.title("ELAN Quantum", anchor=False)
+        st.badge("Datos de mercado", icon=":material/query_stats:", color="green")
+        st.badge("Solo simulación", icon=":material/shield:", color="gray")
+        st.badge(f"v{version}", color="blue")
+    st.caption("Centro cuantitativo para analizar mercado, riesgo y cartera en un solo espacio.")
 
 
 def render_main_metrics(
@@ -36,13 +36,15 @@ def render_main_metrics(
     var_95_pct: float,
     capital: float,
 ) -> None:
-    cols = st.columns(5)
-    cols[0].metric("Régimen", market_regime)
-    cols[1].metric("Score medio", f"{average_score:.1f}/100")
-    cols[2].metric("Riesgo cartera", risk_level)
-    cols[3].metric("Volatilidad", f"{annual_volatility_pct:.1f}%")
-    cols[4].metric(
-        "VaR 95% diario",
-        f"{var_95_pct:.2f}%",
-        f"€{capital * var_95_pct / 100:,.0f}",
-    )
+    with st.container(horizontal=True, gap="xsmall"):
+        st.metric("Régimen", market_regime, border=True)
+        st.metric("Score medio", f"{average_score:.1f}/100", border=True)
+        st.metric("Riesgo cartera", risk_level, border=True)
+        st.metric("Volatilidad", f"{annual_volatility_pct:.1f}%", border=True)
+        st.metric(
+            "VaR 95% diario",
+            f"{var_95_pct:.2f}%",
+            f"€{capital * var_95_pct / 100:,.0f}",
+            delta_color="inverse",
+            border=True,
+        )
