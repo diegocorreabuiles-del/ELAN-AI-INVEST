@@ -1,6 +1,6 @@
 # Arquitectura canónica de ELAN Quantum v1.2.2
 
-> **Estado recuperado en el nuevo PC (21 de julio de 2026).** Los bloques de integración Git, dependencias reproducibles, distribución segura, AppTest y matriz Python están reconstruidos y verificados. La suite pasa 116 pruebas en Python 3.11–3.14 y alcanza 80,6–80,7 % de cobertura frente al 75 % exigido. `scripts/build_distribution.py` construye desde los blobs de `HEAD`, genera un manifiesto SHA-256 y verifica el contenido exacto sin extraerlo. La rama activa es `recovery/pc-migration-20260721`, sin push, merge, tag ni publicación.
+> **Estado recuperado en el nuevo PC (22 de julio de 2026).** Los bloques de integración Git, dependencias reproducibles, distribución segura, AppTest y matriz Python están reconstruidos y verificados. La rama `recovery/pc-migration-20260721` está publicada mediante el PR #1 hacia `develop`; las matrices remotas Python 3.11–3.14 están verdes y `develop`/`main` protegidas. No se ha realizado merge, tag, release ni despliegue.
 
 Estado: arquitectura vigente tras la Fase 1 de estabilización. `ARCHITECTURE_CURRENT.md` conserva la fotografía anterior a la limpieza.
 
@@ -98,8 +98,8 @@ No se borró ninguna implementación. Su retirada requiere búsqueda de consumid
 
 - `scripts/check_git_flow.py` admite únicamente ramas de trabajo hacia `develop` y `develop` hacia `main`.
 - CI valida la transición del pull request; Dependabot usa `develop` como destino.
-- `recovery/pc-migration-20260721` desciende del `origin/develop` actualizado, pero permanece local y sin upstream. No se ha hecho push, merge ni tag.
-- Las protecciones remotas requeridas y la secuencia operativa están en `GIT_WORKFLOW.md`; su aplicación en GitHub requiere permisos y autorización externos.
+- `recovery/pc-migration-20260721` desciende de `develop`, está publicada y seguida por el PR #1. No se ha hecho merge ni tag.
+- Las protecciones remotas verificadas y la secuencia operativa están en `GIT_WORKFLOW.md`; el PR #1 está listo para revisión, todavía sin merge.
 
 ## Ciclo de riesgo de paper trading
 

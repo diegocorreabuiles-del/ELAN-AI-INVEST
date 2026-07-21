@@ -84,7 +84,7 @@ v1.3 debe ser una release de consolidación y fiabilidad, no una expansión de f
 
 ## Estrategia Git propuesta
 
-Estado: política implementada localmente; publicación e integración no ejecutadas.
+Estado: política y protecciones implementadas; rama publicada mediante el PR #1, integración todavía no ejecutada.
 
 1. No publicar desde un working tree: la candidata debe ser un commit limpio.
 2. Crear ramas pequeñas `feature/`, `fix/`, `chore/` o `docs/`.
@@ -93,7 +93,7 @@ Estado: política implementada localmente; publicación e integración no ejecut
 5. Integrar únicamente `develop` en `main`, tras aceptación explícita.
 6. Crear cualquier tag o artefacto publicado desde `main`.
 
-`scripts/check_git_flow.py` aplica esta secuencia en local y CI. Los comandos, snapshot y protecciones remotas pendientes están en `GIT_WORKFLOW.md`.
+`scripts/check_git_flow.py` aplica esta secuencia en local y CI. Los comandos y las protecciones remotas verificadas el 22 de julio de 2026 están en `GIT_WORKFLOW.md`.
 
 ## Versionado
 
