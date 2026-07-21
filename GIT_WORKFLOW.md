@@ -60,9 +60,9 @@ Si Git no está disponible en `PATH`, defina `GIT_EXECUTABLE` con la ruta absolu
 5. Abrir un segundo PR desde `develop` hacia `main` para preparar una release.
 6. Crear tags y artefactos publicados únicamente desde un commit aceptado en `main`.
 
-## Protecciones remotas requeridas
+## Protecciones remotas verificadas
 
-Configurar en GitHub para `develop` y `main`:
+Estado verificado en GitHub el 22 de julio de 2026 para `develop` y `main`:
 
 - exigir pull request;
 - exigir el job de CI;
@@ -70,8 +70,11 @@ Configurar en GitHub para `develop` y `main`:
 - bloquear force-push y borrado de rama;
 - impedir bypass salvo recuperación administrativa documentada.
 
-Estas protecciones deben verificarse en GitHub antes de una release. El script local valida
-la transición, pero no puede demostrar la configuración remota.
+Las cuatro variantes de CI (`test (3.11)` a `test (3.14)`) son obligatorias y usan política
+estricta de rama actualizada. El historial lineal y la resolución de conversaciones también
+son obligatorios; force-push y borrado están bloqueados. Como solo existe un colaborador,
+se exigen cero aprobaciones externas y se conserva bypass administrativo para recuperación.
+El script local valida la transición, pero la API de GitHub es la fuente de verdad remota.
 
 ## Recuperación y rollback
 

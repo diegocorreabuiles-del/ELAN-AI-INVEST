@@ -7,7 +7,7 @@ Plataforma local de análisis cuantitativo, fundamental, riesgo, cartera, paper 
 - La aplicación local se ejecuta en Python 3.12; la suite y los gates pasan en Python 3.11–3.14 sobre Linux.
 - Hay 116 pruebas automáticas superadas, además de Ruff y Black.
 - El cierre de dependencias está verificado en una instalación limpia: 76 pins activos y `pip check` sin conflictos.
-- La política Git local aplica `trabajo -> develop -> main`; la rama de recuperación todavía no se ha publicado ni integrado.
+- La política Git aplica `trabajo -> develop -> main`; la rama de recuperación está publicada en el PR #1 hacia `develop`, todavía sin integrar.
 - El gate global de cobertura pasa con 80,6 %, por encima del 75 % configurado.
 - AppTest recorre las once vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
 - El empaquetador seguro está reconstruido y cubierto por pruebas de integridad, rutas y reproducibilidad.
@@ -82,10 +82,10 @@ La política canónica está en `GIT_WORKFLOW.md`. Las ramas de trabajo y recupe
 .\.venv\Scripts\python.exe scripts\check_git_flow.py
 ```
 
-Las protecciones remotas requieren configuración y autorización en GitHub. Ningún script local realiza push, merge, tag o release.
+`develop` y `main` están protegidas en GitHub: PR, matriz CI, rama actualizada, conversaciones resueltas e historial lineal son obligatorios; force-push y borrado están bloqueados. El bypass administrativo se conserva solo para recuperación.
 
 ## Próximo bloque
 
-Con autorización explícita, publicar `recovery/pc-migration-20260721`, abrir un PR hacia `develop` y verificar allí la CI y las protecciones de GitHub. No integrar todavía en `main`.
+Revisar e integrar el PR #1 en `develop` únicamente con autorización explícita. Después se preparará un PR independiente de `develop` hacia `main`; no se ha creado ninguna release ni tag.
 
 ELAN Quantum es una herramienta educativa y de simulación. No constituye asesoramiento financiero ni garantiza resultados.
