@@ -4,13 +4,15 @@
 
 | Fase | Estado | Evidencia |
 |---|---|---|
-| 0 — baseline | Completada | Rama `feature/core-cleanup` y commit de respaldo `942640a` |
+| 0 — baseline | Completada | Rama `feature/core-cleanup` y commit de respaldo `aca57e7` |
 | 1 — P0 | Completada | Cap institucional corregido; pytest, Ruff y Black verdes |
 | 2 — cartera | Completada para estabilización | `portfolio.engine` canónico, legacy preservado, tests de invariantes/import |
-| 3 — pipeline/backtest | Completada para selección canónica | `CoreEngine` y `BacktestEngine`; adaptadores temporales |
-| 4 — configuración | Parcial | Mercado, cartera, backtest, paper y versión conectados; quedan campos secundarios |
-| 5 — Streamlit | Parcial | Render condicional, cachés acotadas y API de ancho actualizada; falta AppTest y medición |
-| 6–8 | Pendientes | Fuera del alcance de v1.2.2 |
+| 3 — pipeline/backtest | Completada | `CoreEngine` y `BacktestEngine`; costes por turnover, benchmark configurado, lag de ejecución y adaptadores temporales |
+| 4 — configuración | Parcial | Mercado —incluidos timeout, retry/backoff y caché—, cartera, backtest, paper y versión conectados; quedan campos secundarios |
+| 5 — Streamlit | Completada para estabilización | Render condicional, cachés acotadas, API de ancho, tema nativo y AppTest sin red de `app.py` y todas las vistas |
+| 6 — datos/paper | Completada para estabilización | Operaciones, stops y snapshots atómicos; WAL, timeout, rollback, concurrencia y ciclo UI manual probados |
+| 7 — calidad/dependencias | Parcial | Lock transitivo y cobertura de ramas con umbral 75 % conectados a CI; faltan tipos y auditoría de vulnerabilidades |
+| 8 — documentación/release | Parcial | Distribución y política Git completadas; integración autorizada y retirada de legacy siguen pendientes |
 
 No se retirará legacy en v1.2.2. La siguiente fase debe empezar por los P1 abiertos enumerados en `AUDIT_REPORT.md`, manteniendo un commit reversible por riesgo.
 
@@ -102,8 +104,8 @@ Objetivo: evitar trabajo oculto en cada rerun.
 - Cachear recursos apropiados y limitar cachés con TTL/max entries.
 - Evitar recrear engines y esquemas innecesariamente.
 - Reemplazar 22 usos de `use_container_width`.
-- Mover tema/CSS a configuración nativa cuando sea posible.
-- Añadir AppTest con proveedor falso; ninguna prueba depende de internet.
+- Mover tema/CSS a configuración nativa cuando sea posible. **Completado para colores, tipografía, bordes, sidebar y gráficos.**
+- Añadir AppTest con proveedor falso; ninguna prueba depende de internet. **Completado para el flujo principal y todas las vistas.**
 
 Reversibilidad: conservar selector/estructura anterior detrás de flag temporal.  
 Criterio de salida: pestaña oculta no ejecuta Yahoo, backtest ni optimizador.
@@ -112,23 +114,24 @@ Criterio de salida: pestaña oculta no ejecuta Yahoo, backtest ni optimizador.
 
 Objetivo: persistencia consistente y simulación fiable.
 
-- Transacciones atómicas para cash/posición y timeout SQLite.
-- Definir cuándo se aplican stop-loss y snapshots; mostrarlo al usuario.
+- Transacciones atómicas para cash/posición y timeout SQLite. **Completado.**
+- Definir cuándo se aplican stop-loss y snapshots; mostrarlo al usuario. **Completado: evento manual, confirmado y exclusivamente simulado.**
 - Añadir backup/migración de esquema.
-- Sustituir pickle legacy por formato seguro antes de reactivar caché.
+- Sustituir pickle legacy por formato seguro antes de reactivar caché. **Completado con CSV, TTL y escritura atómica.**
 - Ocultar detalles técnicos en UI y correlacionarlos con logs.
 - Separar bases/logs del artefacto de release.
 
 Reversibilidad: migraciones aditivas; nunca modificar una DB sin backup.  
-Criterio de salida: invariantes contables y concurrencia probadas.
+Criterio de salida: invariantes contables y concurrencia probadas. **Cumplido para compras, ventas y el ciclo atómico stop/snapshot; quedan backup/migración y endurecimiento de mensajes como trabajos separados.**
 
 ## Fase 7 — calidad, tipos y dependencias
 
 Objetivo: prevenir regresiones estructurales.
 
-- Añadir cobertura con umbral inicial basado en el baseline, subiendo por módulos críticos.
+- Añadir cobertura con umbral inicial basado en el baseline, subiendo por módulos críticos. **Completado: baseline 77,5 % y gate 75 % sobre líneas y ramas.**
 - Añadir mypy o pyright empezando por core, riesgo, cartera y paper.
 - Añadir auditoría de dependencias/código a CI.
+- Fijar dependencias transitivas y verificar que CI/instaladores usan el lock. **Completado con `requirements.lock` y `scripts/check_lock.py`.**
 - Confirmar y retirar `python-dotenv` solo si no hay consumidor externo.
 - Añadir Python 3.14 a CI o fijar versión máxima soportada.
 - Clasificar los 40 módulos no alcanzables: activo externo, legacy o eliminable.
@@ -143,7 +146,8 @@ Objetivo: alinear producto, código y release.
 - Actualizar README, arquitectura, roadmap, changelog y notas operativas.
 - Retirar adaptadores legacy solo después de un ciclo y búsqueda de consumidores.
 - Eliminar archivos únicamente mediante commit dedicado y revisable.
-- Crear artefacto limpio sin `.git`, `.venv`, bases ni logs.
+- Crear artefacto limpio sin `.git`, `.venv`, bases ni logs. **Completado con empaquetado desde `HEAD`, carpetas de estado vacías y manifiesto SHA-256.**
+- Aplicar `trabajo -> develop -> main` sin saltos. **Gate local/CI completado; push, PR y merge pendientes de autorización.**
 
 Reversibilidad: cada retirada es un commit independiente recuperable desde Git.  
 Criterio de salida: documentación coincide con pruebas y artefacto reproducible.

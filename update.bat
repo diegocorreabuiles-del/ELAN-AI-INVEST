@@ -8,9 +8,9 @@ if not exist ".venv\Scripts\python.exe" (
 )
 
 call .venv\Scripts\activate.bat
-python -m pip install --upgrade pip
+python -m pip install --upgrade "pip==26.1.2"
 if errorlevel 1 goto :error
-python -m pip install -e ".[dev]"
+python -m pip install -r requirements.txt
 if errorlevel 1 goto :error
 if not exist data mkdir data
 if not exist logs mkdir logs

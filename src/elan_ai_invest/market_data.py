@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
+import time
+from collections.abc import Callable, Iterable
 
 import pandas as pd
 
+from elan_ai_invest.market.cache import MarketCache
 from elan_ai_invest.providers.base import DownloadResult
 
 
@@ -24,7 +26,36 @@ def _extract_close(frame: pd.DataFrame, symbol: str) -> pd.Series:
         if field in frame.columns:
             return frame[field]
 
-    raise ValueError("no se encontro la columna de cierre")
+    raise ValueError("no se encontró la columna de cierre")
+
+
+def _load_yfinance_downloader() -> Callable[..., pd.DataFrame]:
+    try:
+        import yfinance as yf
+    except ImportError as exc:
+        raise RuntimeError(
+            "Falta yfinance. Ejecuta update.bat antes de descargar mercado."
+        ) from exc
+    return yf.download
+
+
+def _cached_close(
+    cache: MarketCache | None,
+    symbol: str,
+    period: str,
+    interval: str,
+    minimum_history: int,
+) -> pd.Series | None:
+    if cache is None:
+        return None
+    cached = cache.load(symbol, period, interval)
+    if cached is None:
+        return None
+    try:
+        close = _extract_close(cached, symbol).rename(symbol).dropna()
+    except ValueError:
+        return None
+    return close if len(close) >= minimum_history else None
 
 
 def download_adjusted_close(
@@ -32,33 +63,72 @@ def download_adjusted_close(
     period: str = "2y",
     interval: str = "1d",
     minimum_history: int = 60,
+    *,
+    timeout_seconds: float = 10.0,
+    max_retries: int = 2,
+    backoff_seconds: float = 0.5,
+    cache: MarketCache | None = None,
+    downloader: Callable[..., pd.DataFrame] | None = None,
+    sleep: Callable[[float], None] = time.sleep,
 ) -> DownloadResult:
-    try:
-        import yfinance as yf
-    except ImportError as exc:
-        raise RuntimeError(
-            "Falta yfinance. Ejecuta update.bat antes de descargar mercado."
-        ) from exc
+    if timeout_seconds <= 0:
+        raise ValueError("El timeout de mercado debe ser positivo")
+    if max_retries < 0:
+        raise ValueError("Los reintentos de mercado no pueden ser negativos")
+    if backoff_seconds < 0:
+        raise ValueError("El backoff de mercado no puede ser negativo")
 
+    download = downloader or _load_yfinance_downloader()
     series: list[pd.Series] = []
     errors: dict[str, str] = {}
 
-    for symbol in symbols:
+    for raw_symbol in symbols:
+        symbol = str(raw_symbol).strip().upper()
+        if not symbol:
+            continue
+
+        close = _cached_close(cache, symbol, period, interval, minimum_history)
+        if close is not None:
+            series.append(close)
+            continue
+
+        frame: pd.DataFrame | None = None
+        last_error: Exception | None = None
+        attempts = max_retries + 1
+        for attempt in range(attempts):
+            try:
+                frame = download(
+                    symbol,
+                    period=period,
+                    interval=interval,
+                    auto_adjust=True,
+                    progress=False,
+                    threads=False,
+                    timeout=timeout_seconds,
+                )
+                if frame is None or frame.empty:
+                    raise ValueError("sin datos")
+                break
+            except Exception as exc:
+                last_error = exc
+                frame = None
+                if attempt < max_retries:
+                    sleep(backoff_seconds * (2**attempt))
+
+        if frame is None:
+            detail = str(last_error).strip() if last_error is not None else "error desconocido"
+            errors[symbol] = f"descarga fallida tras {attempts} intentos: {detail}"
+            continue
+
         try:
-            frame = yf.download(
-                symbol,
-                period=period,
-                interval=interval,
-                auto_adjust=True,
-                progress=False,
-                threads=False,
-            )
             close = _extract_close(frame, symbol).rename(symbol).dropna()
             if len(close) < minimum_history:
                 raise ValueError(
                     f"historial insuficiente: {len(close)} < {minimum_history} sesiones"
                 )
             series.append(close)
+            if cache is not None:
+                cache.save(symbol, close.rename("Close").to_frame(), period, interval)
         except Exception as exc:
             errors[symbol] = str(exc)
 

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class AppConfig(BaseModel):
@@ -19,6 +19,19 @@ class MarketConfig(BaseModel):
     interval: str = "1d"
     minimum_history: int = Field(default=210, ge=60)
     benchmark: str = "SPY"
+    timeout_seconds: float = Field(default=10.0, gt=0, le=120)
+    max_retries: int = Field(default=2, ge=0, le=10)
+    backoff_seconds: float = Field(default=0.5, ge=0, le=60)
+    cache_ttl_seconds: int = Field(default=3600, ge=0, le=604800)
+    cache_directory: str = "data/market_cache"
+
+    @field_validator("cache_directory")
+    @classmethod
+    def validate_cache_directory(cls, value: str) -> str:
+        path = Path(value)
+        if path.is_absolute() or ".." in path.parts:
+            raise ValueError("La caché de mercado debe permanecer dentro del proyecto")
+        return value
 
 
 class ScoringConfig(BaseModel):
@@ -41,6 +54,8 @@ class BacktestConfig(BaseModel):
     lookback: int = Field(default=63, ge=21)
     top_n: int = Field(default=3, ge=1)
     rebalance_days: int = Field(default=21, ge=1)
+    commission_pct: float = Field(default=0.10, ge=0, le=5)
+    slippage_pct: float = Field(default=0.05, ge=0, le=5)
 
 
 class RiskConfig(BaseModel):

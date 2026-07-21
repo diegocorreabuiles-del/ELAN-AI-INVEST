@@ -1,6 +1,6 @@
 # Deuda técnica de ELAN Quantum
 
-> Estado v1.2.2: TD-001, TD-002, TD-003, TD-004, TD-005, TD-006 y TD-008 quedan resueltos en Fase 1. TD-007 queda mitigado con `CoreEngine` canónico y legacy congelado. TD-012, TD-024, TD-028, TD-029 y TD-034 quedan parcial o totalmente tratados según `AUDIT_REPORT.md`. El resto permanece abierto; no debe interpretarse como incluido en v1.2.2.
+> Estado v1.2.2: TD-001, TD-002, TD-003, TD-004, TD-005, TD-006, TD-008, TD-009, TD-011, TD-013, TD-014, TD-016, TD-017, TD-018 y TD-022 quedan resueltos. TD-007 queda mitigado con `CoreEngine` canónico y legacy congelado; TD-019 queda mitigado con política y gate `trabajo -> develop -> main`, a la espera de integración autorizada. TD-012, TD-024, TD-025, TD-028, TD-029 y TD-034 quedan parcial o totalmente tratados según `AUDIT_REPORT.md`. El resto sigue pendiente.
 
 Escala: P0 bloquea/rompe; P1 importante; P2 mejora; P3 futuro.
 
@@ -18,21 +18,21 @@ Escala: P0 bloquea/rompe; P1 importante; P2 mejora; P3 futuro.
 | TD-008 | P1 | Backtest | `backtest.py` y `backtesting/` se superponen; UI y tests validan motores distintos | Falsa confianza en lo que ve el usuario | Un único motor productivo y tests sobre la misma ruta |
 | TD-009 | P1 | Backtest | UI no aplica costes, slippage, benchmark configurado ni fuera de muestra | Métricas optimistas y no profesionales | Integrar costes/benchmark; declarar supuestos |
 | TD-010 | P1 | Rendimiento | 11 pestañas eager ejecutan contenido oculto | Reruns lentos, red y DB innecesarios | Tabs dinámicos/condicionales o navegación; medir |
-| TD-011 | P1 | Mercado | Descargas Yahoo secuenciales, sin timeout/retry/backoff ni caché persistente activa | Arranque lento y frágil | Política de cliente, caché acotada y pruebas con dobles |
+| TD-011 | P1 | Mercado | Resuelto: Yahoo aplica timeout y retry/backoff configurables; los aciertos se sirven desde caché CSV con TTL | Seis pruebas sin red cubren éxito tras fallos, agotamiento, caché, corrupción, configuración y conexión bootstrap | Mantener métricas operativas y revisar paralelismo en otra fase |
 | TD-012 | P1 | Config | Múltiples campos YAML son ignorados o hardcoded | El usuario cree configurar algo que no cambia | Matriz campo-consumidor y tests de configuración |
-| TD-013 | P1 | Paper | Stop-loss y snapshots existen pero no se llaman desde la app | Protección e histórico anunciados no operan automáticamente | Definir evento explícito y visible; no automatizar dinero real |
-| TD-014 | P1 | Paper/DB | Compra/venta lee saldo/posición antes de escribir sin condición atómica | Carrera entre sesiones y saldo inconsistente | `BEGIN IMMEDIATE`/update condicional; test concurrente |
+| TD-013 | P1 | Paper | Resuelto: la app ofrece una revisión manual y confirmada que ejecuta stops simulados y guarda el snapshot posterior en una única transacción | Sin confirmación no hay cambios; precios o stops inválidos fallan cerrados; la concurrencia no duplica ventas | Mantener el evento manual y local; no conectarlo a brokers ni automatizarlo sin un diseño y aprobación independientes |
+| TD-014 | P1 | Paper/DB | Resuelto: compras, ventas y reset usan `BEGIN IMMEDIATE`; el efectivo se actualiza con condición y toda mutación exige una única fila de cuenta | Escritores concurrentes se serializan; una cuenta ausente o un fallo de orden provoca rollback sin perder posición, efectivo ni trazabilidad | Mantener regresiones concurrentes, de bloqueo, rollback SQLite y cuenta ausente |
 | TD-015 | P1 | Healthcheck | “Base accesible” solo comprueba carpeta padre; además crea carpetas antes | Falso positivo operativo | Abrir DB, validar esquema y realizar transacción reversible |
-| TD-016 | P1 | Reproducibilidad | No hay lockfile; rangos abiertos y `requirements.txt=-e .[dev]` | Reinstalaciones no deterministas | Elegir uv/pip-tools y bloquear por plataforma soportada |
-| TD-017 | P1 | Distribución | ZIP incluye `.venv`, `.git`, logs y bases SQLite | No portable; posible fuga de estado local | Artefacto limpio con exclusiones y datos vacíos |
-| TD-018 | P1 | Pruebas | Sin cobertura; dashboard, Yahoo, configuración efectiva y límites críticos poco cubiertos | 30 tests pasan sin validar el flujo visible completo | Cobertura por riesgo, AppTest y mocks de proveedor |
-| TD-019 | P1 | Ramas | `main` permanece en 0.1; trabajo actual está sobre feature con cambios no consolidados | Flujo de release incoherente | Política `feature -> develop -> main`, sin saltos |
+| TD-016 | P1 | Reproducibilidad | Resuelto: `requirements.lock` fija el cierre transitivo y `requirements.txt`, CI e instaladores lo consumen | `check_lock.py` rechaza pins ausentes o versiones distintas; NumPy se separa para 3.11 y 3.12–3.14 | Actualizar pins solo en un cambio dedicado y validar toda la matriz CI antes de release |
+| TD-017 | P1 | Distribución | Resuelto: `scripts/build_distribution.py` empaqueta exclusivamente archivos confirmados en Git y crea `data/`/`logs/` vacíos | El verificador bloquea `.git`, `.venv`, bases, logs, cachés, credenciales y rutas inseguras; el manifiesto registra hashes y commit | Mantener el gate en CI y distribuir solo artefactos que superen la verificación |
+| TD-018 | P1 | Pruebas | Resuelto para v1.2.2: 96 pruebas, cobertura de líneas y ramas del producto de 77,5 % y umbral CI de 75 % | AppTest ejecuta `app.py` y todas las vistas con datos deterministas; Yahoo queda bloqueado y los módulos críticos conservan sus regresiones | Aumentar el umbral gradualmente y cubrir rutas de error/legacy solo según riesgo demostrado |
+| TD-019 | P1 | Ramas | Mitigado: `check_git_flow.py`, CI y Dependabot aplican `trabajo -> develop -> main`; la historia local es lineal y la candidata está consolidada | `main` sigue en 0.1 y la feature no tiene upstream porque no se autorizan push/merge; protecciones remotas no verificadas | Publicar la feature y crear PR a `develop`; después PR `develop -> main`, solo con autorización y gates remotos verdes |
 | TD-020 | P2 | Duplicación | `safe_render` existe en `layout.py` y `safe.py` con mensajes/retornos distintos | Conducta inconsistente | Una función pública con contrato tipado |
 | TD-021 | P2 | Código muerto | 40 módulos no alcanzables desde `app.py`; varios son stubs | Superficie y confusión innecesarias | Inventario de consumidores, deprecación y cuarentena antes de borrar |
-| TD-022 | P2 | Seguridad | `market.cache` usa `read_pickle` | Ejecución de código si el archivo es hostil | Formato seguro (Parquet) o directorio confiable validado |
+| TD-022 | P2 | Seguridad | Resuelto: `MarketCache` ya no escribe ni lee pickle | CSV inerte, nombres SHA-256 y reemplazo atómico; los `.pkl` anteriores se ignoran | Mantener la caché generada fuera de Git |
 | TD-023 | P2 | Seguridad/UI | `st.exception` y mensajes crudos de excepción llegan al usuario | Filtración de rutas/detalles en remoto | ID de error al usuario, detalle solo en log |
 | TD-024 | P2 | Streamlit | 22 usos de `use_container_width` deprecado | Ruido y futura incompatibilidad | `width="stretch"` o default, en commit mecánico |
-| TD-025 | P2 | Streamlit | CSS inyectado con `unsafe_allow_html=True` | Fragilidad frente a cambios internos | Tema `.streamlit/config.toml` versionado de forma selectiva |
+| TD-025 | P2 | Streamlit | CSS era la única personalización visual | Mitigado: identidad, tipografía, superficies, bordes, sidebar y gráficos ya usan `.streamlit/config.toml`; solo quedan dos reglas de espaciado/tamaño | Retirar esas reglas al existir equivalentes nativos estables |
 | TD-026 | P2 | Tipado | 88/128 funciones totalmente anotadas; no hay mypy/pyright | Errores de contratos no detectados | Tipar primero core, cartera, riesgo, paper y dashboard público |
 | TD-027 | P2 | Dependencias | `python-dotenv` declarado sin uso encontrado | Mantenimiento/superficie extra | Confirmar consumidor y retirar en cambio separado |
 | TD-028 | P2 | Python | `.venv` usa 3.14.5; CI solo 3.11–3.13 | Diferencias no probadas | Añadir 3.14 o fijar máximo soportado |
@@ -74,8 +74,8 @@ Antes de retirar cualquiera: buscar consumidores externos, añadir aviso de depr
 - Invariantes de cartera: suma invertido+cash=100, límites, capital y perfiles.
 - Resolución de imports de cartera.
 - Backtest con costes, benchmark, señales desplazadas y datos faltantes.
-- Paper trading concurrente, rollback y errores SQLite.
+- Paper trading concurrente, rollback, errores SQLite y ciclo UI de stops/snapshot. **Completado con pruebas de motor y AppTest sin red.**
 - Configuración: cada campo cambia efectivamente el comportamiento.
-- Streamlit AppTest con proveedor falso y sin red.
+- Streamlit AppTest con proveedor falso y sin red. **Completado para `app.py`, todas las vistas y rutas de paper críticas.**
 - Yahoo: timeout, errores parciales, columnas MultiIndex y rate limiting con mocks.
 - Seguridad: no exponer detalles y no cargar pickle no confiable.

@@ -7,12 +7,16 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
-.streamlit/
+.streamlit/*
+!.streamlit/config.toml
 *.egg-info/
 build/
 dist/
+data/market_cache/
 data/*.db
 data/*.sqlite
 logs/*.log
 .coverage
+coverage-*.json
+coverage.xml
 htmlcov/
