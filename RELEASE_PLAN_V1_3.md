@@ -1,6 +1,6 @@
 # Plan de release propuesto — ELAN Quantum v1.3
 
-> v1.3 sigue sin crearse. La rama actual prepara exclusivamente v1.2.2 Core Cleanup. Los gates resueltos aquí son prerrequisitos; los P1 restantes de backtest, paper trading, mercado, reproducibilidad y seguridad deben completarse antes de reconsiderar v1.3.
+> v1.3 sigue sin crearse. La rama actual prepara exclusivamente v1.2.2 Core Cleanup. Los gates resueltos aquí son prerrequisitos; los P1 restantes de healthcheck, tipos y seguridad deben completarse antes de reconsiderar v1.3. Distribución y cobertura quedan resueltas por TD-017 y TD-018.
 
 Estado: **propuesta; v1.3 no ha sido creada**.
 
@@ -21,7 +21,7 @@ v1.3 debe ser una release de consolidación y fiabilidad, no una expansión de f
 - Paper trading atómico, snapshots y semántica clara de stop-loss.
 - Lockfile y matriz Python soportada.
 - Cobertura y type checking inicial en módulos críticos.
-- Documentación y artefacto limpio de distribución.
+- Documentación sincronizada; el artefacto limpio de distribución ya está resuelto como prerrequisito en v1.2.2.
 
 ### No debe entrar
 
@@ -77,18 +77,23 @@ v1.3 debe ser una release de consolidación y fiabilidad, no una expansión de f
 
 ### M5 — release candidate
 
-- Lockfile, tipos, cobertura y seguridad.
+- Lockfile reproducible. **Completado como prerrequisito en v1.2.2.**
+- Tipos, cobertura y seguridad.
 - Documentación sincronizada.
 - Artefacto limpio y smoke test en una máquina/entorno nuevo.
 
 ## Estrategia Git propuesta
 
-1. No publicar desde el working tree actual.
-2. Consolidar primero 1.2.1 en una rama de integración autorizada.
-3. Crear ramas pequeñas `codex/` o `feature/` por fase, según la convención que decida el propietario.
-4. Integrar en `develop` únicamente con gates verdes.
-5. Preparar un release candidate desde `develop`.
-6. Fusionar en `main` solo tras aceptación; no hacer push/merge durante la auditoría.
+Estado: política implementada localmente; publicación e integración no ejecutadas.
+
+1. No publicar desde un working tree: la candidata debe ser un commit limpio.
+2. Crear ramas pequeñas `feature/`, `fix/`, `chore/` o `docs/`.
+3. Integrar ramas de trabajo en `develop` únicamente mediante PR y gates verdes.
+4. Preparar el release candidate desde `develop`.
+5. Integrar únicamente `develop` en `main`, tras aceptación explícita.
+6. Crear cualquier tag o artefacto publicado desde `main`.
+
+`scripts/check_git_flow.py` aplica esta secuencia en local y CI. Los comandos, snapshot y protecciones remotas pendientes están en `GIT_WORKFLOW.md`.
 
 ## Versionado
 

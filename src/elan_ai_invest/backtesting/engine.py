@@ -1,6 +1,10 @@
+from __future__ import annotations
+
 import numpy as np
 import pandas as pd
 
+from .benchmark import build_benchmark_curve
+from .costs import apply_transaction_costs
 from .metrics import calculate_metrics
 from .report import build_report
 from .strategy import run_strategy
@@ -17,25 +21,63 @@ class BacktestEngine:
         lookback: int = 63,
         top_n: int = 3,
         rebalance: int = 21,
+        *,
+        commission_pct: float = 0.0,
+        slippage_pct: float = 0.0,
+        benchmark_symbol: str | None = None,
     ) -> pd.DataFrame:
-        """Run the canonical multi-asset, long-only momentum simulation."""
+        """Run the canonical multi-asset, long-only momentum simulation.
+
+        Signals are calculated with closing prices and shifted one complete
+        bar before execution. Costs are charged on executed turnover.
+        """
+        if lookback < 1 or top_n < 1 or rebalance < 1:
+            raise ValueError("Lookback, top_n y rebalance deben ser positivos")
+
         clean = prices.dropna(how="all").ffill()
+        benchmark, benchmark_label = build_benchmark_curve(clean, benchmark_symbol)
         if clean.empty or len(clean) <= lookback + rebalance:
             return pd.DataFrame()
+
         daily_returns = clean.pct_change().fillna(0.0)
         momentum = clean.pct_change(lookback)
-        weights = pd.DataFrame(0.0, index=clean.index, columns=clean.columns)
+        target_weights = pd.DataFrame(0.0, index=clean.index, columns=clean.columns)
         for index in range(lookback, len(clean), rebalance):
             scores = momentum.iloc[index].dropna().sort_values(ascending=False)
             selected = scores[scores > 0].head(top_n).index
             if len(selected) == 0:
                 continue
             end = min(index + rebalance, len(clean))
-            weights.loc[clean.index[index:end], selected] = 1.0 / len(selected)
-        strategy_returns = (weights.shift(1).fillna(0.0) * daily_returns).sum(axis=1)
-        equity = (1.0 + strategy_returns).cumprod()
-        benchmark = (1.0 + daily_returns.mean(axis=1)).cumprod()
-        return pd.DataFrame({"strategy": equity, "benchmark_equal_weight": benchmark})
+            target_weights.loc[clean.index[index:end], selected] = 1.0 / len(selected)
+
+        executed_weights = target_weights.shift(1).fillna(0.0)
+        gross_returns = (executed_weights * daily_returns).sum(axis=1)
+        net_returns, transaction_cost, turnover = apply_transaction_costs(
+            gross_returns,
+            executed_weights,
+            commission_pct=commission_pct,
+            slippage_pct=slippage_pct,
+        )
+        result = pd.DataFrame(
+            {
+                "strategy": (1.0 + net_returns).cumprod(),
+                "strategy_gross": (1.0 + gross_returns).cumprod(),
+                "benchmark": benchmark,
+                "turnover": turnover,
+                "transaction_cost": transaction_cost,
+            }
+        )
+        if benchmark_symbol is None:
+            result["benchmark_equal_weight"] = benchmark
+        result.attrs.update(
+            {
+                "benchmark_symbol": benchmark_label,
+                "commission_pct": float(commission_pct),
+                "slippage_pct": float(slippage_pct),
+                "execution_lag_bars": 1,
+            }
+        )
+        return result
 
     @staticmethod
     def performance_stats(equity: pd.Series) -> dict[str, float]:

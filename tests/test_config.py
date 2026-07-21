@@ -10,6 +10,9 @@ def test_settings_file_loads():
     settings = load_settings(root / "config" / "settings.yaml")
     assert settings.app.version == "1.2.2"
     assert settings.market.provider == "yahoo"
+    assert settings.market.benchmark == "SPY"
+    assert settings.backtest.commission_pct == pytest.approx(0.10)
+    assert settings.backtest.slippage_pct == pytest.approx(0.05)
 
 
 def test_scoring_weights_must_sum_one():

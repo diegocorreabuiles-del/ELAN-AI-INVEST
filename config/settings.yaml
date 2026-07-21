@@ -9,6 +9,11 @@ market:
   interval: "1d"
   minimum_history: 210
   benchmark: "SPY"
+  timeout_seconds: 10
+  max_retries: 2
+  backoff_seconds: 0.5
+  cache_ttl_seconds: 3600
+  cache_directory: "data/market_cache"
 
 scoring:
   trend_weight: 0.40
@@ -20,6 +25,8 @@ backtest:
   lookback: 63
   top_n: 3
   rebalance_days: 21
+  commission_pct: 0.10
+  slippage_pct: 0.05
 
 storage:
   database_path: "data/elan_ai_invest.db"

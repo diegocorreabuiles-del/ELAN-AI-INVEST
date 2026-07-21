@@ -43,7 +43,8 @@ def build_portfolio(
     if "risk_contribution_pct" not in risk_data.columns:
         risk_data["risk_contribution_pct"] = 0.0
 
-    merged = ranking.merge(
+    ranking_without_derived_risk = ranking.drop(columns=["volatility_pct"], errors="ignore")
+    merged = ranking_without_derived_risk.merge(
         risk_data[["symbol", "volatility_pct", "risk_contribution_pct"]],
         on="symbol",
         how="inner",

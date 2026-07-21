@@ -203,7 +203,13 @@ if tabs[7].open:
         )
 if tabs[8].open:
     with tabs[8]:
-        safe_render("Backtesting", render_backtesting_tab, prices, ENGINE.settings.backtest)
+        safe_render(
+            "Backtesting",
+            render_backtesting_tab,
+            prices,
+            ENGINE.settings.backtest,
+            ENGINE.settings.market.benchmark,
+        )
 if tabs[9].open:
     with tabs[9]:
         safe_render("Histórico", render_history_tab, ENGINE, DB_PATH, selected, period)
