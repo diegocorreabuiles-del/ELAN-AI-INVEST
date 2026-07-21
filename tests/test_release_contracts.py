@@ -36,5 +36,22 @@ def test_documented_release_tooling_paths_exist() -> None:
         "scripts/check_git_flow.py",
         "scripts/check_lock.py",
         "scripts/build_distribution.py",
+        "scripts/run_ci_matrix.ps1",
     ):
         assert (ROOT / relative_path).is_file(), relative_path
+
+
+def test_local_ci_matrix_is_isolated_and_matches_github_versions() -> None:
+    script = (ROOT / "scripts" / "run_ci_matrix.ps1").read_text(encoding="utf-8")
+    workflow = (ROOT / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+
+    for version in ("3.11", "3.12", "3.13", "3.14"):
+        assert f'"{version}"' in script
+        assert f'"{version}"' in workflow
+
+    assert "target=/workspace,readonly" in script
+    assert "PYTHONDONTWRITEBYTECODE=1" in script
+    assert "COVERAGE_FILE=/tmp/.coverage" in script
+    assert "python scripts/check_lock.py" in script
+    assert "python -m pytest -p no:cacheprovider" in script
+    assert "python scripts/build_distribution.py --verify" in script
