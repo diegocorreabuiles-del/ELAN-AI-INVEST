@@ -33,6 +33,12 @@ Validar la rama actual:
 python scripts/check_git_flow.py
 ```
 
+Reproducir la matriz Linux completa de Python 3.11–3.14 con Docker Desktop iniciado:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\run_ci_matrix.ps1
+```
+
 Validar una transición y comprobar que la rama destino es ancestro de la rama de trabajo:
 
 ```powershell

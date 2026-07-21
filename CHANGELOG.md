@@ -9,7 +9,9 @@
 - Reconstruido el empaquetador desde `HEAD`, con manifiesto SHA-256 y verificación segura sin extracción.
 - Añadidas regresiones para reproducibilidad, estado local, rutas, credenciales, enlaces y manipulación del ZIP.
 - Recuperado AppTest sin red para el flujo principal, las once vistas y las acciones paper simuladas.
-- Elevado el baseline de cobertura local a 80,6 % con 115 pruebas, superando el gate del 75 %.
+- Elevado el baseline de cobertura a 80,6 % con 116 pruebas, superando el gate del 75 %.
+- Validada localmente en Docker la matriz Linux Python 3.11–3.14: lock, `pip check`, Ruff, Black, 116 pruebas y distribución reproducible.
+- Cerradas correctamente las conexiones SQLite creadas por los tests de atomicidad.
 - No se ha publicado una release, un tag, un merge ni un artefacto.
 
 ## 1.2.2 — Core Cleanup
