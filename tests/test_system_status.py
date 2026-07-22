@@ -1,4 +1,5 @@
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 from elan_ai_invest.core.config import Settings
@@ -28,7 +29,7 @@ def test_system_status_reports_required_files(tmp_path: Path):
     status = collect_system_status(tmp_path, settings)
     assert status.ok
     assert status.version == "1.2.2"
-    with sqlite3.connect(tmp_path / settings.storage.database_path) as connection:
+    with closing(sqlite3.connect(tmp_path / settings.storage.database_path)) as connection:
         probe = connection.execute(
             "SELECT name FROM sqlite_master WHERE name = '__elan_ai_invest_healthcheck_probe'"
         ).fetchone()
