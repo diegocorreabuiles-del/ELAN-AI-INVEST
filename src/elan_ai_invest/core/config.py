@@ -6,11 +6,22 @@ from typing import Any
 import yaml
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from elan_ai_invest import __version__
+
 
 class AppConfig(BaseModel):
     name: str = "ELAN AI INVEST"
-    version: str = "0.4.0"
+    version: str = __version__
     environment: str = "development"
+
+    @field_validator("version")
+    @classmethod
+    def validate_version(cls, value: str) -> str:
+        if value != __version__:
+            raise ValueError(
+                f"La versión configurada debe coincidir con el paquete ({__version__})"
+            )
+        return value
 
 
 class MarketConfig(BaseModel):

@@ -22,6 +22,14 @@
 - Sustituidos `st.exception` y mensajes crudos por referencias de soporte; el detalle queda solo en logging.
 - El healthcheck inicializa y valida esquemas SQLite, ejecuta `quick_check` y prueba escritura con rollback.
 - Riesgo calcula correlación, volatilidad y VaR únicamente con retornos consecutivos alineados, sin rellenar huecos con cero.
+- Verificado por regresión que las once pestañas Streamlit solo renderizan su contenido al abrirse y que no quedan APIs de ancho deprecadas.
+- Añadido mypy al entorno de desarrollo y a CI para 12 módulos críticos de core, cartera, riesgo, paper trading, sistema y UI segura.
+- Endurecido paper trading para revertir la transacción si SQLite no devuelve identificador de orden.
+- Hecho idempotente el logging por handler, ruta, rotación y nivel, sin reutilizar destinos obsoletos.
+- Convertida la metadata instalada desde `pyproject.toml` en fuente de la versión visible; una versión YAML divergente se rechaza.
+- Retirada la dependencia directa `python-dotenv`, que no tenía consumidor, y actualizado el lock a 78 pins activos.
+- Eliminado del actualizador el borrado automático de siete scripts históricos.
+- Elevado el baseline local a 123 pruebas y 81,1 % de cobertura.
 - No se ha integrado `develop` en `main` ni publicado una release, un tag o un artefacto.
 
 ## 1.2.2 — Core Cleanup

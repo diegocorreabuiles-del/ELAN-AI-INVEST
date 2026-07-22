@@ -313,7 +313,9 @@ class PaperTradingEngine:
                         reason,
                     ),
                 )
-                order_id = int(cursor.lastrowid)
+                order_id = cursor.lastrowid
+                if order_id is None:
+                    raise sqlite3.IntegrityError("paper buy order insert did not return an id")
         except sqlite3.Error as exc:
             return self._database_failure("buy", exc)
 
@@ -409,7 +411,10 @@ class PaperTradingEngine:
                 reason,
             ),
         )
-        return TradeResult(True, f"Venta simulada: {symbol}", int(cursor.lastrowid))
+        order_id = cursor.lastrowid
+        if order_id is None:
+            raise sqlite3.IntegrityError("paper sell order insert did not return an id")
+        return TradeResult(True, f"Venta simulada: {symbol}", order_id)
 
     @staticmethod
     def _validated_risk_prices(
