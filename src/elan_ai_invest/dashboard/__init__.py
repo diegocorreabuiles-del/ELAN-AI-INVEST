@@ -9,7 +9,7 @@ from .paper_trading import render_paper_trading_tab
 from .portfolio import render_portfolio_tab
 from .ranking import render_ranking_tab
 from .risk import render_risk_tab
-from .safe import safe_render
+from .safe import safe_render, show_safe_error
 from .system import render_system_tab
 
 __all__ = [
@@ -28,4 +28,5 @@ __all__ = [
     "render_risk_tab",
     "render_system_tab",
     "safe_render",
+    "show_safe_error",
 ]

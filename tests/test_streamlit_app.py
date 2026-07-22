@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import numpy as np
@@ -370,7 +371,9 @@ def test_app_contains_startup_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     app = AppTest.from_file(APP_PATH, default_timeout=20).run()
 
     assert any("no pudo iniciar" in item.value for item in app.error)
-    assert any("startup fixture" in item.message for item in app.exception)
+    assert any("Referencia:" in item.value for item in app.error)
+    assert not app.exception
+    assert all("startup fixture" not in item.value for item in app.error)
 
 
 def test_app_contains_analysis_failure(app_environment: FakeEngine) -> None:
@@ -380,7 +383,9 @@ def test_app_contains_analysis_failure(app_environment: FakeEngine) -> None:
     app = AppTest.from_file(APP_PATH, default_timeout=20).run()
 
     assert any("No se pudo completar" in item.value for item in app.error)
-    assert any("analysis fixture" in item.message for item in app.exception)
+    assert any("Referencia:" in item.value for item in app.error)
+    assert not app.exception
+    assert all("analysis fixture" not in item.value for item in app.error)
 
 
 def test_app_stops_on_empty_analysis(app_environment: FakeEngine) -> None:
@@ -410,4 +415,7 @@ def fail():
 safe_render("Vista de prueba", fail)
 """).run()
 
-    assert app.error[0].value == "Error en Vista de prueba: view fixture"
+    assert app.error[0].value.startswith("No se pudo mostrar Vista de prueba. Referencia: `")
+    assert re.search(r"[0-9A-F]{12}", app.error[0].value)
+    assert "view fixture" not in app.error[0].value
+    assert not app.exception
