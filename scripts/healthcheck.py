@@ -4,6 +4,8 @@ import importlib
 from pathlib import Path
 
 from elan_ai_invest.core.config import load_settings
+from elan_ai_invest.paper_trading import PaperTradingEngine
+from elan_ai_invest.storage import init_db
 from elan_ai_invest.system_status import collect_system_status
 
 REQUIRED_MODULES = (
@@ -33,6 +35,15 @@ def main() -> int:
     settings = load_settings(root / "config" / "settings.yaml")
     (root / "data").mkdir(exist_ok=True)
     (root / "logs").mkdir(exist_ok=True)
+
+    init_db(root / settings.storage.database_path)
+    PaperTradingEngine(
+        root / settings.paper_trading.database_path,
+        initial_capital=settings.paper_trading.initial_capital,
+        commission_pct=settings.paper_trading.commission_pct,
+        stop_loss_pct=settings.paper_trading.stop_loss_pct,
+        max_open_positions=settings.paper_trading.max_open_positions,
+    )
 
     status = collect_system_status(root, settings)
     checks = dict(status.checks)

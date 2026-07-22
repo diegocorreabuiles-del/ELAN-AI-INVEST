@@ -23,6 +23,7 @@ from elan_ai_invest.dashboard import (
     render_risk_tab,
     render_system_tab,
     safe_render,
+    show_safe_error,
 )
 from elan_ai_invest.paper_trading import PaperTradingEngine
 from elan_ai_invest.risk import calculate_risk_report
@@ -41,10 +42,12 @@ try:
     if missing_columns:
         raise ValueError("Faltan columnas en watchlist.csv: " + ", ".join(sorted(missing_columns)))
 except Exception as exc:
-    st.error("ELAN Quantum no pudo iniciar correctamente.")
+    show_safe_error(
+        "ELAN Quantum no pudo iniciar correctamente.",
+        exc,
+        context="app:startup",
+    )
     st.info("Ejecuta update.bat y vuelve a abrir la aplicación.")
-    with st.expander("Detalle técnico"):
-        st.exception(exc)
     st.stop()
 
 name_map = dict(zip(watchlist["symbol"], watchlist["name"], strict=True))
@@ -101,10 +104,12 @@ try:
     with st.spinner("Actualizando mercado y riesgo...", show_time=True):
         analysis = run_analysis(tuple(selected), period)
 except Exception as exc:
-    st.error("No se pudo completar el análisis de mercado.")
+    show_safe_error(
+        "No se pudo completar el análisis de mercado.",
+        exc,
+        context="app:analysis",
+    )
     st.info("Comprueba la conexión a internet y pulsa Actualizar mercado.")
-    with st.expander("Detalle técnico"):
-        st.exception(exc)
     st.stop()
 
 prices = analysis.prices
