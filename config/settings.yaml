@@ -1,6 +1,5 @@
 app:
   name: "ELAN Quantum"
-  version: "1.2.2"
   environment: "development"
 
 market:

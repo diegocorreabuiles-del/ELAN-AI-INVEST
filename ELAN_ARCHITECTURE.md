@@ -1,6 +1,6 @@
 # Arquitectura canónica de ELAN Quantum v1.2.2
 
-> **Estado recuperado en el nuevo PC (22 de julio de 2026).** Los PR #1, #2 y #3 integraron en `develop` la recuperación, las Actions con Node 24 y la renovación visual; las matrices remotas pasan en Python 3.11–3.14 y `develop`/`main` siguen protegidas. La rama actual endurece errores, healthcheck y datos de riesgo. No se ha integrado `develop` en `main` ni creado tag, release o despliegue.
+> **Estado recuperado en el nuevo PC (22 de julio de 2026).** Los PR #1–#4 integraron en `develop` la recuperación, las Actions con Node 24, la renovación visual y el hardening de errores/datos. La rama actual cierra compatibilidad Streamlit, tipado crítico, logging, versión y tooling antes del release candidate. No se ha integrado `develop` en `main` ni creado tag, release o despliegue.
 
 Estado: arquitectura vigente tras la Fase 1 de estabilización. `ARCHITECTURE_CURRENT.md` conserva la fotografía anterior a la limpieza.
 
@@ -65,7 +65,7 @@ Los datos de mercado entran por el proveedor configurado, se validan con `market
 | `backtest.lookback`, `top_n`, `rebalance_days`, `commission_pct`, `slippage_pct` | controles, costes y ejecución del backtest visible |
 | `market.benchmark` | curva comparativa del backtest y factores cuantitativos |
 | `paper_trading.enabled` | creación y renderizado del simulador |
-| `app.version` | sincronizada con paquete y `pyproject.toml` en 1.2.2 |
+| `app.version` | derivada de la metadata del paquete; `pyproject.toml` es la fuente canónica |
 
 ## Módulos legacy preservados
 
@@ -94,14 +94,14 @@ No se borró ninguna implementación. Su retirada requiere búsqueda de consumid
 
 - Pytest mide líneas y ramas de `app.py` y de todo `elan_ai_invest`, incluidos módulos legacy no ejecutados; CI bloquea cualquier resultado inferior a 75 %.
 - AppTest sustituye el Core Engine y los fundamentales por datos deterministas, prohíbe llamadas Yahoo y renderiza tanto el flujo inicial como todas las vistas.
-- El baseline local de la rama de hardening es 81,0 % con 121 pruebas superadas en Python 3.12. El umbral debe aumentar solo junto con pruebas que cubran riesgo real, sin excluir legacy para inflar el porcentaje.
+- El baseline local del release candidate es 81,1 % con 123 pruebas superadas en Python 3.12. El umbral debe aumentar solo junto con pruebas que cubran riesgo real, sin excluir legacy para inflar el porcentaje.
 
 ## Frontera de integración
 
 - `scripts/check_git_flow.py` admite únicamente ramas de trabajo hacia `develop` y `develop` hacia `main`.
 - CI valida la transición del pull request; Dependabot usa `develop` como destino.
-- El PR #1 integró `recovery/pc-migration-20260721` y el PR #2 integró el mantenimiento Node 24 en `develop`, ambos mediante rebase; sus ramas se conservan como referencia temporal.
-- Las protecciones remotas verificadas y la secuencia operativa están en `GIT_WORKFLOW.md`; el PR #3 ya integró la rama visual y el hardening actual debe entrar en `develop` antes de preparar un PR independiente hacia `main`.
+- Los PR #1–#4 integraron en `develop` la recuperación, el mantenimiento Node 24, la renovación visual y el hardening de errores, healthcheck y riesgo, siempre con matriz posterior verde.
+- Las protecciones remotas verificadas y la secuencia operativa están en `GIT_WORKFLOW.md`; el release candidate actual debe entrar en `develop` antes de preparar un PR independiente hacia `main`.
 
 ## Ciclo de riesgo de paper trading
 
@@ -113,5 +113,5 @@ No se borró ninguna implementación. Su retirada requiere búsqueda de consumid
 
 ## Deuda aún fuera de Fase 1
 
-- Tipado estático.
+- Extender gradualmente el tipado estático más allá de los 12 módulos críticos ya cubiertos por mypy.
 - Retirada de legacy tras el ciclo de compatibilidad.

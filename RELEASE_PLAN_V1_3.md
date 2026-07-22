@@ -1,6 +1,6 @@
 # Plan de release propuesto — ELAN Quantum v1.3
 
-> v1.3 sigue sin crearse. La renovación visual ya entró en `develop` mediante el PR #3. La rama actual resuelve healthcheck, exposición de excepciones y sesgo por datos faltantes; el type checking inicial sigue pendiente antes de reconsiderar v1.3. Distribución y cobertura permanecen resueltas por TD-017 y TD-018.
+> v1.3 sigue sin crearse. Los PR #3 y #4 ya incorporaron a `develop` la renovación visual y el hardening de errores/datos. La rama actual completa compatibilidad Streamlit, type checking crítico, logging idempotente, versión canónica y tooling antes de preparar `develop -> main`.
 
 Estado: **propuesta; v1.3 no ha sido creada**.
 
@@ -80,13 +80,13 @@ v1.3 debe ser una release de consolidación y fiabilidad, no una expansión de f
 ### M5 — release candidate
 
 - Lockfile reproducible. **Completado como prerrequisito en v1.2.2.**
-- Tipos, cobertura y seguridad.
+- Tipos críticos, cobertura y seguridad. **Completado localmente; pendiente matriz CI/PR.**
 - Documentación sincronizada.
 - Artefacto limpio y smoke test en una máquina/entorno nuevo.
 
 ## Estrategia Git propuesta
 
-Estado: política y protecciones implementadas; PR #1, PR #2 y PR #3 integrados en `develop`; la rama de hardening está pendiente de PR y la transición `develop -> main` todavía no se ha ejecutado.
+Estado: política y protecciones implementadas; PR #1–#4 integrados en `develop`; la rama del release candidate está pendiente de PR y la transición `develop -> main` todavía no se ha ejecutado.
 
 1. No publicar desde un working tree: la candidata debe ser un commit limpio.
 2. Crear ramas pequeñas `feature/`, `fix/`, `chore/` o `docs/`.
@@ -99,7 +99,7 @@ Estado: política y protecciones implementadas; PR #1, PR #2 y PR #3 integrados 
 
 ## Versionado
 
-Antes del RC, una sola fuente debe alimentar:
+Antes del RC, `pyproject.toml` actúa como fuente canónica y su metadata alimenta:
 
 - `pyproject.toml`
 - `elan_ai_invest.__version__`
