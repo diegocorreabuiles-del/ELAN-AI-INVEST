@@ -23,9 +23,6 @@ if errorlevel 1 goto :error
 python -m pytest
 if errorlevel 1 goto :error
 
-for %%F in (start_windows.bat update_to_v02.bat update_to_v03.bat update_to_v031.bat update_to_v04.bat update_to_v05.bat update_to_v06.bat) do (
-    if exist "%%F" del /q "%%F"
-)
 
 echo.
 echo ACTUALIZACION COMPLETADA

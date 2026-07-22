@@ -4,7 +4,10 @@ import importlib
 import tomllib
 from pathlib import Path
 
-from elan_ai_invest.core.config import load_settings
+import pytest
+from pydantic import ValidationError
+
+from elan_ai_invest.core.config import AppConfig, load_settings
 
 
 def test_public_packages_import_without_optional_network_calls():
@@ -33,3 +36,8 @@ def test_release_version_is_synchronised():
 
     assert project["project"]["version"] == __version__
     assert settings.app.version == __version__
+
+
+def test_explicit_stale_version_is_rejected():
+    with pytest.raises(ValidationError, match="debe coincidir con el paquete"):
+        AppConfig(version="1.2.1")

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from scripts.check_git_flow import FlowError, normalize_branch, run, validate_transition
@@ -9,6 +11,8 @@ from scripts.check_lock import (
     validate_environment,
     validate_requirements_contract,
 )
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 @pytest.mark.parametrize(
@@ -123,3 +127,8 @@ def test_environment_rejects_version_drift() -> None:
             declared={"numpy"},
             installed={"numpy": "2.5.0"},
         )
+
+
+def test_windows_updater_never_deletes_project_files() -> None:
+    source = (ROOT / "update.bat").read_text(encoding="utf-8")
+    assert "del /q" not in source.lower()
