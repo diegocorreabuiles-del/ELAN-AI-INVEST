@@ -1,6 +1,6 @@
 # Plan de release propuesto — ELAN Quantum v1.3
 
-> v1.3 sigue sin crearse. La rama actual aplica una renovación visual acotada sobre el baseline v1.2.2, sin cambiar arquitectura ni lógica financiera y sin formar parte del alcance funcional de v1.3. Los P1 restantes de healthcheck, tipos y seguridad deben completarse antes de reconsiderar v1.3; distribución y cobertura quedan resueltas por TD-017 y TD-018.
+> v1.3 sigue sin crearse. La renovación visual ya entró en `develop` mediante el PR #3. La rama actual resuelve healthcheck, exposición de excepciones y sesgo por datos faltantes; el type checking inicial sigue pendiente antes de reconsiderar v1.3. Distribución y cobertura permanecen resueltas por TD-017 y TD-018.
 
 Estado: **propuesta; v1.3 no ha sido creada**.
 
@@ -74,6 +74,8 @@ v1.3 debe ser una release de consolidación y fiabilidad, no una expansión de f
 - Streamlit lazy/condicional.
 - Mercado con timeout/retry/cache.
 - Paper trading atómico y observable.
+- Healthcheck SQLite con integridad, esquema y rollback verificados. **Completado en la rama de hardening.**
+- Errores internos fuera de la UI y retornos de riesgo alineados sin imputación cero. **Completado en la rama de hardening.**
 
 ### M5 — release candidate
 
@@ -84,7 +86,7 @@ v1.3 debe ser una release de consolidación y fiabilidad, no una expansión de f
 
 ## Estrategia Git propuesta
 
-Estado: política y protecciones implementadas; PR #1 y PR #2 integrados en `develop`, rama visual pendiente de PR y transición `develop -> main` todavía no ejecutada.
+Estado: política y protecciones implementadas; PR #1, PR #2 y PR #3 integrados en `develop`; la rama de hardening está pendiente de PR y la transición `develop -> main` todavía no se ha ejecutado.
 
 1. No publicar desde un working tree: la candidata debe ser un commit limpio.
 2. Crear ramas pequeñas `feature/`, `fix/`, `chore/` o `docs/`.

@@ -1,6 +1,6 @@
 # Arquitectura canónica de ELAN Quantum v1.2.2
 
-> **Estado recuperado en el nuevo PC (22 de julio de 2026).** Los PR #1 y #2 integraron en `develop` la recuperación y las Actions con Node 24; ambas matrices posteriores al merge pasan en Python 3.11–3.14 y `develop`/`main` siguen protegidas. La rama visual actual renueva únicamente la presentación Streamlit. No se ha integrado `develop` en `main` ni creado tag, release o despliegue.
+> **Estado recuperado en el nuevo PC (22 de julio de 2026).** Los PR #1, #2 y #3 integraron en `develop` la recuperación, las Actions con Node 24 y la renovación visual; las matrices remotas pasan en Python 3.11–3.14 y `develop`/`main` siguen protegidas. La rama actual endurece errores, healthcheck y datos de riesgo. No se ha integrado `develop` en `main` ni creado tag, release o despliegue.
 
 Estado: arquitectura vigente tras la Fase 1 de estabilización. `ARCHITECTURE_CURRENT.md` conserva la fotografía anterior a la limpieza.
 
@@ -49,6 +49,8 @@ Los datos de mercado entran por el proveedor configurado, se validan con `market
 - Valoración y snapshot comparten una única transacción y representan el mismo estado contable.
 - Comisión y slippage se cargan únicamente sobre turnover ejecutado; un cambio completo de activo tiene turnover 2.0.
 - El benchmark visible procede de `market.benchmark`; si falta en los datos, el backtest falla con un mensaje claro.
+- Riesgo elimina observaciones con datos incompletos antes de calcular correlación, volatilidad y VaR; no hace forward-fill ni inventa retornos cero.
+- El healthcheck prepara los esquemas canónicos y luego exige integridad SQLite, tablas requeridas y una transacción de escritura reversible.
 
 ## Configuración conectada en esta fase
 
@@ -79,7 +81,7 @@ No se borró ninguna implementación. Su retirada requiere búsqueda de consumid
 - Fuente externa: Yahoo mediante `yfinance`; las pruebas no dependen de red.
 - Persistencia: SQLite local para histórico y paper trading.
 - No existe integración activa con brokers ni uso de dinero real.
-- La copia activa y su editable viven en `C:\Users\elanv\Desktop\ELAN AI INVESTMENT`. Las validaciones usan `PYTHONPATH=src` sin reinstalar ni modificar `.venv`.
+- La copia activa y su editable viven en `C:\Users\Asus\Desktop\ELAN AI INVESTMENT`. Las validaciones usan el entorno `.venv` local y no requieren reinstalar el paquete para cada cambio.
 
 ## Frontera de distribución
 
@@ -92,14 +94,14 @@ No se borró ninguna implementación. Su retirada requiere búsqueda de consumid
 
 - Pytest mide líneas y ramas de `app.py` y de todo `elan_ai_invest`, incluidos módulos legacy no ejecutados; CI bloquea cualquier resultado inferior a 75 %.
 - AppTest sustituye el Core Engine y los fundamentales por datos deterministas, prohíbe llamadas Yahoo y renderiza tanto el flujo inicial como todas las vistas.
-- El baseline local de la rama visual es 80,7 % con 118 pruebas en Python 3.12; la matriz de `develop` mantiene 116 pruebas verdes en Python 3.11–3.14 hasta integrar esta rama. El umbral debe aumentar solo junto con pruebas que cubran riesgo real, sin excluir legacy para inflar el porcentaje.
+- El baseline local de la rama de hardening es 81,0 % con 121 pruebas superadas en Python 3.12. El umbral debe aumentar solo junto con pruebas que cubran riesgo real, sin excluir legacy para inflar el porcentaje.
 
 ## Frontera de integración
 
 - `scripts/check_git_flow.py` admite únicamente ramas de trabajo hacia `develop` y `develop` hacia `main`.
 - CI valida la transición del pull request; Dependabot usa `develop` como destino.
 - El PR #1 integró `recovery/pc-migration-20260721` y el PR #2 integró el mantenimiento Node 24 en `develop`, ambos mediante rebase; sus ramas se conservan como referencia temporal.
-- Las protecciones remotas verificadas y la secuencia operativa están en `GIT_WORKFLOW.md`; primero debe integrarse la rama visual en `develop` y después preparar un PR independiente de `develop` hacia `main`.
+- Las protecciones remotas verificadas y la secuencia operativa están en `GIT_WORKFLOW.md`; el PR #3 ya integró la rama visual y el hardening actual debe entrar en `develop` antes de preparar un PR independiente hacia `main`.
 
 ## Ciclo de riesgo de paper trading
 

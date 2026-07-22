@@ -9,7 +9,7 @@
 - Reconstruido el empaquetador desde `HEAD`, con manifiesto SHA-256 y verificación segura sin extracción.
 - Añadidas regresiones para reproducibilidad, estado local, rutas, credenciales, enlaces y manipulación del ZIP.
 - Recuperado AppTest sin red para el flujo principal, las once vistas y las acciones paper simuladas.
-- Elevado el baseline local de cobertura a 80,7 % con 118 pruebas, superando el gate del 75 %.
+- Elevado el baseline local de cobertura a 81,0 % con 121 pruebas superadas, superando el gate del 75 %.
 - Validada localmente en Docker la matriz Linux Python 3.11–3.14: lock, `pip check`, Ruff, Black, 116 pruebas y distribución reproducible.
 - Cerradas correctamente las conexiones SQLite creadas por los tests de atomicidad.
 - Publicada la rama recuperada mediante el PR #1 hacia `develop`; CI remota Python 3.11–3.14 verde.
@@ -18,6 +18,10 @@
 - Actualizadas las Actions oficiales a `checkout@v7` y `setup-python@v7`, ambas sobre Node 24.
 - Integrado el PR #2 en `develop` mediante rebase, con matriz posterior al merge verde y sin avisos de Node 20.
 - Renovada la interfaz Streamlit con un workspace grafito, acentos verde/rojo, tarjetas responsive y controles nativos; sin cambios en lógica financiera.
+- Integrado el PR #3 en `develop` mediante rebase, con la matriz Python 3.11–3.14 verde.
+- Sustituidos `st.exception` y mensajes crudos por referencias de soporte; el detalle queda solo en logging.
+- El healthcheck inicializa y valida esquemas SQLite, ejecuta `quick_check` y prueba escritura con rollback.
+- Riesgo calcula correlación, volatilidad y VaR únicamente con retornos consecutivos alineados, sin rellenar huecos con cero.
 - No se ha integrado `develop` en `main` ni publicado una release, un tag o un artefacto.
 
 ## 1.2.2 — Core Cleanup
