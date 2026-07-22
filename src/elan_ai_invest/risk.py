@@ -23,7 +23,8 @@ class PortfolioRiskReport:
 
 
 def _clean_prices(prices: pd.DataFrame) -> pd.DataFrame:
-    clean = prices.copy().sort_index().ffill().dropna(axis=1, how="all")
+    clean = prices.copy().sort_index().replace([np.inf, -np.inf], np.nan)
+    clean = clean.dropna(axis=1, how="all")
     clean = clean.dropna(how="all")
     if clean.shape[0] < 60 or clean.shape[1] == 0:
         raise ValueError("Se necesitan al menos 60 sesiones y un activo válido")
@@ -48,7 +49,9 @@ def calculate_risk_report(
     annualisation_days: int = 252,
 ) -> PortfolioRiskReport:
     clean = _clean_prices(prices)
-    returns = clean.pct_change(fill_method=None).dropna(how="all").fillna(0.0)
+    returns = clean.pct_change(fill_method=None).dropna(how="any")
+    if len(returns) < 59:
+        raise ValueError("Se necesitan al menos 60 sesiones alineadas con precios consecutivos")
     w = _normalise_weights(returns.columns, weights)
     portfolio_returns = returns.mul(w, axis=1).sum(axis=1)
 

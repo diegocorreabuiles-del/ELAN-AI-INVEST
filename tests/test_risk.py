@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pytest
 
 from elan_ai_invest.risk import calculate_risk_report, suggested_position_size_pct
 
@@ -31,3 +32,24 @@ def test_custom_weights_are_normalised():
 def test_position_size_respects_cap():
     assert suggested_position_size_pct(10, max_position_pct=12) <= 12
     assert suggested_position_size_pct(0) == 0
+
+
+def test_missing_prices_are_excluded_instead_of_becoming_zero_returns():
+    prices = sample_prices()
+    missing_date = prices.index[100]
+    following_date = prices.index[101]
+    prices.loc[missing_date, "BBB"] = np.nan
+
+    report = calculate_risk_report(prices)
+
+    assert missing_date not in report.daily_returns.index
+    assert following_date not in report.daily_returns.index
+    assert len(report.daily_returns) == len(prices) - 3
+
+
+def test_risk_requires_enough_aligned_consecutive_sessions():
+    prices = sample_prices().iloc[:80].copy()
+    prices.loc[prices.index[10:40], "BBB"] = np.nan
+
+    with pytest.raises(ValueError, match="60 sesiones alineadas"):
+        calculate_risk_report(prices)
