@@ -18,7 +18,7 @@
 4. **[2026-07-22] A successful PR still needs post-merge CI**
    Do instead: wait for the four-version push workflow on `develop` after merging a work PR.
 5. **[2026-07-28] Rebase promotion can split `main` and `develop` ancestry**
-   Do instead: after `develop -> main`, verify `main` is an ancestor of `develop`; before another promotion, use the documented backed-up realignment procedure with explicit approval if ancestry diverged.
+   Do instead: when `main` is already an ancestor of a fully validated `develop`, promote the reviewed PR by an exact non-force fast-forward and verify both refs match; use the backed-up realignment procedure with explicit approval only if ancestry has already diverged.
 
 ## Shell & Command Reliability
 

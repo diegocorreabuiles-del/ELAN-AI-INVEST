@@ -13,12 +13,12 @@
 ## Estado validado — 28 de julio de 2026
 
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
-- Base funcional promovida a `main`: `66d6992928d8db3bae5c0c28a63c754982bcbf42`.
-- Candidata `1.3.0rc1` realineada sobre `main` e integrada en `develop`: `3342c65ed4a8e2a23f62cdae759168640e86c9aa`.
+- Base funcional `1.3.0rc1` promovida a `main` y sincronizada con `develop`: `3c4cc72b73d0e7b4159dceb5e960d904fb073196`.
+- La promoción se realizó como avance rápido exacto, sin `force` ni cambios de protección, para conservar el historial lineal y la misma ascendencia en ambas ramas.
 - PR #5 (`feature/release-candidate-hardening -> develop`) fusionada por rebase.
 - PR #6 (`develop -> main`) fusionada por rebase el 28 de julio de 2026.
 - PR #8 (`chore/v1.3.0rc1-candidate -> develop`) fusionada por rebase el 28 de julio de 2026.
-- PR #10 (`develop -> main`) abierta, limpia, fusionable y con CI verde; su fusión no está autorizada todavía.
+- PR #10 (`develop -> main`) fusionada el 28 de julio de 2026; GitHub registró como commit de fusión el propio `3c4cc72`.
 - Respaldo previo a la realineación: `backup/develop-pre-realign-20260728-4a9010a` en `4a9010a8ddc48e057a3e6c49a6c028e4e063c47e`.
 - Working tree estaba limpio antes de crear esta documentación.
 - No existe tag, release ni despliegue nuevo.
@@ -43,6 +43,7 @@ Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que sig
 - Lock, `pip check`, Ruff, Black, mypy, pytest y empaquetado/verificación: verdes.
 - Artefacto del commit realineado `3342c65`: SHA-256 `c24a7643503b39aaf6cd329c3574b08ff5a56278aec9ad5a2ae7793787882e55`.
 - CI del commit realineado (runs `30352036059`, `30352343392` y `30352346829`): verde en Python 3.11–3.14.
+- CI posterior a la promoción en `main` (run `30356214073`): verde en Python 3.11–3.14, incluido lock, `pip check`, Ruff, Black, mypy, pytest y empaquetado/verificación.
 - La protección de `develop` se restauró tras la realineación: PR y checks estrictos obligatorios, historial lineal, conversaciones resueltas, force-push y borrado deshabilitados.
 
 ## Decisiones canónicas
@@ -134,6 +135,6 @@ gh pr view 6 --json state,mergeable,mergeStateStatus,statusCheckRollup,url
 
 ## Siguiente paso autorizado
 
-- La PR #10 `develop -> main` está abierta, limpia y validada; pedir autorización explícita antes de fusionarla.
+- La promoción a `main` y su CI posterior están completadas; no hay ninguna acción de release autorizada todavía.
 - Crear el tag, publicar release o desplegar requieren autorizaciones explícitas independientes posteriores.
 - Mantener el producto en paper trading; cualquier activación de broker o dinero real queda fuera de alcance.
