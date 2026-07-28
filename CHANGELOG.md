@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.0rc1 — Release candidate (no publicada)
+## 1.3.0rc1 — Release candidate
 
 - Reconstruida y documentada la política Git `trabajo -> develop -> main`.
 - Añadido un gate local/CI que valida nombres de rama y transiciones permitidas.
@@ -31,7 +31,9 @@
 - Eliminado del actualizador el borrado automático de siete scripts históricos.
 - Elevado el baseline local a 123 pruebas y 81,1 % de cobertura.
 - Promovida la base validada mediante la PR #6 a `main`; la CI posterior pasó en Python 3.11–3.14.
-- Preparada la metadata PEP 440 `1.3.0rc1` como candidata; no se ha creado tag, publicado release ni desplegado.
+- Preparada la metadata PEP 440 `1.3.0rc1` como candidata.
+- Promovida la candidata mediante la PR #10 a `main` (`3c4cc72`), con CI posterior verde en Python 3.11–3.14.
+- La publicación de una GitHub Release y cualquier despliegue permanecen fuera de este hito.
 
 ## 1.2.2 — Core Cleanup
 

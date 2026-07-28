@@ -21,7 +21,7 @@
 - PR #10 (`develop -> main`) fusionada el 28 de julio de 2026; GitHub registró como commit de fusión el propio `3c4cc72`.
 - Respaldo previo a la realineación: `backup/develop-pre-realign-20260728-4a9010a` en `4a9010a8ddc48e057a3e6c49a6c028e4e063c47e`.
 - Working tree estaba limpio antes de crear esta documentación.
-- No existe tag, release ni despliegue nuevo.
+- El tag canónico de la candidata es `v1.3.0-rc.1`; no existe GitHub Release ni despliegue.
 - Producto local de análisis y paper trading; no conecta brokers ni dinero real.
 
 Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que siguen vigentes en otra fecha.
@@ -56,7 +56,7 @@ Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que sig
 6. **Paper trading:** SQLite local, transacciones `BEGIN IMMEDIATE`, mutaciones atómicas, fallos cerrados y revisión de stops manual/confirmada.
 7. **Streamlit:** workspace grafito tipo plataforma de trading; 11 pestañas lazy con `tab.open`; sin CSS inyectado ni `use_container_width`.
 8. **Errores:** UI neutra con referencia; detalle técnico solo en logging.
-9. **Versión:** `pyproject.toml` es la fuente; `importlib.metadata` alimenta paquete, configuración, UI y healthcheck. Candidata integrada en `develop`: `1.3.0rc1`; todavía no publicada.
+9. **Versión:** `pyproject.toml` es la fuente; `importlib.metadata` alimenta paquete, configuración, UI y healthcheck. Candidata `1.3.0rc1` promovida y validada en `main`; GitHub Release no publicada.
 10. **Dependencias:** cierre exacto en `requirements.lock`; `python-dotenv` fue retirado por no tener consumidor.
 
 ## Reglas de implementación
@@ -135,6 +135,6 @@ gh pr view 6 --json state,mergeable,mergeStateStatus,statusCheckRollup,url
 
 ## Siguiente paso autorizado
 
-- La promoción a `main` y su CI posterior están completadas; no hay ninguna acción de release autorizada todavía.
-- Crear el tag, publicar release o desplegar requieren autorizaciones explícitas independientes posteriores.
+- La creación del tag `v1.3.0-rc.1` sobre `main` está autorizada; su publicación espera que esta sincronización documental llegue a `main`.
+- Publicar una GitHub Release o desplegar requieren autorizaciones explícitas independientes posteriores.
 - Mantener el producto en paper trading; cualquier activación de broker o dinero real queda fuera de alcance.

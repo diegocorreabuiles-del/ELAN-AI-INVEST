@@ -7,7 +7,7 @@ Plataforma local de análisis cuantitativo, fundamental, riesgo, cartera, paper 
 - La aplicación local se ejecuta en Python 3.12; la suite y los gates pasan en Python 3.11–3.14 sobre Linux.
 - El gate local del release candidate supera 123 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
 - El cierre de dependencias está verificado: 78 pins activos y `pip check` sin conflictos.
-- La política Git aplica `trabajo -> develop -> main`; la PR #6 promovió la base validada a `main` y su CI posterior pasó en Python 3.11–3.14.
+- La política Git aplica `trabajo -> develop -> main`; la PR #10 promovió `1.3.0rc1` a `main` y su CI posterior pasó en Python 3.11–3.14.
 - El gate global de cobertura pasa con 81,0 %, por encima del 75 % configurado.
 - AppTest recorre las once vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
 - El empaquetador seguro está reconstruido y cubierto por pruebas de integridad, rutas y reproducibilidad.
@@ -94,6 +94,6 @@ La política canónica está en `GIT_WORKFLOW.md`. Las ramas de trabajo y recupe
 
 ## Siguiente paso de release
 
-`1.3.0rc1` está validada e integrada en `develop`. El siguiente paso es preparar el PR independiente `develop -> main`, pero abrirlo/fusionarlo, crear el tag, publicar una release o desplegar requieren autorizaciones explícitas independientes.
+`1.3.0rc1` está validada y promovida a `main` en el commit `3c4cc72`. El tag canónico de la candidata se crea exclusivamente desde ese commit; publicar una GitHub Release o desplegar requieren autorizaciones explícitas independientes.
 
 ELAN Quantum es una herramienta educativa y de simulación. No constituye asesoramiento financiero ni garantiza resultados.
