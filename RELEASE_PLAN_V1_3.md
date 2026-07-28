@@ -1,8 +1,8 @@
 # Plan de release propuesto — ELAN Quantum v1.3
 
-> `1.3.0rc1` se prepara como candidata PEP 440. La PR #6 promovió a `main` la base funcional validada y su CI posterior pasó en Python 3.11–3.14. No existe todavía tag, release ni despliegue.
+> `1.3.0rc1` está integrada en `develop` mediante la PR #8 y su CI posterior pasó en Python 3.11–3.14. No existe todavía promoción de esta candidata a `main`, tag, release ni despliegue.
 
-Estado: **release candidate en preparación; no publicada**.
+Estado: **release candidate validada en `develop`; no publicada**.
 
 ## Objetivo
 
@@ -81,12 +81,12 @@ v1.3 es una release de consolidación y fiabilidad, no una expansión de funcion
 
 - Lockfile reproducible. **Completado como prerrequisito en v1.2.2.**
 - Tipos críticos, cobertura y seguridad. **Completado y validado en la promoción de la PR #6.**
-- Documentación sincronizada. **En preparación para `1.3.0rc1`.**
+- Documentación sincronizada. **Completada para `1.3.0rc1`.**
 - Artefacto limpio y smoke test en una máquina/entorno nuevo.
 
 ## Estrategia Git propuesta
 
-Estado: política y protecciones implementadas; PR #1–#6 completados y CI posterior a la promoción a `main` verde. La candidata `1.3.0rc1` vuelve a iniciar el flujo desde una rama `chore/` hacia `develop`.
+Estado: política y protecciones implementadas; la PR #8 integró `1.3.0rc1` en `develop` y su CI posterior quedó verde. La promoción `develop -> main` requiere una autorización explícita independiente.
 
 1. No publicar desde un working tree: la candidata debe ser un commit limpio.
 2. Crear ramas pequeñas `feature/`, `fix/`, `chore/` o `docs/`.
