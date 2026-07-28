@@ -1,4 +1,4 @@
-# ELAN Quantum 1.2.2 dependency constraints.
+# ELAN Quantum 1.3.0rc1 dependency constraints.
 # Generated from a clean Python 3.12.13 environment on 2026-07-21.
 # Validate after installation with: python scripts/check_lock.py
 # NumPy 2.2.6 is the compatible pin for Python 3.11; 2.5.1 covers 3.12-3.14.

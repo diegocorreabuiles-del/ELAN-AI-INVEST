@@ -21,10 +21,10 @@ def test_public_packages_import_without_optional_network_calls():
         assert importlib.import_module(module) is not None
 
 
-def test_version_is_core_cleanup_release():
+def test_version_is_v1_3_release_candidate():
     from elan_ai_invest import __version__
 
-    assert __version__ == "1.2.2"
+    assert __version__ == "1.3.0rc1"
 
 
 def test_release_version_is_synchronised():

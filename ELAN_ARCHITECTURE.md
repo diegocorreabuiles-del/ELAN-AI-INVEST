@@ -1,6 +1,6 @@
-# Arquitectura canónica de ELAN Quantum v1.2.2
+# Arquitectura canónica de ELAN Quantum v1.3.0rc1
 
-> **Estado recuperado en el nuevo PC (22 de julio de 2026).** Los PR #1–#4 integraron en `develop` la recuperación, las Actions con Node 24, la renovación visual y el hardening de errores/datos. La rama actual cierra compatibilidad Streamlit, tipado crítico, logging, versión y tooling antes del release candidate. No se ha integrado `develop` en `main` ni creado tag, release o despliegue.
+> **Estado verificado (28 de julio de 2026).** La PR #6 promovió a `main` la base recuperada y endurecida; la CI posterior pasó en Python 3.11–3.14. Esta rama prepara `1.3.0rc1` sin activar broker, dinero real, tag, release ni despliegue.
 
 Estado: arquitectura vigente tras la Fase 1 de estabilización. `ARCHITECTURE_CURRENT.md` conserva la fotografía anterior a la limpieza.
 
@@ -100,8 +100,8 @@ No se borró ninguna implementación. Su retirada requiere búsqueda de consumid
 
 - `scripts/check_git_flow.py` admite únicamente ramas de trabajo hacia `develop` y `develop` hacia `main`.
 - CI valida la transición del pull request; Dependabot usa `develop` como destino.
-- Los PR #1–#4 integraron en `develop` la recuperación, el mantenimiento Node 24, la renovación visual y el hardening de errores, healthcheck y riesgo, siempre con matriz posterior verde.
-- Las protecciones remotas verificadas y la secuencia operativa están en `GIT_WORKFLOW.md`; el release candidate actual debe entrar en `develop` antes de preparar un PR independiente hacia `main`.
+- Los PR #1–#6 integraron y promovieron la recuperación, el mantenimiento Node 24, la renovación visual y el hardening de errores, healthcheck y riesgo, siempre con matriz posterior verde.
+- Las protecciones remotas verificadas y la secuencia operativa están en `GIT_WORKFLOW.md`; cualquier cambio de versión entra en `develop` antes de preparar un PR independiente hacia `main`.
 
 ## Ciclo de riesgo de paper trading
 
