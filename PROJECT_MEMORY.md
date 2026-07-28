@@ -13,15 +13,18 @@
 ## Estado validado — 28 de julio de 2026
 
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
-- Base funcional `1.3.0rc1` promovida a `main` y sincronizada con `develop`: `5cf2bca1cd98954c1c71e191368432d2b242d9ae`.
+- Base publicada `1.3.0rc1` en `main`: `5cf2bca1cd98954c1c71e191368432d2b242d9ae`.
+- `develop` integra el buscador global de instrumentos y el panel principal de mercado en `4521ced0a3233b76888e968234265c0d7b3bf43d`.
 - La promoción se realizó como avance rápido exacto, sin `force` ni cambios de protección, para conservar el historial lineal y la misma ascendencia en ambas ramas.
 - PR #5 (`feature/release-candidate-hardening -> develop`) fusionada por rebase.
 - PR #6 (`develop -> main`) fusionada por rebase el 28 de julio de 2026.
 - PR #8 (`chore/v1.3.0rc1-candidate -> develop`) fusionada por rebase el 28 de julio de 2026.
 - PR #10 (`develop -> main`) fusionada el 28 de julio de 2026; GitHub registró como commit de fusión el propio `3c4cc72`.
 - PR #14 (`develop -> main`) fusionada por avance rápido el 28 de julio de 2026 para sincronizar la documentación previa al tag.
+- PR #16 (`feature/market-overview -> develop`) fusionada el 28 de julio de 2026; su CI posterior (`30381167190`) pasó en Python 3.11–3.14.
 - Respaldo previo a la realineación: `backup/develop-pre-realign-20260728-4a9010a` en `4a9010a8ddc48e057a3e6c49a6c028e4e063c47e`.
-- Working tree estaba limpio antes de crear esta documentación.
+- Copia local sincronizada en `develop`, alineada con `origin/develop` y con working tree limpio.
+- El cambio no funcional de metadata gzip del catálogo quedó preservado en `stash@{0}` con el mensaje `local gzip metadata before syncing develop`.
 - Tag anotado `v1.3.0-rc.1` publicado sobre `5cf2bca1cd98954c1c71e191368432d2b242d9ae`; no existe GitHub Release ni despliegue.
 - Producto local de análisis y paper trading; no conecta brokers ni dinero real.
 
@@ -147,6 +150,8 @@ gh pr view 6 --json state,mergeable,mergeStateStatus,statusCheckRollup,url
 
 ## Siguiente paso autorizado
 
+- La sincronización local con `develop` y la verificación HTTP de Streamlit están completadas.
+- No hay un nuevo bloque funcional autorizado. Recomendación: **Bloque 21 — calidad y resiliencia de Market Data**, centrado en frescura, cobertura, huecos, estado del proveedor y mensajes de disponibilidad antes de iniciar Fundamental Engine.
 - El tag `v1.3.0-rc.1` está publicado; no hay ninguna acción adicional de release autorizada.
 - Publicar una GitHub Release o desplegar requieren autorizaciones explícitas independientes posteriores.
 - Mantener el producto en paper trading; cualquier activación de broker o dinero real queda fuera de alcance.
