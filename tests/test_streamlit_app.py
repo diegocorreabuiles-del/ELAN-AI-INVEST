@@ -350,6 +350,21 @@ def test_history_view_saves_only_through_fake_engine(app_environment: FakeEngine
     assert any("Fotografía guardada" in item.value for item in app.success)
 
 
+def test_app_searches_and_adds_global_instrument(app_environment: FakeEngine) -> None:
+    app = AppTest.from_file(APP_PATH, default_timeout=20).run()
+    search = next(item for item in app.text_input if item.label == "Buscar instrumento")
+
+    search.set_value("EMAAR").run(timeout=20)
+    results = next(item for item in app.selectbox if item.label == "Resultados")
+    assert results.value == "EMAAR.DU"
+
+    _button(app, "Añadir seleccionado").click().run(timeout=20)
+
+    assert "EMAAR.DU" in app.multiselect[0].value
+    assert "EMAAR.DU" in app_environment.requests[-1].symbols
+    assert not app.exception
+
+
 def test_app_stops_when_no_asset_is_selected(app_environment: FakeEngine) -> None:
     app = AppTest.from_file(APP_PATH, default_timeout=20).run()
     app.multiselect[0].set_value([]).run(timeout=20)

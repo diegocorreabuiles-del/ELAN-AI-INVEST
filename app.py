@@ -25,11 +25,24 @@ from elan_ai_invest.dashboard import (
     safe_render,
     show_safe_error,
 )
+from elan_ai_invest.instruments import (
+    ASSET_TYPE_LABELS,
+    labels_by_symbol,
+    load_instrument_catalog,
+    normalize_custom_symbol,
+    search_instruments,
+)
 from elan_ai_invest.paper_trading import PaperTradingEngine
 from elan_ai_invest.risk import calculate_risk_report
 
 ROOT = Path(__file__).resolve().parent
 configure_page()
+
+
+@st.cache_data(show_spinner=False)
+def load_catalog(curated_path: Path, open_catalog_path: Path) -> pd.DataFrame:
+    return load_instrument_catalog(curated_path, open_catalog_path)
+
 
 try:
     ENGINE = build_core_engine(ROOT)
@@ -41,6 +54,12 @@ try:
     missing_columns = required_columns.difference(watchlist.columns)
     if missing_columns:
         raise ValueError("Faltan columnas en watchlist.csv: " + ", ".join(sorted(missing_columns)))
+    catalog = load_catalog(
+        ROOT / "config" / "instruments.csv",
+        ROOT / "config" / "catalog" / "adanos_tickers.csv.gz",
+    )
+    if catalog.empty:
+        raise ValueError("El catálogo de instrumentos está vacío.")
 except Exception as exc:
     show_safe_error(
         "ELAN Quantum no pudo iniciar correctamente.",
@@ -50,16 +69,120 @@ except Exception as exc:
     st.info("Ejecuta update.bat y vuelve a abrir la aplicación.")
     st.stop()
 
-name_map = dict(zip(watchlist["symbol"], watchlist["name"], strict=True))
+catalog_labels = labels_by_symbol(catalog)
+name_map = dict(zip(catalog["symbol"], catalog["name"], strict=True))
+default_symbols = [
+    symbol
+    for symbol in watchlist["symbol"].astype(str).str.upper().tolist()
+    if symbol in catalog_labels
+]
+if "workspace_symbols" not in st.session_state:
+    st.session_state["workspace_symbols"] = default_symbols
+
 render_header(ENGINE.settings.app.version)
 
 with st.sidebar:
     st.subheader(":material/tune: Espacio de trabajo")
-    st.caption("Configura el universo y el horizonte del análisis.")
+    st.caption(
+        f"Busca entre {len(catalog):,} instrumentos por símbolo, nombre, ISIN, país o bolsa."
+    )
+
+    search_query = st.text_input(
+        "Buscar instrumento",
+        placeholder="Ej.: Tencent, EMAAR, ES0113900J37, Colombia...",
+        icon=":material/search:",
+        key="instrument_search_query",
+    )
+    asset_types = ["", *sorted(value for value in catalog["asset_type"].unique() if value)]
+    selected_asset_type = st.selectbox(
+        "Tipo",
+        asset_types,
+        format_func=lambda value: ASSET_TYPE_LABELS.get(value, value) if value else "Todos",
+        key="instrument_asset_type",
+    )
+
+    country_scope = catalog
+    if selected_asset_type:
+        country_scope = country_scope.loc[country_scope["asset_type"].eq(selected_asset_type)]
+    countries = ["", *sorted(value for value in country_scope["country"].unique() if value)]
+    selected_country = st.selectbox(
+        "País",
+        countries,
+        format_func=lambda value: value or "Todos",
+        key="instrument_country",
+    )
+
+    exchange_scope = country_scope
+    if selected_country:
+        exchange_scope = exchange_scope.loc[exchange_scope["country"].eq(selected_country)]
+    exchanges = ["", *sorted(value for value in exchange_scope["exchange"].unique() if value)]
+    selected_exchange = st.selectbox(
+        "Bolsa o mercado",
+        exchanges,
+        format_func=lambda value: value or "Todos",
+        key="instrument_exchange",
+    )
+
+    search_results = search_instruments(
+        catalog,
+        search_query,
+        selected_asset_type or None,
+        selected_country or None,
+        selected_exchange or None,
+        limit=100,
+    )
+    result_symbols = search_results["symbol"].tolist()
+    result_labels = labels_by_symbol(search_results)
+    result_symbol = st.selectbox(
+        "Resultados",
+        result_symbols,
+        index=0 if result_symbols else None,
+        format_func=lambda symbol: result_labels.get(symbol, symbol),
+        placeholder="No hay coincidencias",
+        disabled=not result_symbols,
+        key="instrument_search_result",
+    )
+    st.caption(
+        f"{len(search_results)} coincidencias mostradas"
+        + (" · Escribe más para afinar" if len(search_results) == 100 else "")
+    )
+
+    if st.button(
+        "Añadir seleccionado",
+        icon=":material/add:",
+        width="stretch",
+        disabled=result_symbol is None,
+    ):
+        current_symbols = list(st.session_state["workspace_symbols"])
+        if result_symbol not in current_symbols:
+            current_symbols.append(result_symbol)
+            st.session_state["workspace_symbols"] = current_symbols
+
+    with st.expander("Añadir símbolo manual de Yahoo"):
+        custom_symbol = st.text_input(
+            "Símbolo exacto",
+            placeholder="Ej.: 1810.HK, SAN.MC, GC=F",
+            key="custom_instrument_symbol",
+        )
+        if st.button("Añadir símbolo manual", width="stretch"):
+            try:
+                normalized_symbol = normalize_custom_symbol(custom_symbol)
+            except ValueError as exc:
+                st.error(str(exc))
+            else:
+                current_symbols = list(st.session_state["workspace_symbols"])
+                if normalized_symbol not in current_symbols:
+                    current_symbols.append(normalized_symbol)
+                    st.session_state["workspace_symbols"] = current_symbols
+                    catalog_labels[normalized_symbol] = f"{normalized_symbol} — Símbolo manual"
+
+    workspace_options = list(st.session_state["workspace_symbols"])
     selected = st.multiselect(
-        "Universo de activos",
-        watchlist["symbol"].tolist(),
-        default=watchlist["symbol"].tolist(),
+        "Universo activo",
+        workspace_options,
+        format_func=lambda symbol: catalog_labels.get(symbol, symbol),
+        key="workspace_symbols",
+        help="Elimina aquí los instrumentos que no quieras analizar.",
     )
     period_options = ["1y", "2y", "5y"]
     if ENGINE.settings.market.period not in period_options:

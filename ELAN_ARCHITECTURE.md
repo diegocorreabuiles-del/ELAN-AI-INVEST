@@ -79,6 +79,7 @@ No se borró ninguna implementación. Su retirada requiere búsqueda de consumid
 ## Fronteras operativas
 
 - Fuente externa: Yahoo mediante `yfinance`; las pruebas no dependen de red.
+- Descubrimiento de instrumentos: catálogo local curado más una instantánea comprimida de Adanos. `instruments.py` normaliza búsquedas y adapta símbolos de bolsas conocidas al formato Yahoo. El catálogo no sustituye ni garantiza la cobertura del proveedor de precios.
 - Persistencia: SQLite local para histórico y paper trading.
 - No existe integración activa con brokers ni uso de dinero real.
 - La copia activa y su editable viven en `C:\Users\Asus\Desktop\ELAN AI INVESTMENT`. Las validaciones usan el entorno `.venv` local y no requieren reinstalar el paquete para cada cambio.

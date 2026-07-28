@@ -8,7 +8,8 @@ Este documento describe el sistema **tal como existe**, no la arquitectura objet
 
 ```text
 app.py (Streamlit)
-  ├─ config/settings.yaml + config/watchlist.csv
+  ├─ config/settings.yaml + config/watchlist.csv + config/instruments.csv
+  ├─ config/catalog/adanos_tickers.csv.gz
   ├─ core.bootstrap -> core.engine
   │    ├─ providers.yahoo -> market_data -> yfinance
   │    ├─ scoring -> quant.factors + quant.recommendations
@@ -149,6 +150,7 @@ Python resuelve el segundo. El primero no es accesible con el nombre público es
 
 - Aplicación local sin autenticación propia.
 - Fuente externa: Yahoo/yfinance.
+- El selector global usa `instruments.py` y un catálogo local independiente de Yahoo. La presencia de un instrumento en el catálogo no implica disponibilidad de histórico en el proveedor de mercado.
 - Datos persistentes: SQLite local y logs.
 - No hay broker real.
 - `market.cache` usa pickle, aunque está fuera del flujo activo.

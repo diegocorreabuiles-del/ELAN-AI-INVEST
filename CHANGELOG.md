@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Añadido un buscador global offline por símbolo, nombre, alias, ISIN, país y bolsa.
+- Añadidos filtros de tipo de activo, país y mercado, selección incremental y entrada manual Yahoo.
+- Incorporada una instantánea MIT de Adanos con 63.185 acciones/ETF de 91 países.
+- Separado explícitamente el catálogo de descubrimiento del proveedor Yahoo de históricos.
+
 ## 1.3.0rc1 — Release candidate
 
 - Reconstruida y documentada la política Git `trabajo -> develop -> main`.
