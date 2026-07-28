@@ -13,15 +13,16 @@
 ## Estado validado — 28 de julio de 2026
 
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
-- Base funcional `1.3.0rc1` promovida a `main` y sincronizada con `develop`: `3c4cc72b73d0e7b4159dceb5e960d904fb073196`.
+- Base funcional `1.3.0rc1` promovida a `main` y sincronizada con `develop`: `5cf2bca1cd98954c1c71e191368432d2b242d9ae`.
 - La promoción se realizó como avance rápido exacto, sin `force` ni cambios de protección, para conservar el historial lineal y la misma ascendencia en ambas ramas.
 - PR #5 (`feature/release-candidate-hardening -> develop`) fusionada por rebase.
 - PR #6 (`develop -> main`) fusionada por rebase el 28 de julio de 2026.
 - PR #8 (`chore/v1.3.0rc1-candidate -> develop`) fusionada por rebase el 28 de julio de 2026.
 - PR #10 (`develop -> main`) fusionada el 28 de julio de 2026; GitHub registró como commit de fusión el propio `3c4cc72`.
+- PR #14 (`develop -> main`) fusionada por avance rápido el 28 de julio de 2026 para sincronizar la documentación previa al tag.
 - Respaldo previo a la realineación: `backup/develop-pre-realign-20260728-4a9010a` en `4a9010a8ddc48e057a3e6c49a6c028e4e063c47e`.
 - Working tree estaba limpio antes de crear esta documentación.
-- El tag canónico de la candidata es `v1.3.0-rc.1`; no existe GitHub Release ni despliegue.
+- Tag anotado `v1.3.0-rc.1` publicado sobre `5cf2bca1cd98954c1c71e191368432d2b242d9ae`; no existe GitHub Release ni despliegue.
 - Producto local de análisis y paper trading; no conecta brokers ni dinero real.
 
 Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que siguen vigentes en otra fecha.
@@ -44,6 +45,7 @@ Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que sig
 - Artefacto del commit realineado `3342c65`: SHA-256 `c24a7643503b39aaf6cd329c3574b08ff5a56278aec9ad5a2ae7793787882e55`.
 - CI del commit realineado (runs `30352036059`, `30352343392` y `30352346829`): verde en Python 3.11–3.14.
 - CI posterior a la promoción en `main` (run `30356214073`): verde en Python 3.11–3.14, incluido lock, `pip check`, Ruff, Black, mypy, pytest y empaquetado/verificación.
+- CI del commit etiquetado en `main` (run `30364715816`): verde en Python 3.11–3.14.
 - La protección de `develop` se restauró tras la realineación: PR y checks estrictos obligatorios, historial lineal, conversaciones resueltas, force-push y borrado deshabilitados.
 
 ## Decisiones canónicas
@@ -135,6 +137,6 @@ gh pr view 6 --json state,mergeable,mergeStateStatus,statusCheckRollup,url
 
 ## Siguiente paso autorizado
 
-- La creación del tag `v1.3.0-rc.1` sobre `main` está autorizada; su publicación espera que esta sincronización documental llegue a `main`.
+- El tag `v1.3.0-rc.1` está publicado; no hay ninguna acción adicional de release autorizada.
 - Publicar una GitHub Release o desplegar requieren autorizaciones explícitas independientes posteriores.
 - Mantener el producto en paper trading; cualquier activación de broker o dinero real queda fuera de alcance.
