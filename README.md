@@ -1,4 +1,4 @@
-# ELAN Quantum v1.2.2 Core Cleanup
+# ELAN Quantum v1.3.0rc1
 
 Plataforma local de análisis cuantitativo, fundamental, riesgo, cartera, paper trading y backtesting.
 
@@ -7,7 +7,7 @@ Plataforma local de análisis cuantitativo, fundamental, riesgo, cartera, paper 
 - La aplicación local se ejecuta en Python 3.12; la suite y los gates pasan en Python 3.11–3.14 sobre Linux.
 - El gate local del release candidate supera 123 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
 - El cierre de dependencias está verificado: 78 pins activos y `pip check` sin conflictos.
-- La política Git aplica `trabajo -> develop -> main`; los PR #1–#4 integraron la recuperación, Node 24, la renovación visual y el hardening de errores/datos en `develop`, mientras `main` permanece sin cambios.
+- La política Git aplica `trabajo -> develop -> main`; la PR #6 promovió la base validada a `main` y su CI posterior pasó en Python 3.11–3.14.
 - El gate global de cobertura pasa con 81,0 %, por encima del 75 % configurado.
 - AppTest recorre las once vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
 - El empaquetador seguro está reconstruido y cubierto por pruebas de integridad, rutas y reproducibilidad.
@@ -76,8 +76,8 @@ NumPy usa 2.2.6 en Python 3.11 y 2.5.1 en Python 3.12–3.14.
 El constructor exige un working tree limpio y lee exclusivamente los blobs del commit `HEAD`.
 
 ```powershell
-.\.venv\Scripts\python.exe scripts\build_distribution.py --output dist\elan-quantum-1.2.2-core-cleanup.zip
-.\.venv\Scripts\python.exe scripts\build_distribution.py --verify dist\elan-quantum-1.2.2-core-cleanup.zip
+.\.venv\Scripts\python.exe scripts\build_distribution.py --output dist\elan-quantum-1.3.0rc1.zip
+.\.venv\Scripts\python.exe scripts\build_distribution.py --verify dist\elan-quantum-1.3.0rc1.zip
 ```
 
 El ZIP contiene una sola raíz, `data/` y `logs/` vacíos y un manifiesto SHA-256. El gate bloquea bases de datos, logs, ejecutables, credenciales, enlaces simbólicos, rutas no portables y cualquier contenido no confirmado en Git.
@@ -94,6 +94,6 @@ La política canónica está en `GIT_WORKFLOW.md`. Las ramas de trabajo y recupe
 
 ## Siguiente paso de release
 
-Cerrar la matriz Python 3.11–3.14, integrar este release candidate en `develop` y abrir el PR independiente `develop -> main`. La fusión de `main`, cualquier tag y cualquier release requieren autorización explícita; todavía no se ha creado ninguno.
+Validar `1.3.0rc1` desde un commit limpio, integrarlo primero en `develop` y preparar después un PR independiente `develop -> main`. Crear el tag, publicar una release o desplegar requieren autorizaciones explícitas independientes; todavía no se ha realizado ninguna de esas acciones.
 
 ELAN Quantum es una herramienta educativa y de simulación. No constituye asesoramiento financiero ni garantiza resultados.

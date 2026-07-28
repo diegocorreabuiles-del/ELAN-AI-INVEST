@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — Recuperación del entorno
+## 1.3.0rc1 — Release candidate (no publicada)
 
 - Reconstruida y documentada la política Git `trabajo -> develop -> main`.
 - Añadido un gate local/CI que valida nombres de rama y transiciones permitidas.
@@ -30,7 +30,8 @@
 - Retirada la dependencia directa `python-dotenv`, que no tenía consumidor, y actualizado el lock a 78 pins activos.
 - Eliminado del actualizador el borrado automático de siete scripts históricos.
 - Elevado el baseline local a 123 pruebas y 81,1 % de cobertura.
-- No se ha integrado `develop` en `main` ni publicado una release, un tag o un artefacto.
+- Promovida la base validada mediante la PR #6 a `main`; la CI posterior pasó en Python 3.11–3.14.
+- Preparada la metadata PEP 440 `1.3.0rc1` como candidata; no se ha creado tag, publicado release ni desplegado.
 
 ## 1.2.2 — Core Cleanup
 
