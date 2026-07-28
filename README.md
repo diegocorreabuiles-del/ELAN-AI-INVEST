@@ -94,6 +94,6 @@ La política canónica está en `GIT_WORKFLOW.md`. Las ramas de trabajo y recupe
 
 ## Siguiente paso de release
 
-Validar `1.3.0rc1` desde un commit limpio, integrarlo primero en `develop` y preparar después un PR independiente `develop -> main`. Crear el tag, publicar una release o desplegar requieren autorizaciones explícitas independientes; todavía no se ha realizado ninguna de esas acciones.
+`1.3.0rc1` está validada e integrada en `develop`. El siguiente paso es preparar el PR independiente `develop -> main`, pero abrirlo/fusionarlo, crear el tag, publicar una release o desplegar requieren autorizaciones explícitas independientes.
 
 ELAN Quantum es una herramienta educativa y de simulación. No constituye asesoramiento financiero ni garantiza resultados.

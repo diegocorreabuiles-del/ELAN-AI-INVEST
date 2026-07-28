@@ -14,9 +14,10 @@
 
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
 - Base funcional promovida a `main`: `66d6992928d8db3bae5c0c28a63c754982bcbf42`.
-- `develop` contenía la misma base en `ad87c80` antes de iniciar la rama de versión `chore/v1.3.0rc1-candidate`.
+- Candidata `1.3.0rc1` integrada en `develop`: `1251e9faf2329e9b6ac213ed1f47a999c544552d`.
 - PR #5 (`feature/release-candidate-hardening -> develop`) fusionada por rebase.
 - PR #6 (`develop -> main`) fusionada por rebase el 28 de julio de 2026.
+- PR #8 (`chore/v1.3.0rc1-candidate -> develop`) fusionada por rebase el 28 de julio de 2026.
 - Working tree estaba limpio antes de crear esta documentación.
 - No existe tag, release ni despliegue nuevo.
 - Producto local de análisis y paper trading; no conecta brokers ni dinero real.
@@ -38,8 +39,8 @@ Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que sig
 - Docker Python 3.11, 3.12, 3.13 y 3.14: verde.
 - 129 pruebas por versión.
 - Lock, `pip check`, Ruff, Black, mypy, pytest y empaquetado/verificación: verdes.
-- Artefacto del commit `7f1c50c`: SHA-256 `ea059af7dcd9291f63e3b94136a4ea10c451626733c311c49ca19e81430a2a45`.
-- CI posterior a la fusión de la PR #6 en `main` (run `30317041433`): verde en Python 3.11–3.14.
+- Artefacto del commit `1251e9f`: SHA-256 `84f75fb432c87a0dcffe269b7d623c7fec279c6968d035e5c8416e51afb0d531`.
+- CI posterior a la PR #6 en `main` (run `30317041433`) y a la PR #8 en `develop` (run `30343085112`): verdes en Python 3.11–3.14.
 
 ## Decisiones canónicas
 
@@ -51,7 +52,7 @@ Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que sig
 6. **Paper trading:** SQLite local, transacciones `BEGIN IMMEDIATE`, mutaciones atómicas, fallos cerrados y revisión de stops manual/confirmada.
 7. **Streamlit:** workspace grafito tipo plataforma de trading; 11 pestañas lazy con `tab.open`; sin CSS inyectado ni `use_container_width`.
 8. **Errores:** UI neutra con referencia; detalle técnico solo en logging.
-9. **Versión:** `pyproject.toml` es la fuente; `importlib.metadata` alimenta paquete, configuración, UI y healthcheck. Candidata en preparación: `1.3.0rc1`; todavía no publicada.
+9. **Versión:** `pyproject.toml` es la fuente; `importlib.metadata` alimenta paquete, configuración, UI y healthcheck. Candidata integrada en `develop`: `1.3.0rc1`; todavía no publicada.
 10. **Dependencias:** cierre exacto en `requirements.lock`; `python-dotenv` fue retirado por no tener consumidor.
 
 ## Reglas de implementación
@@ -130,6 +131,6 @@ gh pr view 6 --json state,mergeable,mergeStateStatus,statusCheckRollup,url
 
 ## Siguiente paso autorizado
 
-- Preparar `1.3.0rc1` en `chore/v1.3.0rc1-candidate`, ejecutar el gate completo y promoverla mediante PR a `develop`.
-- No fusionar después `develop -> main`, crear tag, publicar release ni desplegar sin una autorización explícita independiente.
+- `1.3.0rc1` está validada e integrada en `develop`; el siguiente gate es pedir autorización explícita antes de abrir/fusionar `develop -> main`.
+- Crear el tag, publicar release o desplegar requieren autorizaciones explícitas independientes posteriores.
 - Mantener el producto en paper trading; cualquier activación de broker o dinero real queda fuera de alcance.
