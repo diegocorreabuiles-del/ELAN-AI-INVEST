@@ -6,6 +6,8 @@
 - Añadidos filtros de tipo de activo, país y mercado, selección incremental y entrada manual Yahoo.
 - Incorporada una instantánea MIT de Adanos con 63.185 acciones/ETF de 91 países.
 - Separado explícitamente el catálogo de descubrimiento del proveedor Yahoo de históricos.
+- Añadido al primer tab un panel OHLCV con horizontes de un mes a máximo histórico y vistas de velas, línea, rentabilidad y volumen.
+- Añadido un comparador base 100 con dispersión y correlación móvil sobre rendimientos diarios alineados.
 
 ## 1.3.0rc1 — Release candidate
 

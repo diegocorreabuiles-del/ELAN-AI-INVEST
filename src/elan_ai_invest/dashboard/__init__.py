@@ -4,7 +4,7 @@ from .history import render_history_tab
 from .institutional import render_institutional_tab
 from .intelligence import render_intelligence_tab
 from .layout import configure_page, render_header, render_main_metrics
-from .market import render_market_tab
+from .market import clear_market_history_cache, render_market_tab
 from .paper_trading import render_paper_trading_tab
 from .portfolio import render_portfolio_tab
 from .ranking import render_ranking_tab
@@ -13,6 +13,7 @@ from .safe import safe_render, show_safe_error
 from .system import render_system_tab
 
 __all__ = [
+    "clear_market_history_cache",
     "configure_page",
     "render_backtesting_tab",
     "render_fundamental_tab",

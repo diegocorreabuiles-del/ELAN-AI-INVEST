@@ -8,6 +8,7 @@ import streamlit as st
 from elan_ai_invest.core.bootstrap import build_core_engine
 from elan_ai_invest.core.models import AnalysisRequest
 from elan_ai_invest.dashboard import (
+    clear_market_history_cache,
     configure_page,
     render_backtesting_tab,
     render_fundamental_tab,
@@ -157,6 +158,7 @@ with st.sidebar:
         if result_symbol not in current_symbols:
             current_symbols.append(result_symbol)
             st.session_state["workspace_symbols"] = current_symbols
+        st.session_state["market_primary_symbol"] = result_symbol
 
     with st.expander("Añadir símbolo manual de Yahoo"):
         custom_symbol = st.text_input(
@@ -175,6 +177,7 @@ with st.sidebar:
                     current_symbols.append(normalized_symbol)
                     st.session_state["workspace_symbols"] = current_symbols
                     catalog_labels[normalized_symbol] = f"{normalized_symbol} — Símbolo manual"
+                st.session_state["market_primary_symbol"] = normalized_symbol
 
     workspace_options = list(st.session_state["workspace_symbols"])
     selected = st.multiselect(
@@ -222,6 +225,7 @@ def run_analysis(symbols: tuple[str, ...], selected_period: str):
 
 if refresh:
     run_analysis.clear()
+    clear_market_history_cache()
 
 try:
     with st.spinner("Actualizando mercado y riesgo...", show_time=True):
@@ -286,7 +290,15 @@ tabs = st.tabs(
 
 if tabs[0].open:
     with tabs[0]:
-        safe_render("Mercado", render_market_tab, ranking)
+        safe_render(
+            "Mercado",
+            render_market_tab,
+            ranking,
+            prices,
+            selected,
+            catalog_labels,
+            ENGINE.settings.market,
+        )
 if tabs[1].open:
     with tabs[1]:
         safe_render("Inteligencia", render_intelligence_tab, ranking)

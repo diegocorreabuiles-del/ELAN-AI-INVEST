@@ -24,7 +24,7 @@ app.py (Streamlit)
   -> dashboard/*
 ```
 
-Los datos de mercado entran por el proveedor configurado, se validan con `market.interval` y `market.minimum_history`, y se convierten en un `AnalysisResult`. Yahoo usa timeout y retry/backoff acotados; los aciertos se guardan como CSV inerte con TTL y clave SHA-256. Todas las vistas reciben ese resultado común. Las pestañas costosas solo se renderizan cuando están abiertas; los cachés tienen TTL y límites de entradas.
+Los datos de mercado entran por el proveedor configurado, se validan con `market.interval` y `market.minimum_history`, y se convierten en un `AnalysisResult`. Yahoo usa timeout y retry/backoff acotados; los aciertos se guardan como CSV inerte con TTL y clave SHA-256. Todas las vistas reciben ese resultado común. La primera pestaña puede solicitar OHLCV ajustado del único activo visible mediante `download_market_history()`; esta consulta conserva timeout/retry y un caché Streamlit de 15 minutos y 50 entradas. Las pestañas costosas solo se renderizan cuando están abiertas; los cachés tienen TTL y límites de entradas.
 
 ## APIs canónicas
 
@@ -50,6 +50,7 @@ Los datos de mercado entran por el proveedor configurado, se validan con `market
 - Comisión y slippage se cargan únicamente sobre turnover ejecutado; un cambio completo de activo tiene turnover 2.0.
 - El benchmark visible procede de `market.benchmark`; si falta en los datos, el backtest falla con un mensaje claro.
 - Riesgo elimina observaciones con datos incompletos antes de calcular correlación, volatilidad y VaR; no hace forward-fill ni inventa retornos cero.
+- El comparador visual aplica la misma disciplina: alinea cierres completos y calcula correlación sobre rendimientos diarios consecutivos, nunca sobre niveles ni series rellenadas.
 - El healthcheck prepara los esquemas canónicos y luego exige integridad SQLite, tablas requeridas y una transacción de escritura reversible.
 
 ## Configuración conectada en esta fase
@@ -95,7 +96,7 @@ No se borró ninguna implementación. Su retirada requiere búsqueda de consumid
 
 - Pytest mide líneas y ramas de `app.py` y de todo `elan_ai_invest`, incluidos módulos legacy no ejecutados; CI bloquea cualquier resultado inferior a 75 %.
 - AppTest sustituye el Core Engine y los fundamentales por datos deterministas, prohíbe llamadas Yahoo y renderiza tanto el flujo inicial como todas las vistas.
-- El baseline local del release candidate es 81,1 % con 123 pruebas superadas en Python 3.12. El umbral debe aumentar solo junto con pruebas que cubran riesgo real, sin excluir legacy para inflar el porcentaje.
+- El baseline local de esta rama es 80,35 % con 141 pruebas superadas en Python 3.12. El umbral debe aumentar solo junto con pruebas que cubran riesgo real, sin excluir legacy para inflar el porcentaje.
 
 ## Frontera de integración
 

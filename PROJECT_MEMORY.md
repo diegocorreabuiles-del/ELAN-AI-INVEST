@@ -32,8 +32,8 @@ Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que sig
 ### Windows local
 
 - Python 3.12.13.
-- 133 pruebas superadas y 6 omitidas por entorno.
-- Cobertura 81,20 %; umbral obligatorio 75 %.
+- 141 pruebas superadas y 6 omitidas por entorno.
+- Cobertura 80,35 %; umbral obligatorio 75 %.
 - `requirements.lock`: 78 pins activos y 78 distribuciones locales verificadas.
 - `pip check`, Ruff, Black, mypy crítico y healthcheck: verdes.
 
@@ -61,6 +61,7 @@ Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que sig
 9. **Versión:** `pyproject.toml` es la fuente; `importlib.metadata` alimenta paquete, configuración, UI y healthcheck. Candidata `1.3.0rc1` promovida y validada en `main`; GitHub Release no publicada.
 10. **Dependencias:** cierre exacto en `requirements.lock`; `python-dotenv` fue retirado por no tener consumidor.
 11. **Catálogo global:** el descubrimiento usa una instantánea MIT de Adanos más `config/instruments.csv`; los históricos siguen en Yahoo. Catálogo disponible no equivale a histórico garantizado. No añadir el paquete `financedatabase` ni sus dependencias pesadas al runtime.
+12. **Panel de mercado:** el detalle OHLCV se carga solo para el activo/horizonte visible y se cachea 15 minutos; el comparador usa rendimientos diarios consecutivos alineados, sin rellenar huecos ni correlacionar niveles de precio.
 
 ## Reglas de implementación
 
@@ -129,7 +130,7 @@ gh pr view 6 --json state,mergeable,mergeStateStatus,statusCheckRollup,url
 - Cartera: `src/elan_ai_invest/portfolio/engine.py`.
 - Paper trading: `src/elan_ai_invest/paper_trading.py`.
 - Persistencia histórica: `src/elan_ai_invest/storage.py`.
-- UI: `src/elan_ai_invest/dashboard/`.
+- UI: `src/elan_ai_invest/dashboard/`; el panel principal y comparador viven en `dashboard/market.py`.
 - Configuración: `config/settings.yaml` y `pyproject.toml`.
 - Instrumentos: `src/elan_ai_invest/instruments.py`, `config/instruments.csv` y `config/catalog/`.
 - Gates: `.github/workflows/ci.yml`, `scripts/check_lock.py`, `scripts/run_ci_matrix.ps1` y `scripts/build_distribution.py`.

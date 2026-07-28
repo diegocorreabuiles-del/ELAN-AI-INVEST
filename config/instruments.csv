@@ -19,6 +19,7 @@ AEDUSD=X,AEDUSD=X,AED/USD,Forex,United Arab Emirates,AE,FX,,dirham emiratos,ELAN
 CNYUSD=X,CNYUSD=X,CNY/USD,Forex,China,CN,FX,,yuan renminbi china,ELAN curated
 COPUSD=X,COPUSD=X,COP/USD,Forex,Colombia,CO,FX,,peso colombiano,ELAN curated
 ^GSPC,^GSPC,S&P 500 Index,Index,United States,US,INDEX,,s&p 500 index,ELAN curated
+DX-Y.NYB,DX-Y.NYB,US Dollar Index,Index,United States,US,ICE,,dollar index dxy usd dolar,ELAN curated
 ^IBEX,^IBEX,IBEX 35 Index,Index,Spain,ES,INDEX,,ibex 35,ELAN curated
 ^HSI,^HSI,Hang Seng Index,Index,Hong Kong,HK,INDEX,,hang seng,ELAN curated
 AAPL,AAPL,Apple Inc,Stock,United States,US,NASDAQ,US0378331005,apple,ELAN curated

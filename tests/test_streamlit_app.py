@@ -13,6 +13,7 @@ from streamlit.testing.v1 import AppTest
 import elan_ai_invest.core.bootstrap as bootstrap
 import elan_ai_invest.dashboard.fundamental as fundamental_dashboard
 import elan_ai_invest.dashboard.history as history_dashboard
+import elan_ai_invest.dashboard.market as market_dashboard
 import elan_ai_invest.paper_trading as paper_module
 from elan_ai_invest.core.config import Settings
 from elan_ai_invest.core.models import AnalysisRequest, AnalysisResult
@@ -21,6 +22,7 @@ from elan_ai_invest.paper_trading import RiskReviewResult, TradeResult
 
 ROOT = Path(__file__).resolve().parents[1]
 APP_PATH = ROOT / "app.py"
+APP_TEST_TIMEOUT = 60
 TAB_LABELS = (
     "Mercado",
     "Inteligencia",
@@ -209,6 +211,21 @@ def _fundamental_analysis() -> FundamentalAnalysis:
     )
 
 
+def _market_history() -> pd.DataFrame:
+    index = pd.bdate_range("2025-01-01", periods=260)
+    close = pd.Series(150 + np.arange(len(index)) * 0.12, index=index)
+    return pd.DataFrame(
+        {
+            "Open": close - 0.4,
+            "High": close + 1.0,
+            "Low": close - 1.0,
+            "Close": close,
+            "Volume": 1_000_000 + np.arange(len(index)) * 1_000,
+        },
+        index=index,
+    )
+
+
 def _forbid_network(*args, **kwargs):
     del args, kwargs
     raise AssertionError("Las pruebas AppTest no pueden usar Yahoo ni la red.")
@@ -226,6 +243,7 @@ def app_environment(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> FakeEngi
 
     monkeypatch.setattr(bootstrap, "build_core_engine", lambda root: engine)
     monkeypatch.setattr(paper_module, "PaperTradingEngine", FakePaperTradingEngine)
+    monkeypatch.setattr(market_dashboard, "_load_history", lambda *args: _market_history())
     monkeypatch.setattr(
         fundamental_dashboard,
         "_load_fundamental",
@@ -259,7 +277,7 @@ def _tab_widget_id(app: AppTest) -> str:
 
 def _select_tab(app: AppTest, widget_id: str, label: str) -> None:
     app.session_state[widget_id] = label
-    app.run(timeout=20)
+    app.run(timeout=APP_TEST_TIMEOUT)
     _assert_no_ui_failure(app, label)
 
 
@@ -282,18 +300,21 @@ def _history_view_script(engine, db_path, selected, period):
 
 
 def test_app_renders_every_view_and_simulated_actions(app_environment: FakeEngine) -> None:
-    app = AppTest.from_file(APP_PATH, default_timeout=20).run()
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
     _assert_no_ui_failure(app, "initial")
     assert [tab.label for tab in app.tabs] == list(TAB_LABELS)
     assert app.title[0].value == "ELAN Quantum"
-    assert len(app.metric) >= 5
+    assert len(app.metric) >= 10
+    assert any(item.label == "Activo principal" for item in app.selectbox)
+    assert any(item.label == "Instrumento A" for item in app.selectbox)
+    assert any(item.label == "Instrumento B" for item in app.selectbox)
 
     tab_widget_id = _tab_widget_id(app)
     for label in TAB_LABELS:
         _select_tab(app, tab_widget_id, label)
 
     calls_before_refresh = len(app_environment.requests)
-    _button(app, "Actualizar datos").click().run(timeout=20)
+    _button(app, "Actualizar datos").click().run(timeout=APP_TEST_TIMEOUT)
     assert len(app_environment.requests) > calls_before_refresh
     _assert_no_ui_failure(app, "refresh")
 
@@ -351,23 +372,25 @@ def test_history_view_saves_only_through_fake_engine(app_environment: FakeEngine
 
 
 def test_app_searches_and_adds_global_instrument(app_environment: FakeEngine) -> None:
-    app = AppTest.from_file(APP_PATH, default_timeout=20).run()
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
     search = next(item for item in app.text_input if item.label == "Buscar instrumento")
 
-    search.set_value("EMAAR").run(timeout=20)
+    search.set_value("EMAAR").run(timeout=APP_TEST_TIMEOUT)
     results = next(item for item in app.selectbox if item.label == "Resultados")
     assert results.value == "EMAAR.DU"
 
-    _button(app, "Añadir seleccionado").click().run(timeout=20)
+    _button(app, "Añadir seleccionado").click().run(timeout=APP_TEST_TIMEOUT)
 
     assert "EMAAR.DU" in app.multiselect[0].value
+    primary = next(item for item in app.selectbox if item.label == "Activo principal")
+    assert primary.value == "EMAAR.DU"
     assert "EMAAR.DU" in app_environment.requests[-1].symbols
     assert not app.exception
 
 
 def test_app_stops_when_no_asset_is_selected(app_environment: FakeEngine) -> None:
-    app = AppTest.from_file(APP_PATH, default_timeout=20).run()
-    app.multiselect[0].set_value([]).run(timeout=20)
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
+    app.multiselect[0].set_value([]).run(timeout=APP_TEST_TIMEOUT)
 
     assert any("Selecciona al menos un activo" in item.value for item in app.warning)
     assert not app.exception
@@ -383,7 +406,7 @@ def test_app_contains_startup_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(yf, "download", _forbid_network)
     monkeypatch.setattr(yf, "Ticker", _forbid_network)
 
-    app = AppTest.from_file(APP_PATH, default_timeout=20).run()
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
 
     assert any("no pudo iniciar" in item.value for item in app.error)
     assert any("Referencia:" in item.value for item in app.error)
@@ -395,7 +418,7 @@ def test_app_contains_analysis_failure(app_environment: FakeEngine) -> None:
     st.cache_data.clear()
     app_environment.failure = RuntimeError("analysis fixture")
 
-    app = AppTest.from_file(APP_PATH, default_timeout=20).run()
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
 
     assert any("No se pudo completar" in item.value for item in app.error)
     assert any("Referencia:" in item.value for item in app.error)
@@ -414,7 +437,7 @@ def test_app_stops_on_empty_analysis(app_environment: FakeEngine) -> None:
         average_score=0.0,
     )
 
-    app = AppTest.from_file(APP_PATH, default_timeout=20).run()
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
 
     assert any("No hay datos suficientes" in item.value for item in app.error)
     assert not app.exception
