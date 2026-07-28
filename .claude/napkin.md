@@ -17,6 +17,8 @@
    Do instead: mock Yahoo/market data and use temporary SQLite paths; keep broker access absent.
 4. **[2026-07-22] A successful PR still needs post-merge CI**
    Do instead: wait for the four-version push workflow on `develop` after merging a work PR.
+5. **[2026-07-28] Rebase promotion can split `main` and `develop` ancestry**
+   Do instead: after `develop -> main`, verify `main` is an ancestor of `develop`; before another promotion, use the documented backed-up realignment procedure with explicit approval if ancestry diverged.
 
 ## Shell & Command Reliability
 

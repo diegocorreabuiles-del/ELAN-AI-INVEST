@@ -14,10 +14,12 @@
 
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
 - Base funcional promovida a `main`: `66d6992928d8db3bae5c0c28a63c754982bcbf42`.
-- Candidata `1.3.0rc1` integrada en `develop`: `1251e9faf2329e9b6ac213ed1f47a999c544552d`.
+- Candidata `1.3.0rc1` realineada sobre `main` e integrada en `develop`: `3342c65ed4a8e2a23f62cdae759168640e86c9aa`.
 - PR #5 (`feature/release-candidate-hardening -> develop`) fusionada por rebase.
 - PR #6 (`develop -> main`) fusionada por rebase el 28 de julio de 2026.
 - PR #8 (`chore/v1.3.0rc1-candidate -> develop`) fusionada por rebase el 28 de julio de 2026.
+- PR #10 (`develop -> main`) abierta, limpia, fusionable y con CI verde; su fusión no está autorizada todavía.
+- Respaldo previo a la realineación: `backup/develop-pre-realign-20260728-4a9010a` en `4a9010a8ddc48e057a3e6c49a6c028e4e063c47e`.
 - Working tree estaba limpio antes de crear esta documentación.
 - No existe tag, release ni despliegue nuevo.
 - Producto local de análisis y paper trading; no conecta brokers ni dinero real.
@@ -39,8 +41,9 @@ Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que sig
 - Docker Python 3.11, 3.12, 3.13 y 3.14: verde.
 - 129 pruebas por versión.
 - Lock, `pip check`, Ruff, Black, mypy, pytest y empaquetado/verificación: verdes.
-- Artefacto del commit `1251e9f`: SHA-256 `84f75fb432c87a0dcffe269b7d623c7fec279c6968d035e5c8416e51afb0d531`.
-- CI posterior a la PR #6 en `main` (run `30317041433`) y a la PR #8 en `develop` (run `30343085112`): verdes en Python 3.11–3.14.
+- Artefacto del commit realineado `3342c65`: SHA-256 `c24a7643503b39aaf6cd329c3574b08ff5a56278aec9ad5a2ae7793787882e55`.
+- CI del commit realineado (runs `30352036059`, `30352343392` y `30352346829`): verde en Python 3.11–3.14.
+- La protección de `develop` se restauró tras la realineación: PR y checks estrictos obligatorios, historial lineal, conversaciones resueltas, force-push y borrado deshabilitados.
 
 ## Decisiones canónicas
 
@@ -131,6 +134,6 @@ gh pr view 6 --json state,mergeable,mergeStateStatus,statusCheckRollup,url
 
 ## Siguiente paso autorizado
 
-- `1.3.0rc1` está validada e integrada en `develop`; el siguiente gate es pedir autorización explícita antes de abrir/fusionar `develop -> main`.
+- La PR #10 `develop -> main` está abierta, limpia y validada; pedir autorización explícita antes de fusionarla.
 - Crear el tag, publicar release o desplegar requieren autorizaciones explícitas independientes posteriores.
 - Mantener el producto en paper trading; cualquier activación de broker o dinero real queda fuera de alcance.

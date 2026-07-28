@@ -1,6 +1,6 @@
 # Flujo Git de ELAN Quantum
 
-Estado verificado: 21 de julio de 2026.
+Estado verificado: 28 de julio de 2026.
 
 Esta política conserva una ruta de integración lineal y revisable. No autoriza por sí sola
 ningún push, merge, tag o release.
@@ -58,11 +58,12 @@ Si Git no está disponible en `PATH`, defina `GIT_EXECUTABLE` con la ruta absolu
 3. Publicar la rama de trabajo y abrir PR hacia `develop`.
 4. Integrar únicamente con CI verde y revisión aprobada.
 5. Abrir un segundo PR desde `develop` hacia `main` para preparar una release.
-6. Crear tags y artefactos publicados únicamente desde un commit aceptado en `main`.
+6. Tras la promoción, verificar que `main` sea ancestro de `develop`.
+7. Crear tags y artefactos publicados únicamente desde un commit aceptado en `main`.
 
 ## Protecciones remotas verificadas
 
-Estado verificado en GitHub el 22 de julio de 2026 para `develop` y `main`:
+Estado verificado en GitHub el 28 de julio de 2026 para `develop` y `main`:
 
 - exigir pull request;
 - exigir el job de CI;
@@ -79,5 +80,17 @@ El script local valida la transición, pero la API de GitHub es la fuente de ver
 ## Recuperación y rollback
 
 Un fallo del gate no modifica ramas ni archivos. Corrija la rama de destino o actualice la
-rama de trabajo y vuelva a ejecutar el comando. No reescriba historia compartida para hacer
-pasar el gate.
+rama de trabajo y vuelva a ejecutar el comando.
+
+Una promoción `develop -> main` mediante rebase o squash puede dejar árboles equivalentes
+con identidades de commit distintas. Después de cada promoción, comprobar:
+
+```powershell
+git fetch origin main develop
+git merge-base --is-ancestor origin/main origin/develop
+```
+
+Si falla, no abrir otra promoción hasta realinear `develop`. La realineación requiere
+autorización explícita, respaldo remoto del SHA anterior, igualdad exacta de árboles, gates
+completos, `--force-with-lease` y restauración inmediata de la protección. Fuera de este
+procedimiento documentado, no reescriba historia compartida para hacer pasar un gate.
