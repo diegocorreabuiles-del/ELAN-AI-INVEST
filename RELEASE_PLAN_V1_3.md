@@ -1,12 +1,12 @@
 # Plan de release propuesto — ELAN Quantum v1.3
 
-> v1.3 sigue sin crearse. Los PR #3 y #4 ya incorporaron a `develop` la renovación visual y el hardening de errores/datos. La rama actual completa compatibilidad Streamlit, type checking crítico, logging idempotente, versión canónica y tooling antes de preparar `develop -> main`.
+> `1.3.0rc1` se prepara como candidata PEP 440. La PR #6 promovió a `main` la base funcional validada y su CI posterior pasó en Python 3.11–3.14. No existe todavía tag, release ni despliegue.
 
-Estado: **propuesta; v1.3 no ha sido creada**.
+Estado: **release candidate en preparación; no publicada**.
 
 ## Objetivo
 
-v1.3 debe ser una release de consolidación y fiabilidad, no una expansión de funciones. Su valor será convertir la implementación 1.2.1 actual en una base reproducible, con una arquitectura canónica, restricciones financieras comprobadas y una UI que no ejecute trabajo oculto.
+v1.3 es una release de consolidación y fiabilidad, no una expansión de funciones. Su valor es convertir la implementación 1.2.x en una base reproducible, con una arquitectura canónica, restricciones financieras comprobadas y una UI que no ejecute trabajo oculto.
 
 ## Alcance recomendado
 
@@ -80,13 +80,13 @@ v1.3 debe ser una release de consolidación y fiabilidad, no una expansión de f
 ### M5 — release candidate
 
 - Lockfile reproducible. **Completado como prerrequisito en v1.2.2.**
-- Tipos críticos, cobertura y seguridad. **Completado localmente; pendiente matriz CI/PR.**
-- Documentación sincronizada.
+- Tipos críticos, cobertura y seguridad. **Completado y validado en la promoción de la PR #6.**
+- Documentación sincronizada. **En preparación para `1.3.0rc1`.**
 - Artefacto limpio y smoke test en una máquina/entorno nuevo.
 
 ## Estrategia Git propuesta
 
-Estado: política y protecciones implementadas; PR #1–#4 integrados en `develop`; la rama del release candidate está pendiente de PR y la transición `develop -> main` todavía no se ha ejecutado.
+Estado: política y protecciones implementadas; PR #1–#6 completados y CI posterior a la promoción a `main` verde. La candidata `1.3.0rc1` vuelve a iniciar el flujo desde una rama `chore/` hacia `develop`.
 
 1. No publicar desde un working tree: la candidata debe ser un commit limpio.
 2. Crear ramas pequeñas `feature/`, `fix/`, `chore/` o `docs/`.
@@ -107,7 +107,7 @@ Antes del RC, `pyproject.toml` actúa como fuente canónica y su metadata alimen
 - healthcheck
 - changelog
 
-No usar simultáneamente `1.3.0` y `1.3.0-stability` en fuentes distintas. Si se necesita prerelease, usar una convención PEP 440 como `1.3.0rc1`.
+La candidata usa de forma canónica la versión PEP 440 `1.3.0rc1`. No usar simultáneamente `1.3.0`, `1.3.0-stability` u otra variante en fuentes distintas.
 
 ## Plan de pruebas de release
 

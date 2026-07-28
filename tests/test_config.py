@@ -8,7 +8,7 @@ from elan_ai_invest.core.config import ScoringConfig, load_settings
 def test_settings_file_loads():
     root = Path(__file__).resolve().parents[1]
     settings = load_settings(root / "config" / "settings.yaml")
-    assert settings.app.version == "1.2.2"
+    assert settings.app.version == "1.3.0rc1"
     assert settings.market.provider == "yahoo"
     assert settings.market.benchmark == "SPY"
     assert settings.backtest.commission_pct == pytest.approx(0.10)
