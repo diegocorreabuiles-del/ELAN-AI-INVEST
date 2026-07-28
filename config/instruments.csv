@@ -1,0 +1,40 @@
+symbol,ticker,name,asset_type,country,country_code,exchange,isin,aliases,source
+SPY,SPY,S&P 500 ETF Trust,ETF,United States,US,NYSE ARCA,US78462F1030,s&p 500 spy,ELAN curated
+QQQ,QQQ,Invesco QQQ Trust,ETF,United States,US,NASDAQ,US46090E1038,nasdaq 100,ELAN curated
+IWM,IWM,iShares Russell 2000 ETF,ETF,United States,US,NYSE ARCA,US4642876555,russell 2000,ELAN curated
+VGK,VGK,Vanguard FTSE Europe ETF,ETF,United States,US,NYSE ARCA,US9220428745,europe,ELAN curated
+EEM,EEM,iShares MSCI Emerging Markets ETF,ETF,United States,US,NYSE ARCA,US4642872349,emerging markets,ELAN curated
+TLT,TLT,iShares 20+ Year Treasury Bond ETF,Bond,United States,US,NASDAQ,US4642874329,treasury bond bonos,ELAN curated
+GLD,GLD,SPDR Gold Shares,Commodity,United States,US,NYSE ARCA,US78463V1070,gold oro,ELAN curated
+GC=F,GC=F,Gold Futures,Commodity,Global,,COMEX,,gold oro futuro,ELAN curated
+SI=F,SI=F,Silver Futures,Commodity,Global,,COMEX,,silver plata futuro,ELAN curated
+CL=F,CL=F,Crude Oil WTI Futures,Commodity,Global,,NYMEX,,oil petroleo crudo wti,ELAN curated
+NG=F,NG=F,Natural Gas Futures,Commodity,Global,,NYMEX,,natural gas gas natural,ELAN curated
+HG=F,HG=F,Copper Futures,Commodity,Global,,COMEX,,copper cobre,ELAN curated
+ZC=F,ZC=F,Corn Futures,Commodity,Global,,CBOT,,corn maiz,ELAN curated
+BTC-USD,BTC-USD,Bitcoin USD,Crypto,Global,,CRYPTO,,bitcoin btc,ELAN curated
+ETH-USD,ETH-USD,Ethereum USD,Crypto,Global,,CRYPTO,,ethereum ether eth,ELAN curated
+EURUSD=X,EURUSD=X,EUR/USD,Forex,Global,,FX,,euro dollar dolar,ELAN curated
+AEDUSD=X,AEDUSD=X,AED/USD,Forex,United Arab Emirates,AE,FX,,dirham emiratos,ELAN curated
+CNYUSD=X,CNYUSD=X,CNY/USD,Forex,China,CN,FX,,yuan renminbi china,ELAN curated
+COPUSD=X,COPUSD=X,COP/USD,Forex,Colombia,CO,FX,,peso colombiano,ELAN curated
+^GSPC,^GSPC,S&P 500 Index,Index,United States,US,INDEX,,s&p 500 index,ELAN curated
+DX-Y.NYB,DX-Y.NYB,US Dollar Index,Index,United States,US,ICE,,dollar index dxy usd dolar,ELAN curated
+^IBEX,^IBEX,IBEX 35 Index,Index,Spain,ES,INDEX,,ibex 35,ELAN curated
+^HSI,^HSI,Hang Seng Index,Index,Hong Kong,HK,INDEX,,hang seng,ELAN curated
+AAPL,AAPL,Apple Inc,Stock,United States,US,NASDAQ,US0378331005,apple,ELAN curated
+MSFT,MSFT,Microsoft Corporation,Stock,United States,US,NASDAQ,US5949181045,microsoft,ELAN curated
+NVDA,NVDA,NVIDIA Corporation,Stock,United States,US,NASDAQ,US67066G1040,nvidia,ELAN curated
+ASML,ASML,ASML Holding ADR,Stock,Netherlands,NL,NASDAQ,USN070592100,asml,ELAN curated
+SAN.MC,SAN,Banco Santander SA,Stock,Spain,ES,BME,ES0113900J37,santander,ELAN curated
+ITX.MC,ITX,Industria de Diseño Textil SA,Stock,Spain,ES,BME,ES0148396007,inditex zara,ELAN curated
+IBE.MC,IBE,Iberdrola SA,Stock,Spain,ES,BME,ES0144580Y14,iberdrola,ELAN curated
+BBVA.MC,BBVA,Banco Bilbao Vizcaya Argentaria SA,Stock,Spain,ES,BME,ES0113211835,bbva,ELAN curated
+0700.HK,0700,Tencent Holdings Ltd,Stock,China,CN,HKEX,KYG875721634,tencent,ELAN curated
+9988.HK,9988,Alibaba Group Holding Ltd,Stock,China,CN,HKEX,KYG017191142,alibaba,ELAN curated
+600519.SS,600519,Kweichow Moutai Co Ltd,Stock,China,CN,SSE,CNE0000018R8,moutai,ELAN curated
+000001.SZ,000001,Ping An Bank Co Ltd,Stock,China,CN,SZSE,CNE000000040,ping an bank,ELAN curated
+EMAAR.DU,EMAAR,Emaar Properties PJSC,Stock,United Arab Emirates,AE,DFM,AEE000301011,emaar dubai,ELAN curated
+FAB.AD,FAB,First Abu Dhabi Bank PJSC,Stock,United Arab Emirates,AE,ADX,AEN000101016,first abu dhabi bank,ELAN curated
+ALDAR.AD,ALDAR,Aldar Properties PJSC,Stock,United Arab Emirates,AE,ADX,AEA002001013,aldar,ELAN curated
+EC,EC,Ecopetrol SA ADR,Stock,Colombia,CO,NYSE,US2791581091,ecopetrol,ELAN curated

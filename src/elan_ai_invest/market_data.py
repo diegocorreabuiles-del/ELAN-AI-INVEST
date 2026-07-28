@@ -39,6 +39,101 @@ def _load_yfinance_downloader() -> Callable[..., pd.DataFrame]:
     return yf.download
 
 
+def _extract_history(frame: pd.DataFrame, symbol: str) -> pd.DataFrame:
+    if frame.empty:
+        raise ValueError("sin datos")
+
+    fields = ("Open", "High", "Low", "Close", "Volume")
+    history: dict[str, pd.Series] = {}
+    if isinstance(frame.columns, pd.MultiIndex):
+        first_level = frame.columns.get_level_values(0)
+        second_level = frame.columns.get_level_values(1)
+        if any(field in first_level for field in fields):
+            for field in fields:
+                if field not in first_level:
+                    continue
+                values = frame[field]
+                if isinstance(values, pd.DataFrame):
+                    values = values[symbol] if symbol in values.columns else values.iloc[:, 0]
+                history[field] = values
+        elif any(field in second_level for field in fields):
+            for field in fields:
+                if field not in second_level:
+                    continue
+                values = frame.xs(field, axis=1, level=1)
+                if isinstance(values, pd.DataFrame):
+                    values = values[symbol] if symbol in values.columns else values.iloc[:, 0]
+                history[field] = values
+    else:
+        history = {field: frame[field] for field in fields if field in frame.columns}
+
+    required = {"Open", "High", "Low", "Close"}
+    missing = required.difference(history)
+    if missing:
+        raise ValueError("faltan columnas OHLC: " + ", ".join(sorted(missing)))
+
+    result = pd.DataFrame(history).sort_index()
+    result = result.loc[~result.index.duplicated(keep="last")]
+    result = result.dropna(subset=list(required))
+    if "Volume" not in result:
+        result["Volume"] = 0.0
+    result["Volume"] = pd.to_numeric(result["Volume"], errors="coerce").fillna(0.0)
+    return result
+
+
+def download_market_history(
+    symbol: str,
+    period: str = "2y",
+    interval: str = "1d",
+    *,
+    timeout_seconds: float = 10.0,
+    max_retries: int = 2,
+    backoff_seconds: float = 0.5,
+    downloader: Callable[..., pd.DataFrame] | None = None,
+    sleep: Callable[[float], None] = time.sleep,
+) -> pd.DataFrame:
+    normalized_symbol = str(symbol).strip().upper()
+    if not normalized_symbol:
+        raise ValueError("El símbolo no puede estar vacío")
+    if timeout_seconds <= 0:
+        raise ValueError("El timeout de mercado debe ser positivo")
+    if max_retries < 0:
+        raise ValueError("Los reintentos de mercado no pueden ser negativos")
+    if backoff_seconds < 0:
+        raise ValueError("El backoff de mercado no puede ser negativo")
+
+    download = downloader or _load_yfinance_downloader()
+    attempts = max_retries + 1
+    last_error: Exception | None = None
+    for attempt in range(attempts):
+        try:
+            frame = download(
+                normalized_symbol,
+                period=period,
+                interval=interval,
+                auto_adjust=True,
+                actions=False,
+                progress=False,
+                threads=False,
+                timeout=timeout_seconds,
+            )
+            if frame is None:
+                raise ValueError("sin datos")
+            history = _extract_history(frame, normalized_symbol)
+            if len(history) < 2:
+                raise ValueError("historial insuficiente: menos de 2 sesiones")
+            return history
+        except Exception as exc:
+            last_error = exc
+            if attempt < max_retries:
+                sleep(backoff_seconds * (2**attempt))
+
+    detail = str(last_error).strip() if last_error is not None else "error desconocido"
+    raise RuntimeError(
+        f"descarga OHLCV fallida para {normalized_symbol} tras {attempts} intentos: {detail}"
+    ) from last_error
+
+
 def _cached_close(
     cache: MarketCache | None,
     symbol: str,

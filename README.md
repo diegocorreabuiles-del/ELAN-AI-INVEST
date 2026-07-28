@@ -5,10 +5,10 @@ Plataforma local de análisis cuantitativo, fundamental, riesgo, cartera, paper 
 ## Estado recuperado en este PC
 
 - La aplicación local se ejecuta en Python 3.12; la suite y los gates pasan en Python 3.11–3.14 sobre Linux.
-- El gate local del release candidate supera 123 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
+- El gate local supera 141 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
 - El cierre de dependencias está verificado: 78 pins activos y `pip check` sin conflictos.
 - La política Git aplica `trabajo -> develop -> main`; la PR #10 promovió `1.3.0rc1` a `main` y su CI posterior pasó en Python 3.11–3.14.
-- El gate global de cobertura pasa con 81,0 %, por encima del 75 % configurado.
+- El gate global de cobertura pasa con 80,4 %, por encima del 75 % configurado.
 - AppTest recorre las once vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
 - El empaquetador seguro está reconstruido y cubierto por pruebas de integridad, rutas y reproducibilidad.
 
@@ -27,6 +27,53 @@ El instalador usa `requirements.lock`, valida las versiones instaladas y ejecuta
 ```powershell
 .\run.bat
 ```
+
+## Buscador global de instrumentos
+
+El espacio de trabajo permite buscar por símbolo, nombre, alias, ISIN, país y
+bolsa, y filtrar por tipo de activo, país y mercado. La copia local combina:
+
+- 63.185 acciones y ETF de 91 países procedentes de
+  [Adanos Free Ticker Database](https://github.com/adanos-software/free-ticker-database),
+  bajo licencia MIT;
+- una selección compatible con Yahoo de índices, materias primas, divisas,
+  criptoactivos y bonos;
+- entrada manual para cualquier símbolo exacto aceptado por Yahoo Finance.
+
+El catálogo de búsqueda y el proveedor de precios son capas distintas. Un
+instrumento puede estar identificado correctamente aunque Yahoo no ofrezca
+histórico para esa bolsa. Los mercados compatibles se traducen automáticamente,
+por ejemplo BME (`.MC`), Hong Kong (`.HK`), Shanghái (`.SS`), Shenzhen (`.SZ`),
+Abu Dabi (`.AD`) y Dubái (`.DU`).
+
+Actualizar la instantánea abierta:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\sync_instrument_catalog.ps1
+```
+
+La procedencia, hash y licencia de la instantánea están documentados en
+`config/catalog/README.md`.
+
+## Panel principal y comparador
+
+La primera pestaña permite seleccionar cualquier instrumento del universo activo
+y estudiar su histórico con cuatro vistas:
+
+- velas OHLC;
+- línea de cierres;
+- rentabilidad acumulada del periodo;
+- volumen negociado cuando Yahoo lo publica.
+
+El horizonte del gráfico es independiente del análisis general y admite desde un
+mes hasta el máximo histórico disponible. El panel muestra último cierre,
+rentabilidad del periodo, máximo, mínimo, distancia al máximo y volatilidad
+anualizada.
+
+El comparador alinea dos instrumentos, los rebasa a 100 y muestra dispersión y
+correlación móvil de sus rendimientos diarios. Para estudiar EUR/USD frente al
+dólar se pueden añadir `EURUSD=X` y `DX-Y.NYB`. La correlación no implica
+causalidad y puede cambiar con el tiempo.
 
 ## Verificación local
 
@@ -50,7 +97,7 @@ Calidad estática reproducida también por CI:
 .\.venv\Scripts\python.exe -m mypy
 ```
 
-Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,1 % con 123 pruebas superadas.
+Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 80,4 % con 141 pruebas superadas.
 
 ## Matriz Python 3.11–3.14
 
