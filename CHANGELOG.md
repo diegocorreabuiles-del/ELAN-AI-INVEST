@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Añadido un reporte de calidad por instrumento con frescura, cobertura, huecos, disponibilidad y procedencia proveedor/caché.
+- Incorporados estados saludables, degradados, obsoletos, insuficientes y no disponibles sin rellenar ni alterar precios.
+- Mostrado en Mercado el estado global del proveedor, cobertura media, incidencias y detalle del OHLCV visible.
+- Elevado el gate local a 151 pruebas y 80,74 % de cobertura.
 - Añadido un buscador global offline por símbolo, nombre, alias, ISIN, país y bolsa.
 - Añadidos filtros de tipo de activo, país y mercado, selección incremental y entrada manual Yahoo.
 - Incorporada una instantánea MIT de Adanos con 63.185 acciones/ETF de 91 países.

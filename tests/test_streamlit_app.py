@@ -18,6 +18,7 @@ import elan_ai_invest.paper_trading as paper_module
 from elan_ai_invest.core.config import Settings
 from elan_ai_invest.core.models import AnalysisRequest, AnalysisResult
 from elan_ai_invest.fundamental.models import FundamentalAnalysis, FundamentalSnapshot
+from elan_ai_invest.market.quality import assess_market_data_quality
 from elan_ai_invest.paper_trading import RiskReviewResult, TradeResult
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -162,13 +163,23 @@ def _analysis_result() -> AnalysisResult:
             )
         ]
     )
+    errors = {"OFFLINE": "Error parcial simulado"}
+    quality = assess_market_data_quality(
+        prices,
+        [*prices.columns, *errors],
+        minimum_history=210,
+        provider="Yahoo",
+        errors=errors,
+        now=prices.index[-1] + pd.Timedelta(days=1),
+    )
     return AnalysisResult(
         prices=prices,
         ranking=ranking,
-        errors={"OFFLINE": "Error parcial simulado"},
+        errors=errors,
         market_regime="Alcista",
         breadth_pct=75.0,
         average_score=76.0,
+        quality=quality,
     )
 
 
@@ -305,6 +316,8 @@ def test_app_renders_every_view_and_simulated_actions(app_environment: FakeEngin
     assert [tab.label for tab in app.tabs] == list(TAB_LABELS)
     assert app.title[0].value == "ELAN Quantum"
     assert len(app.metric) >= 10
+    assert any(item.label == "Calidad global" for item in app.metric)
+    assert any("requieren atención" in item.value for item in app.warning)
     assert any(item.label == "Activo principal" for item in app.selectbox)
     assert any(item.label == "Instrumento A" for item in app.selectbox)
     assert any(item.label == "Instrumento B" for item in app.selectbox)

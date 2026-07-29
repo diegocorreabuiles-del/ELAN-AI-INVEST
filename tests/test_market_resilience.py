@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pandas as pd
@@ -41,6 +42,9 @@ def test_market_download_retries_with_exponential_backoff_and_timeout():
     assert list(result.prices.columns) == ["SPY"]
     assert [call["timeout"] for call in calls] == [7.5, 7.5, 7.5]
     assert delays == [0.25, 0.5]
+    assert result.quality is not None
+    assert result.quality.provider == "Yahoo"
+    assert result.quality.assets["SPY"].source == "provider"
 
 
 def test_market_download_reports_exhausted_retries_without_inventing_data():
@@ -74,10 +78,18 @@ def test_safe_csv_cache_avoids_network_and_path_traversal(tmp_path: Path):
         return _market_frame()
 
     first = download_adjusted_close(
-        ["../SPY"], minimum_history=60, cache=cache, downloader=downloader
+        ["../SPY"],
+        minimum_history=60,
+        cache=cache,
+        downloader=downloader,
+        quality_now=datetime(2025, 4, 5, tzinfo=UTC),
     )
     second = download_adjusted_close(
-        ["../SPY"], minimum_history=60, cache=cache, downloader=downloader
+        ["../SPY"],
+        minimum_history=60,
+        cache=cache,
+        downloader=downloader,
+        quality_now=datetime(2025, 4, 5, tzinfo=UTC),
     )
 
     assert first.errors == second.errors == {}
@@ -87,6 +99,10 @@ def test_safe_csv_cache_avoids_network_and_path_traversal(tmp_path: Path):
     assert files[0].suffix == ".csv"
     assert files[0].parent == tmp_path
     assert not list(tmp_path.glob("*.pkl"))
+    assert first.quality is not None
+    assert second.quality is not None
+    assert first.quality.assets["../SPY"].source == "provider"
+    assert second.quality.assets["../SPY"].source == "cache"
 
 
 def test_market_cache_ignores_expired_or_corrupt_entries(tmp_path: Path):

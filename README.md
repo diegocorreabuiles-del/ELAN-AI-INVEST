@@ -5,10 +5,10 @@ Plataforma local de análisis cuantitativo, fundamental, riesgo, cartera, paper 
 ## Estado recuperado en este PC
 
 - La aplicación local se ejecuta en Python 3.12; la suite y los gates pasan en Python 3.11–3.14 sobre Linux.
-- El gate local supera 141 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
+- El gate local supera 151 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
 - El cierre de dependencias está verificado: 78 pins activos y `pip check` sin conflictos.
 - La política Git aplica `trabajo -> develop -> main`; la PR #10 promovió `1.3.0rc1` a `main` y su CI posterior pasó en Python 3.11–3.14.
-- El gate global de cobertura pasa con 80,4 %, por encima del 75 % configurado.
+- El gate global de cobertura pasa con 80,7 %, por encima del 75 % configurado.
 - AppTest recorre las once vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
 - El empaquetador seguro está reconstruido y cubierto por pruebas de integridad, rutas y reproducibilidad.
 
@@ -75,6 +75,18 @@ correlación móvil de sus rendimientos diarios. Para estudiar EUR/USD frente al
 dólar se pueden añadir `EURUSD=X` y `DX-Y.NYB`. La correlación no implica
 causalidad y puede cambiar con el tiempo.
 
+## Calidad de Market Data
+
+Cada análisis adjunta un reporte aditivo de calidad por instrumento. El panel
+Mercado muestra proveedor, estado global, cobertura media, incidencias,
+procedencia (`Proveedor` o `Caché local`), última sesión y posibles huecos.
+
+Los estados distinguen historiales saludables, degradados, obsoletos,
+insuficientes y no disponibles. La frescura tolera hasta cinco días naturales y
+la cobertura usa sesiones laborables esperadas con un umbral del 95 %. Es una
+heurística operativa, no un calendario oficial de cada bolsa. El diagnóstico no
+rellena precios ni modifica las series usadas por scoring, riesgo o comparación.
+
 ## Verificación local
 
 Suite funcional, sin el umbral global de cobertura:
@@ -97,7 +109,7 @@ Calidad estática reproducida también por CI:
 .\.venv\Scripts\python.exe -m mypy
 ```
 
-Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 80,4 % con 141 pruebas superadas.
+Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 80,7 % con 151 pruebas superadas.
 
 ## Matriz Python 3.11–3.14
 
@@ -141,6 +153,6 @@ La política canónica está en `GIT_WORKFLOW.md`. Las ramas de trabajo y recupe
 
 ## Siguiente paso de release
 
-`1.3.0rc1` está validada y promovida a `main` en el commit `3c4cc72`. El tag canónico de la candidata se crea exclusivamente desde ese commit; publicar una GitHub Release o desplegar requieren autorizaciones explícitas independientes.
+`1.3.0rc1` está validada en `main` y el tag anotado `v1.3.0-rc.1` apunta a `5cf2bca`. Publicar una GitHub Release o desplegar requieren autorizaciones explícitas independientes.
 
 ELAN Quantum es una herramienta educativa y de simulación. No constituye asesoramiento financiero ni garantiza resultados.

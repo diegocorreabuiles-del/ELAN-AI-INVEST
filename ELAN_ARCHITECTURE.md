@@ -1,6 +1,6 @@
 # Arquitectura canónica de ELAN Quantum v1.3.0rc1
 
-> **Estado verificado (28 de julio de 2026).** La PR #6 promovió a `main` la base recuperada y endurecida; la CI posterior pasó en Python 3.11–3.14. Esta rama prepara `1.3.0rc1` sin activar broker, dinero real, tag, release ni despliegue.
+> **Estado verificado (28 de julio de 2026).** `1.3.0rc1` está etiquetada en `main`; `develop` integra el panel de mercado y esta rama añade calidad de datos sin activar broker, dinero real, release ni despliegue.
 
 Estado: arquitectura vigente tras la Fase 1 de estabilización. `ARCHITECTURE_CURRENT.md` conserva la fotografía anterior a la limpieza.
 
@@ -12,6 +12,7 @@ app.py (Streamlit)
   -> core.engine.CoreEngine                         [pipeline canónico]
        -> providers.yahoo.YahooMarketDataProvider
        -> market_data.download_adjusted_close()
+            -> market.quality.assess_market_data_quality()
             -> market.cache.MarketCache (CSV inerte, TTL, escritura atómica)
        -> scoring + quant
        -> storage (solo si se solicita persistencia)
@@ -24,7 +25,7 @@ app.py (Streamlit)
   -> dashboard/*
 ```
 
-Los datos de mercado entran por el proveedor configurado, se validan con `market.interval` y `market.minimum_history`, y se convierten en un `AnalysisResult`. Yahoo usa timeout y retry/backoff acotados; los aciertos se guardan como CSV inerte con TTL y clave SHA-256. Todas las vistas reciben ese resultado común. La primera pestaña puede solicitar OHLCV ajustado del único activo visible mediante `download_market_history()`; esta consulta conserva timeout/retry y un caché Streamlit de 15 minutos y 50 entradas. Las pestañas costosas solo se renderizan cuando están abiertas; los cachés tienen TTL y límites de entradas.
+Los datos de mercado entran por el proveedor configurado, se validan con `market.interval` y `market.minimum_history`, y se convierten en un `AnalysisResult`. Yahoo usa timeout y retry/backoff acotados; los aciertos se guardan como CSV inerte con TTL y clave SHA-256. `DownloadResult` añade opcionalmente un reporte por instrumento con procedencia, observaciones, cobertura, huecos, última sesión, antigüedad y estado. Todas las vistas reciben ese resultado común. La primera pestaña evalúa además el OHLCV ajustado del activo visible; la consulta conserva timeout/retry y un caché Streamlit de 15 minutos y 50 entradas. Las pestañas costosas solo se renderizan cuando están abiertas; los cachés tienen TTL y límites de entradas.
 
 ## APIs canónicas
 
@@ -36,6 +37,7 @@ Los datos de mercado entran por el proveedor configurado, se validan con `market
 
 ## Invariantes relevantes
 
+- La calidad de mercado es metadata: nunca rellena, recorta ni altera las series consumidas por scoring, riesgo o comparación.
 - El optimizador institucional nunca devuelve un peso superior a `max_weight`.
 - Si `n_activos * max_weight < 1`, falla con un `ValueError` que explica la inviabilidad.
 - Portfolio valida capital, posiciones, cap por posición y efectivo mínimo.
@@ -96,7 +98,7 @@ No se borró ninguna implementación. Su retirada requiere búsqueda de consumid
 
 - Pytest mide líneas y ramas de `app.py` y de todo `elan_ai_invest`, incluidos módulos legacy no ejecutados; CI bloquea cualquier resultado inferior a 75 %.
 - AppTest sustituye el Core Engine y los fundamentales por datos deterministas, prohíbe llamadas Yahoo y renderiza tanto el flujo inicial como todas las vistas.
-- El baseline local de esta rama es 80,35 % con 141 pruebas superadas en Python 3.12. El umbral debe aumentar solo junto con pruebas que cubran riesgo real, sin excluir legacy para inflar el porcentaje.
+- El baseline local de esta rama es 80,74 % con 151 pruebas superadas en Python 3.12. El umbral debe aumentar solo junto con pruebas que cubran riesgo real, sin excluir legacy para inflar el porcentaje.
 
 ## Frontera de integración
 

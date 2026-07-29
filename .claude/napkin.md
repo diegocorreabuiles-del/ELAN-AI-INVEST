@@ -39,11 +39,13 @@
    Do instead: keep all orders local and simulated; require a separate approved design for any broker or live mode.
 2. **[2026-07-22] Risk data must use aligned consecutive returns**
    Do instead: drop incomplete observations and fail with insufficient history; never forward-fill prices or invent zero returns.
-3. **[2026-07-22] Paper mutations are atomic and fail closed**
+3. **[2026-07-28] Market quality is metadata-only**
+   Do instead: report freshness, coverage, gaps and source separately; never fill or mutate prices to improve the quality status.
+4. **[2026-07-22] Paper mutations are atomic and fail closed**
    Do instead: use `BEGIN IMMEDIATE`, require affected rows/order IDs, and roll back cash, positions, orders and snapshots together.
-4. **[2026-07-22] Hidden Streamlit tabs must stay lazy**
+5. **[2026-07-22] Hidden Streamlit tabs must stay lazy**
    Do instead: preserve `on_change="rerun"`, guard all 11 tabs with `tab.open`, and keep the regression test.
-5. **[2026-07-22] Version has one canonical source**
+6. **[2026-07-22] Version has one canonical source**
    Do instead: change `pyproject.toml`; let installed metadata feed package, configuration, UI and healthcheck.
 
 ## User Directives

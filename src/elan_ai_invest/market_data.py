@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable, Iterable
+from datetime import datetime
 
 import pandas as pd
 
 from elan_ai_invest.market.cache import MarketCache
+from elan_ai_invest.market.quality import assess_market_data_quality
 from elan_ai_invest.providers.base import DownloadResult
 
 
@@ -165,6 +167,8 @@ def download_adjusted_close(
     cache: MarketCache | None = None,
     downloader: Callable[..., pd.DataFrame] | None = None,
     sleep: Callable[[float], None] = time.sleep,
+    provider_name: str = "Yahoo",
+    quality_now: datetime | pd.Timestamp | None = None,
 ) -> DownloadResult:
     if timeout_seconds <= 0:
         raise ValueError("El timeout de mercado debe ser positivo")
@@ -176,15 +180,17 @@ def download_adjusted_close(
     download = downloader or _load_yfinance_downloader()
     series: list[pd.Series] = []
     errors: dict[str, str] = {}
+    sources: dict[str, str] = {}
+    normalized_symbols = list(
+        dict.fromkeys(str(raw).strip().upper() for raw in symbols if str(raw).strip())
+    )
 
-    for raw_symbol in symbols:
-        symbol = str(raw_symbol).strip().upper()
-        if not symbol:
-            continue
+    for symbol in normalized_symbols:
 
         close = _cached_close(cache, symbol, period, interval, minimum_history)
         if close is not None:
             series.append(close)
+            sources[symbol] = "cache"
             continue
 
         frame: pd.DataFrame | None = None
@@ -222,10 +228,20 @@ def download_adjusted_close(
                     f"historial insuficiente: {len(close)} < {minimum_history} sesiones"
                 )
             series.append(close)
+            sources[symbol] = "provider"
             if cache is not None:
                 cache.save(symbol, close.rename("Close").to_frame(), period, interval)
         except Exception as exc:
             errors[symbol] = str(exc)
 
     prices = pd.concat(series, axis=1).sort_index() if series else pd.DataFrame()
-    return DownloadResult(prices=prices, errors=errors)
+    quality = assess_market_data_quality(
+        prices,
+        normalized_symbols,
+        minimum_history=minimum_history,
+        provider=provider_name,
+        sources=sources,
+        errors=errors,
+        now=quality_now,
+    )
+    return DownloadResult(prices=prices, errors=errors, quality=quality)
