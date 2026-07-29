@@ -62,6 +62,8 @@ files = [
   "src/elan_ai_invest/paper_trading.py",
   "src/elan_ai_invest/system_status.py",
   "src/elan_ai_invest/dashboard/safe.py",
+  "src/elan_ai_invest/dashboard/news.py",
+  "src/elan_ai_invest/news",
 ]
 ignore_missing_imports = true
 disallow_untyped_defs = true

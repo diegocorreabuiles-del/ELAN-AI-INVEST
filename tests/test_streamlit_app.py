@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from datetime import UTC, date, datetime
 from pathlib import Path
 
 import numpy as np
@@ -14,11 +15,18 @@ import elan_ai_invest.core.bootstrap as bootstrap
 import elan_ai_invest.dashboard.fundamental as fundamental_dashboard
 import elan_ai_invest.dashboard.history as history_dashboard
 import elan_ai_invest.dashboard.market as market_dashboard
+import elan_ai_invest.dashboard.news as news_dashboard
 import elan_ai_invest.paper_trading as paper_module
 from elan_ai_invest.core.config import Settings
 from elan_ai_invest.core.models import AnalysisRequest, AnalysisResult
 from elan_ai_invest.fundamental.models import FundamentalAnalysis, FundamentalSnapshot
 from elan_ai_invest.market.quality import assess_market_data_quality
+from elan_ai_invest.news import (
+    CorporateEvent,
+    CorporateEventType,
+    NewsEventsResult,
+    NewsItem,
+)
 from elan_ai_invest.paper_trading import RiskReviewResult, TradeResult
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,6 +36,7 @@ TAB_LABELS = (
     "Mercado",
     "Inteligencia",
     "Fundamental",
+    "Noticias y eventos",
     "Ranking",
     "Riesgo",
     "Cartera",
@@ -45,6 +54,7 @@ class FakeEngine:
         self.result = result
         self.failure: Exception | None = None
         self.requests: list[AnalysisRequest] = []
+        self.news_requests: list[str] = []
 
     def run_analysis(self, request: AnalysisRequest) -> AnalysisResult:
         self.requests.append(request)
@@ -222,6 +232,30 @@ def _fundamental_analysis() -> FundamentalAnalysis:
     )
 
 
+def _news_events_result(symbol: str = "AAPL") -> NewsEventsResult:
+    return NewsEventsResult(
+        symbol=symbol,
+        news=(
+            NewsItem(
+                symbol=symbol,
+                title="Titular fixture sin red",
+                publisher="Fuente fixture",
+                url="https://example.com/noticia",
+                published_at=datetime(2026, 7, 29, 10, tzinfo=UTC),
+                summary="Resumen determinista.",
+            ),
+        ),
+        events=(
+            CorporateEvent(
+                symbol=symbol,
+                event_type=CorporateEventType.EARNINGS,
+                event_date=date(2026, 8, 1),
+            ),
+        ),
+        captured_at=datetime(2026, 7, 29, 12, tzinfo=UTC),
+    )
+
+
 def _market_history() -> pd.DataFrame:
     index = pd.bdate_range("2025-01-01", periods=260)
     close = pd.Series(150 + np.arange(len(index)) * 0.12, index=index)
@@ -260,6 +294,13 @@ def app_environment(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> FakeEngi
         "_load_fundamental",
         lambda symbol: _fundamental_analysis(),
     )
+
+    def fake_news_loader(symbol: str, max_items: int, cache_bucket: int) -> NewsEventsResult:
+        del max_items, cache_bucket
+        engine.news_requests.append(symbol)
+        return _news_events_result(symbol)
+
+    monkeypatch.setattr(news_dashboard, "_load_news_events", fake_news_loader)
     monkeypatch.setattr(
         history_dashboard,
         "read_history",
@@ -313,6 +354,7 @@ def _history_view_script(engine, db_path, selected, period):
 def test_app_renders_every_view_and_simulated_actions(app_environment: FakeEngine) -> None:
     app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
     _assert_no_ui_failure(app, "initial")
+    assert app_environment.news_requests == []
     assert [tab.label for tab in app.tabs] == list(TAB_LABELS)
     assert app.title[0].value == "ELAN Quantum"
     assert len(app.metric) >= 10
@@ -325,6 +367,7 @@ def test_app_renders_every_view_and_simulated_actions(app_environment: FakeEngin
     tab_widget_id = _tab_widget_id(app)
     for label in TAB_LABELS:
         _select_tab(app, tab_widget_id, label)
+    assert app_environment.news_requests == ["AAPL"]
 
     calls_before_refresh = len(app_environment.requests)
     _button(app, "Actualizar datos").click().run(timeout=APP_TEST_TIMEOUT)

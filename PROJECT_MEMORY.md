@@ -14,7 +14,7 @@
 
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
 - Base publicada `1.3.0rc1` en `main`: `5cf2bca1cd98954c1c71e191368432d2b242d9ae`.
-- `develop` integra el buscador global, el panel principal y la calidad/resiliencia de Market Data en `87379f04fe1a005d82d3c496f82dcb2ee86d6c3e`.
+- `develop` integra el buscador global, el panel principal y la calidad/resiliencia de Market Data en `ab0686416b77fe49d113ce642f710053c91015cf`.
 - La promoción se realizó como avance rápido exacto, sin `force` ni cambios de protección, para conservar el historial lineal y la misma ascendencia en ambas ramas.
 - PR #5 (`feature/release-candidate-hardening -> develop`) fusionada por rebase.
 - PR #6 (`develop -> main`) fusionada por rebase el 28 de julio de 2026.
@@ -24,7 +24,8 @@
 - PR #16 (`feature/market-overview -> develop`) fusionada el 28 de julio de 2026; su CI posterior (`30381167190`) pasó en Python 3.11–3.14.
 - PR #17 (`feature/market-data-quality -> develop`) fusionada por rebase el 29 de julio de 2026; su CI posterior (`30444192200`) pasó en Python 3.11–3.14.
 - Respaldo previo a la realineación: `backup/develop-pre-realign-20260728-4a9010a` en `4a9010a8ddc48e057a3e6c49a6c028e4e063c47e`.
-- El Bloque 21 quedó integrado en `develop`; no hay otro bloque funcional autorizado.
+- El Bloque 21 quedó integrado en `develop` y el Bloque 22 fue autorizado y acotado como News & Events Engine v1.
+- `feature/news-events-engine` contiene la implementación local sin confirmar; el gate Windows está verde y no se ha publicado ni abierto PR.
 - El cambio no funcional de metadata gzip del catálogo quedó preservado en `stash@{0}` con el mensaje `local gzip metadata before syncing develop`.
 - Tag anotado `v1.3.0-rc.1` publicado sobre `5cf2bca1cd98954c1c71e191368432d2b242d9ae`; no existe GitHub Release ni despliegue.
 - Producto local de análisis y paper trading; no conecta brokers ni dinero real.
@@ -36,8 +37,8 @@ Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que sig
 ### Windows local
 
 - Python 3.12.13.
-- 151 pruebas superadas.
-- Cobertura 80,74 %; umbral obligatorio 75 %.
+- 162 pruebas superadas.
+- Cobertura 81,17 %; umbral obligatorio 75 %.
 - `requirements.lock`: 78 pins activos y 78 distribuciones locales verificadas.
 - `pip check`, Ruff, Black, mypy crítico y healthcheck: verdes.
 
@@ -62,13 +63,14 @@ Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que sig
 4. **Arquitectura:** `core.engine.CoreEngine`, `portfolio.engine` y `backtesting.engine.BacktestEngine` son canónicos; legacy se conserva congelado/deprecado.
 5. **Datos de riesgo:** usar retornos consecutivos alineados; sin forward-fill ni retornos cero inventados.
 6. **Paper trading:** SQLite local, transacciones `BEGIN IMMEDIATE`, mutaciones atómicas, fallos cerrados y revisión de stops manual/confirmada.
-7. **Streamlit:** workspace grafito tipo plataforma de trading; 11 pestañas lazy con `tab.open`; sin CSS inyectado ni `use_container_width`.
+7. **Streamlit:** workspace grafito tipo plataforma de trading; 12 pestañas lazy con `tab.open`; sin CSS inyectado ni `use_container_width`.
 8. **Errores:** UI neutra con referencia; detalle técnico solo en logging.
 9. **Versión:** `pyproject.toml` es la fuente; `importlib.metadata` alimenta paquete, configuración, UI y healthcheck. Candidata `1.3.0rc1` promovida y validada en `main`; GitHub Release no publicada.
 10. **Dependencias:** cierre exacto en `requirements.lock`; `python-dotenv` fue retirado por no tener consumidor.
 11. **Catálogo global:** el descubrimiento usa una instantánea MIT de Adanos más `config/instruments.csv`; los históricos siguen en Yahoo. Catálogo disponible no equivale a histórico garantizado. No añadir el paquete `financedatabase` ni sus dependencias pesadas al runtime.
 12. **Panel de mercado:** el detalle OHLCV se carga solo para el activo/horizonte visible y se cachea 15 minutos; el comparador usa rendimientos diarios consecutivos alineados, sin rellenar huecos ni correlacionar niveles de precio.
 13. **Calidad de mercado:** el reporte es metadata aditiva; clasifica frescura, cobertura, huecos y disponibilidad por activo, registra proveedor/caché y nunca rellena ni altera precios.
+14. **Noticias y eventos:** Yahoo se consulta solo al abrir la pestaña, con caché y límites acotados; el resultado es contexto de solo lectura y nunca alimenta scoring, señales, riesgo, cartera ni ejecución paper.
 
 ## Reglas de implementación
 
@@ -139,6 +141,7 @@ gh pr view 6 --json state,mergeable,mergeStateStatus,statusCheckRollup,url
 - Persistencia histórica: `src/elan_ai_invest/storage.py`.
 - UI: `src/elan_ai_invest/dashboard/`; el panel principal y comparador viven en `dashboard/market.py`.
 - Calidad de Market Data: `src/elan_ai_invest/market/quality.py`; contrato aditivo en `providers/base.py` y presentación en `dashboard/market.py`.
+- Noticias y eventos: `src/elan_ai_invest/news/` y presentación lazy en `dashboard/news.py`.
 - Configuración: `config/settings.yaml` y `pyproject.toml`.
 - Instrumentos: `src/elan_ai_invest/instruments.py`, `config/instruments.csv` y `config/catalog/`.
 - Gates: `.github/workflows/ci.yml`, `scripts/check_lock.py`, `scripts/run_ci_matrix.ps1` y `scripts/build_distribution.py`.
@@ -155,9 +158,10 @@ gh pr view 6 --json state,mergeable,mergeStateStatus,statusCheckRollup,url
 
 ## Siguiente paso autorizado
 
-- **Bloque 21 — calidad y resiliencia de Market Data** está integrado en `develop@87379f0`; gate local y CI posterior a la fusión verdes.
-- Siguiente paso pendiente de autorización explícita: definir y acotar el próximo bloque funcional.
-- Fundamental Engine ya existe; cualquier ampliación queda para un bloque posterior autorizado.
+- **Bloque 21 — calidad y resiliencia de Market Data** está integrado en `develop@ab06864`; su CI funcional y posterior a la fusión quedaron verdes.
+- **Bloque 22 — News & Events Engine v1** está implementado en el working tree de `feature/news-events-engine`: 162 pruebas, 81,17 % de cobertura, lock, `pip check`, Ruff, Black, mypy y healthcheck verdes.
+- Siguiente paso pendiente de autorización explícita: revisar el diff final y, si se aprueba, confirmar, publicar la rama y abrir PR hacia `develop` para ejecutar CI Python 3.11–3.14.
+- Sentimiento/NLP/IA, alertas, persistencia, ranking por noticias, multi-proveedor y cualquier conexión de broker permanecen fuera del Bloque 22.
 - El tag `v1.3.0-rc.1` está publicado; no hay ninguna acción adicional de release autorizada.
 - Publicar una GitHub Release o desplegar requieren autorizaciones explícitas independientes posteriores.
 - Mantener el producto en paper trading; cualquier activación de broker o dinero real queda fuera de alcance.

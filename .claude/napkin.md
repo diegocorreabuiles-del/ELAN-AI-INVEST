@@ -44,7 +44,7 @@
 4. **[2026-07-22] Paper mutations are atomic and fail closed**
    Do instead: use `BEGIN IMMEDIATE`, require affected rows/order IDs, and roll back cash, positions, orders and snapshots together.
 5. **[2026-07-22] Hidden Streamlit tabs must stay lazy**
-   Do instead: preserve `on_change="rerun"`, guard all 11 tabs with `tab.open`, and keep the regression test.
+   Do instead: preserve `on_change="rerun"`, guard all 12 tabs with `tab.open`, and keep the regression test; news/events must remain read-only and outside scoring and execution.
 6. **[2026-07-22] Version has one canonical source**
    Do instead: change `pyproject.toml`; let installed metadata feed package, configuration, UI and healthcheck.
 
