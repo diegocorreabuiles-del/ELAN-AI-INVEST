@@ -63,6 +63,7 @@ class CoreEngine:
             market_regime=regime,
             breadth_pct=breadth,
             average_score=avg_score,
+            quality=downloaded.quality,
         )
 
         if request.save_snapshot and not ranking.empty:

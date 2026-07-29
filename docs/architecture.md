@@ -8,16 +8,18 @@ Flujo:
 
 1. Recibe una `AnalysisRequest`.
 2. Solicita precios a un proveedor mediante la interfaz `MarketDataProvider`.
-3. Ejecuta el motor de scoring.
-4. Determina el régimen de mercado.
-5. Guarda una fotografía cuando se solicita.
-6. Devuelve un `AnalysisResult` tipado.
-7. Registra el proceso en consola y en archivo rotatorio.
+3. Adjunta un reporte de calidad por activo sin modificar las series descargadas.
+4. Ejecuta el motor de scoring.
+5. Determina el régimen de mercado.
+6. Guarda una fotografía cuando se solicita.
+7. Devuelve un `AnalysisResult` tipado.
+8. Registra el proceso en consola y en archivo rotatorio.
 
 ## Separación de responsabilidades
 
 - `core/`: configuración, logging, modelos y orquestación.
 - `providers/`: adaptadores de proveedores de datos.
+- `market/quality.py`: frescura, cobertura, huecos y disponibilidad como metadata.
 - `scoring.py`: cálculo cuantitativo.
 - `storage.py`: persistencia SQLite.
 - `app.py`: presentación Streamlit.

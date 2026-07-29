@@ -298,6 +298,7 @@ if tabs[0].open:
             selected,
             catalog_labels,
             ENGINE.settings.market,
+            analysis.quality,
         )
 if tabs[1].open:
     with tabs[1]:

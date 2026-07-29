@@ -5,6 +5,8 @@ from datetime import UTC, datetime
 
 import pandas as pd
 
+from elan_ai_invest.providers.base import MarketDataQualityReport
+
 
 @dataclass
 class AnalysisRequest:
@@ -21,6 +23,7 @@ class AnalysisResult:
     market_regime: str
     breadth_pct: float
     average_score: float
+    quality: MarketDataQualityReport | None = None
     captured_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     @property

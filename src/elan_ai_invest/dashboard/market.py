@@ -9,7 +9,12 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+from elan_ai_invest.market.quality import assess_market_data_quality
 from elan_ai_invest.market_data import download_market_history
+from elan_ai_invest.providers.base import (
+    MarketDataQualityReport,
+    MarketDataQualityStatus,
+)
 
 LOGGER = logging.getLogger(__name__)
 HORIZONS = {
@@ -23,6 +28,18 @@ HORIZONS = {
     "Máximo": "max",
 }
 CHART_VIEWS = ("Velas", "Línea", "Rentabilidad", "Volumen")
+QUALITY_STATUS_LABELS = {
+    MarketDataQualityStatus.HEALTHY: "Saludable",
+    MarketDataQualityStatus.DEGRADED: "Degradado",
+    MarketDataQualityStatus.STALE: "Obsoleto",
+    MarketDataQualityStatus.INSUFFICIENT: "Insuficiente",
+    MarketDataQualityStatus.UNAVAILABLE: "No disponible",
+}
+QUALITY_SOURCE_LABELS = {
+    "provider": "Proveedor",
+    "cache": "Caché local",
+    "unavailable": "No disponible",
+}
 
 
 @dataclass(frozen=True)
@@ -184,6 +201,65 @@ def _correlation_label(value: float) -> str:
     return f"{strength} {direction}"
 
 
+def _format_observation(value) -> str:
+    return value.strftime("%d/%m/%Y") if value is not None else "N/D"
+
+
+def _quality_rows(report: MarketDataQualityReport) -> list[dict[str, str | int]]:
+    return [
+        {
+            "Instrumento": quality.symbol,
+            "Estado": QUALITY_STATUS_LABELS[quality.status],
+            "Origen": QUALITY_SOURCE_LABELS.get(quality.source, quality.source),
+            "Observaciones": quality.observations,
+            "Cobertura": f"{quality.coverage_ratio:.1%}",
+            "Huecos": quality.missing_sessions,
+            "Última sesión": _format_observation(quality.last_observation),
+            "Antigüedad": (f"{quality.age_days} días" if quality.age_days is not None else "N/D"),
+        }
+        for quality in report.assets.values()
+    ]
+
+
+def _render_quality_summary(report: MarketDataQualityReport | None) -> None:
+    if report is None:
+        return
+
+    st.subheader(":material/monitoring: Calidad de datos")
+    with st.container(horizontal=True):
+        st.metric("Proveedor", report.provider, border=True)
+        st.metric(
+            "Calidad global",
+            QUALITY_STATUS_LABELS[report.status],
+            border=True,
+        )
+        st.metric(
+            "Cobertura media",
+            f"{report.average_coverage_ratio:.1%}",
+            border=True,
+        )
+        st.metric(
+            "Incidencias",
+            f"{report.issue_count}/{len(report.assets)}",
+            border=True,
+        )
+
+    if report.status is MarketDataQualityStatus.HEALTHY:
+        st.success("El proveedor entregó historiales recientes y con cobertura suficiente.")
+    elif report.status is MarketDataQualityStatus.UNAVAILABLE:
+        st.warning("El proveedor no entregó históricos utilizables para el universo solicitado.")
+    else:
+        st.warning(
+            f"{report.issue_count} de {len(report.assets)} instrumentos requieren atención. "
+            "Revisa frescura, cobertura o disponibilidad antes de tomar decisiones."
+        )
+
+    details = st.expander("Detalle de calidad por instrumento", on_change="rerun")
+    if details.open:
+        with details:
+            st.dataframe(pd.DataFrame(_quality_rows(report)), hide_index=True, width="stretch")
+
+
 def _render_detail_panel(selected, labels, market_settings) -> str:
     st.subheader(":material/candlestick_chart: Desempeño del activo")
     with st.container(horizontal=True, vertical_alignment="bottom"):
@@ -222,6 +298,33 @@ def _render_detail_panel(selected, labels, market_settings) -> str:
             "Prueba otro horizonte o instrumento."
         )
         return primary_symbol
+
+    detail_quality_report = assess_market_data_quality(
+        history[["Close"]].rename(columns={"Close": primary_symbol}),
+        [primary_symbol],
+        minimum_history=2,
+        provider="Yahoo",
+    )
+    detail_quality = detail_quality_report.assets[primary_symbol]
+    if detail_quality.status in {
+        MarketDataQualityStatus.STALE,
+        MarketDataQualityStatus.INSUFFICIENT,
+    }:
+        st.warning(
+            "El histórico detallado está "
+            f"{QUALITY_STATUS_LABELS[detail_quality.status].lower()}. "
+            "Confirma su vigencia antes de usarlo."
+        )
+    elif detail_quality.status is MarketDataQualityStatus.DEGRADED:
+        st.info(
+            f"El histórico contiene {detail_quality.missing_sessions} posibles huecos "
+            "de sesión; no se han rellenado artificialmente."
+        )
+    st.caption(
+        f"Calidad OHLCV: {QUALITY_STATUS_LABELS[detail_quality.status]} · "
+        f"Cobertura {detail_quality.coverage_ratio:.1%} · "
+        f"Última sesión {_format_observation(detail_quality.last_observation)}"
+    )
 
     metrics = _price_metrics(history)
     with st.container(horizontal=True):
@@ -361,7 +464,10 @@ def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> Non
     )
 
 
-def render_market_tab(ranking, prices, selected, labels, market_settings):
+def render_market_tab(ranking, prices, selected, labels, market_settings, quality_report=None):
+    _render_quality_summary(quality_report)
+    if quality_report is not None:
+        st.divider()
     primary_symbol = _render_detail_panel(selected, labels, market_settings)
     st.divider()
     _render_comparator(prices, primary_symbol, labels)

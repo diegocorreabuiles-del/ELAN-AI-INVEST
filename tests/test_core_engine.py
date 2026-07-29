@@ -6,12 +6,14 @@ import pandas as pd
 from elan_ai_invest.core.config import Settings
 from elan_ai_invest.core.engine import CoreEngine
 from elan_ai_invest.core.models import AnalysisRequest
+from elan_ai_invest.market.quality import assess_market_data_quality
 from elan_ai_invest.providers.base import DownloadResult, MarketDataProvider
 
 
 class FakeProvider(MarketDataProvider):
     def __init__(self):
         self.request = None
+        self.quality = None
 
     def download_prices(self, symbols, period, interval="1d", minimum_history=60):
         self.request = {
@@ -28,7 +30,14 @@ class FakeProvider(MarketDataProvider):
             },
             index=idx,
         )
-        return DownloadResult(prices=prices, errors={})
+        self.quality = assess_market_data_quality(
+            prices,
+            self.request["symbols"],
+            minimum_history=minimum_history,
+            provider="Fake",
+            now=idx[-1] + pd.Timedelta(days=1),
+        )
+        return DownloadResult(prices=prices, errors={}, quality=self.quality)
 
 
 class NullLogger:
@@ -46,6 +55,7 @@ def test_core_engine_orchestrates_analysis(tmp_path: Path):
     assert result.successful_symbols == 2
     assert not result.ranking.empty
     assert result.market_regime in {"Alcista", "Mixto", "Defensivo"}
+    assert result.quality is provider.quality
     assert provider.request == {
         "symbols": ["SPY", "QQQ"],
         "period": "2y",
