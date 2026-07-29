@@ -86,6 +86,12 @@ class PortfolioConfig(BaseModel):
     min_cash_pct: float = Field(default=20.0, ge=0, le=100)
 
 
+class NewsConfig(BaseModel):
+    enabled: bool = True
+    max_items: int = Field(default=10, ge=1, le=50)
+    cache_ttl_seconds: int = Field(default=900, ge=60, le=86400)
+
+
 class PaperTradingConfig(BaseModel):
     enabled: bool = True
     initial_capital: float = Field(default=100_000.0, gt=0)
@@ -113,6 +119,7 @@ class Settings(BaseModel):
     backtest: BacktestConfig = BacktestConfig()
     risk: RiskConfig = RiskConfig()
     portfolio: PortfolioConfig = PortfolioConfig()
+    news: NewsConfig = NewsConfig()
     paper_trading: PaperTradingConfig = PaperTradingConfig()
     storage: StorageConfig = StorageConfig()
     logging: LoggingConfig = LoggingConfig()

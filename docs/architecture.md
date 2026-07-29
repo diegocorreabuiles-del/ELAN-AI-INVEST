@@ -20,8 +20,11 @@ Flujo:
 - `core/`: configuración, logging, modelos y orquestación.
 - `providers/`: adaptadores de proveedores de datos.
 - `market/quality.py`: frescura, cobertura, huecos y disponibilidad como metadata.
+- `news/`: proveedor y modelos de noticias y calendario corporativo; queda fuera del Core Engine.
 - `scoring.py`: cálculo cuantitativo.
 - `storage.py`: persistencia SQLite.
 - `app.py`: presentación Streamlit.
 
 La interfaz puede cambiar en el futuro sin reescribir el núcleo.
+
+La UI consulta noticias y eventos únicamente al abrir su pestaña. La información es contextual, tolera fallos parciales y no altera el pipeline cuantitativo ni las operaciones simuladas.

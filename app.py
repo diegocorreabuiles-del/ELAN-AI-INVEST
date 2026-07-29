@@ -18,6 +18,7 @@ from elan_ai_invest.dashboard import (
     render_intelligence_tab,
     render_main_metrics,
     render_market_tab,
+    render_news_events_tab,
     render_paper_trading_tab,
     render_portfolio_tab,
     render_ranking_tab,
@@ -276,6 +277,7 @@ tabs = st.tabs(
         "Mercado",
         "Inteligencia",
         "Fundamental",
+        "Noticias y eventos",
         "Ranking",
         "Riesgo",
         "Cartera",
@@ -308,12 +310,15 @@ if tabs[2].open:
         safe_render("Fundamental", render_fundamental_tab, ranking)
 if tabs[3].open:
     with tabs[3]:
-        safe_render("Ranking", render_ranking_tab, ranking, prices)
+        safe_render("Noticias y eventos", render_news_events_tab, ranking, ENGINE.settings.news)
 if tabs[4].open:
     with tabs[4]:
-        safe_render("Riesgo", render_risk_tab, risk_report, ranking, capital, ENGINE.settings)
+        safe_render("Ranking", render_ranking_tab, ranking, prices)
 if tabs[5].open:
     with tabs[5]:
+        safe_render("Riesgo", render_risk_tab, risk_report, ranking, capital, ENGINE.settings)
+if tabs[6].open:
+    with tabs[6]:
         safe_render(
             "Cartera",
             render_portfolio_tab,
@@ -323,11 +328,11 @@ if tabs[5].open:
             capital,
             ENGINE.settings,
         )
-if tabs[6].open:
-    with tabs[6]:
-        safe_render("Institucional", render_institutional_tab, prices, capital)
 if tabs[7].open:
     with tabs[7]:
+        safe_render("Institucional", render_institutional_tab, prices, capital)
+if tabs[8].open:
+    with tabs[8]:
         paper_engine = None
         if ENGINE.settings.paper_trading.enabled:
             paper_engine = PaperTradingEngine(
@@ -345,8 +350,8 @@ if tabs[7].open:
             selected,
             ENGINE.settings,
         )
-if tabs[8].open:
-    with tabs[8]:
+if tabs[9].open:
+    with tabs[9]:
         safe_render(
             "Backtesting",
             render_backtesting_tab,
@@ -354,11 +359,11 @@ if tabs[8].open:
             ENGINE.settings.backtest,
             ENGINE.settings.market.benchmark,
         )
-if tabs[9].open:
-    with tabs[9]:
-        safe_render("Histórico", render_history_tab, ENGINE, DB_PATH, selected, period)
 if tabs[10].open:
     with tabs[10]:
+        safe_render("Histórico", render_history_tab, ENGINE, DB_PATH, selected, period)
+if tabs[11].open:
+    with tabs[11]:
         safe_render("Sistema", render_system_tab, ROOT, ENGINE.settings)
 
 if analysis.errors:

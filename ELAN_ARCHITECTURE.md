@@ -1,6 +1,6 @@
 # Arquitectura canónica de ELAN Quantum v1.3.0rc1
 
-> **Estado verificado (28 de julio de 2026).** `1.3.0rc1` está etiquetada en `main`; `develop` integra el panel de mercado y esta rama añade calidad de datos sin activar broker, dinero real, release ni despliegue.
+> **Estado verificado (29 de julio de 2026).** `1.3.0rc1` está etiquetada en `main`; `develop` integra calidad de Market Data y esta rama añade noticias y eventos de solo lectura sin activar broker, dinero real, release ni despliegue.
 
 Estado: arquitectura vigente tras la Fase 1 de estabilización. `ARCHITECTURE_CURRENT.md` conserva la fotografía anterior a la limpieza.
 
@@ -21,11 +21,14 @@ app.py (Streamlit)
   -> institutional.optimizer
   -> backtesting.engine.BacktestEngine              [Backtesting Engine canónico]
   -> fundamental
+  -> news (Yahoo, carga bajo demanda; solo contexto)
   -> paper_trading (simulación SQLite; sin broker)
   -> dashboard/*
 ```
 
 Los datos de mercado entran por el proveedor configurado, se validan con `market.interval` y `market.minimum_history`, y se convierten en un `AnalysisResult`. Yahoo usa timeout y retry/backoff acotados; los aciertos se guardan como CSV inerte con TTL y clave SHA-256. `DownloadResult` añade opcionalmente un reporte por instrumento con procedencia, observaciones, cobertura, huecos, última sesión, antigüedad y estado. Todas las vistas reciben ese resultado común. La primera pestaña evalúa además el OHLCV ajustado del activo visible; la consulta conserva timeout/retry y un caché Streamlit de 15 minutos y 50 entradas. Las pestañas costosas solo se renderizan cuando están abiertas; los cachés tienen TTL y límites de entradas.
+
+`news.YahooNewsEventsProvider` normaliza noticias y calendario corporativo fuera del Core Engine. La pestaña visible dispara la consulta, cacheada por `news.cache_ttl_seconds` y limitada a 50 entradas; un fallo parcial conserva la parte disponible y nunca alimenta scoring, señales, riesgo, cartera ni paper trading.
 
 ## APIs canónicas
 
@@ -38,6 +41,7 @@ Los datos de mercado entran por el proveedor configurado, se validan con `market
 ## Invariantes relevantes
 
 - La calidad de mercado es metadata: nunca rellena, recorta ni altera las series consumidas por scoring, riesgo o comparación.
+- Noticias y eventos son contexto de solo lectura: no participan en decisiones, puntuaciones ni ejecución.
 - El optimizador institucional nunca devuelve un peso superior a `max_weight`.
 - Si `n_activos * max_weight < 1`, falla con un `ValueError` que explica la inviabilidad.
 - Portfolio valida capital, posiciones, cap por posición y efectivo mínimo.
@@ -64,6 +68,7 @@ Los datos de mercado entran por el proveedor configurado, se validan con `market
 | `market.minimum_history` | validación de series |
 | `market.timeout_seconds`, `max_retries`, `backoff_seconds` | política de red del proveedor Yahoo |
 | `market.cache_ttl_seconds`, `cache_directory` | caché CSV segura dentro del proyecto |
+| `news.enabled`, `max_items`, `cache_ttl_seconds` | pestaña bajo demanda, límite de noticias y caché Streamlit |
 | `portfolio.*` | defaults y restricciones de `build_portfolio` |
 | `backtest.lookback`, `top_n`, `rebalance_days`, `commission_pct`, `slippage_pct` | controles, costes y ejecución del backtest visible |
 | `market.benchmark` | curva comparativa del backtest y factores cuantitativos |
@@ -97,8 +102,8 @@ No se borró ninguna implementación. Su retirada requiere búsqueda de consumid
 ## Frontera de pruebas
 
 - Pytest mide líneas y ramas de `app.py` y de todo `elan_ai_invest`, incluidos módulos legacy no ejecutados; CI bloquea cualquier resultado inferior a 75 %.
-- AppTest sustituye el Core Engine y los fundamentales por datos deterministas, prohíbe llamadas Yahoo y renderiza tanto el flujo inicial como todas las vistas.
-- El baseline local de esta rama es 80,74 % con 151 pruebas superadas en Python 3.12. El umbral debe aumentar solo junto con pruebas que cubran riesgo real, sin excluir legacy para inflar el porcentaje.
+- AppTest sustituye el Core Engine, los fundamentales y las noticias por datos deterministas, prohíbe llamadas Yahoo y renderiza tanto el flujo inicial como las doce vistas.
+- El baseline local de esta rama es 81,17 % con 162 pruebas superadas en Python 3.12. El umbral debe aumentar solo junto con pruebas que cubran riesgo real, sin excluir legacy para inflar el porcentaje.
 
 ## Frontera de integración
 

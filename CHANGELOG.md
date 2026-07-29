@@ -2,10 +2,14 @@
 
 ## Unreleased
 
+- Añadido News & Events Engine v1 con noticias recientes y próximos resultados, dividendos y fechas ex-dividendo desde Yahoo Finance.
+- Incorporada una duodécima pestaña de carga perezosa, caché configurable de 15 minutos y límite de 50 entradas.
+- Aislados los fallos de noticias y calendario sin modificar scoring, señales, riesgo, cartera ni paper trading.
+
 - Añadido un reporte de calidad por instrumento con frescura, cobertura, huecos, disponibilidad y procedencia proveedor/caché.
 - Incorporados estados saludables, degradados, obsoletos, insuficientes y no disponibles sin rellenar ni alterar precios.
 - Mostrado en Mercado el estado global del proveedor, cobertura media, incidencias y detalle del OHLCV visible.
-- Elevado el gate local a 151 pruebas y 80,74 % de cobertura.
+- Elevado el gate local a 162 pruebas y 81,17 % de cobertura.
 - Añadido un buscador global offline por símbolo, nombre, alias, ISIN, país y bolsa.
 - Añadidos filtros de tipo de activo, país y mercado, selección incremental y entrada manual Yahoo.
 - Incorporada una instantánea MIT de Adanos con 63.185 acciones/ETF de 91 países.

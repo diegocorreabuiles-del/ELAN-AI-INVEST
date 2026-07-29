@@ -8,6 +8,6 @@
 - [x] Backtesting Engine profesional
 - [x] Market Data Engine con caché y calidad
 - [x] Fundamental Engine
-- [ ] News & Events Engine
+- [x] News & Events Engine v1
 - [ ] AI Explanation Engine
 - [ ] Broker Gateway en modo paper

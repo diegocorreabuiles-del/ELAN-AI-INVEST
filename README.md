@@ -1,15 +1,15 @@
 # ELAN Quantum v1.3.0rc1
 
-Plataforma local de análisis cuantitativo, fundamental, riesgo, cartera, paper trading y backtesting.
+Plataforma local de análisis cuantitativo, fundamental, noticias, riesgo, cartera, paper trading y backtesting.
 
 ## Estado recuperado en este PC
 
 - La aplicación local se ejecuta en Python 3.12; la suite y los gates pasan en Python 3.11–3.14 sobre Linux.
-- El gate local supera 151 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
+- El gate local incluye 162 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
 - El cierre de dependencias está verificado: 78 pins activos y `pip check` sin conflictos.
 - La política Git aplica `trabajo -> develop -> main`; la PR #10 promovió `1.3.0rc1` a `main` y su CI posterior pasó en Python 3.11–3.14.
-- El gate global de cobertura pasa con 80,7 %, por encima del 75 % configurado.
-- AppTest recorre las once vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
+- El gate global de cobertura pasa con 81,17 %, por encima del 75 % configurado.
+- AppTest recorre las doce vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
 - El empaquetador seguro está reconstruido y cubierto por pruebas de integridad, rutas y reproducibilidad.
 
 Este es un proyecto de simulación y paper trading. No se conecta a brokers ni opera con dinero real.
@@ -75,6 +75,18 @@ correlación móvil de sus rendimientos diarios. Para estudiar EUR/USD frente al
 dólar se pueden añadir `EURUSD=X` y `DX-Y.NYB`. La correlación no implica
 causalidad y puede cambiar con el tiempo.
 
+## Noticias y eventos
+
+La pestaña **Noticias y eventos** consulta bajo demanda hasta diez noticias recientes y el
+calendario corporativo del activo visible. Muestra próximas fechas de resultados, dividendo y
+ex-dividendo cuando Yahoo Finance las publica. La consulta se cachea durante 15 minutos, con un
+máximo de 50 entradas, y puede desactivarse o ajustarse mediante `news.*` en
+`config/settings.yaml`.
+
+Esta información es contextual y de solo lectura: no modifica puntuaciones, señales, riesgo,
+carteras ni operaciones paper. Los fallos de noticias y calendario se aíslan entre sí y la UI
+presenta un estado neutro sin exponer detalles técnicos.
+
 ## Calidad de Market Data
 
 Cada análisis adjunta un reporte aditivo de calidad por instrumento. El panel
@@ -109,7 +121,7 @@ Calidad estática reproducida también por CI:
 .\.venv\Scripts\python.exe -m mypy
 ```
 
-Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 80,7 % con 151 pruebas superadas.
+Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,17 % con 162 pruebas superadas.
 
 ## Matriz Python 3.11–3.14
 

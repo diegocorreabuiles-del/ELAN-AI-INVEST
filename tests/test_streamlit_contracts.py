@@ -14,7 +14,7 @@ def test_all_dashboard_tabs_are_lazy() -> None:
 
     assert 'on_change="rerun"' in source
     guarded_tabs = {int(index) for index in re.findall(r"if tabs\[(\d+)\]\.open:", source)}
-    assert guarded_tabs == set(range(11))
+    assert guarded_tabs == set(range(12))
 
 
 def test_deprecated_streamlit_width_api_is_absent() -> None:
