@@ -14,7 +14,7 @@
 
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
 - Base publicada `1.3.0rc1` en `main`: `5cf2bca1cd98954c1c71e191368432d2b242d9ae`.
-- `develop` integra el buscador global de instrumentos y el panel principal de mercado en `4521ced0a3233b76888e968234265c0d7b3bf43d`.
+- `develop` integra el buscador global, el panel principal y la calidad/resiliencia de Market Data en `87379f04fe1a005d82d3c496f82dcb2ee86d6c3e`.
 - La promoción se realizó como avance rápido exacto, sin `force` ni cambios de protección, para conservar el historial lineal y la misma ascendencia en ambas ramas.
 - PR #5 (`feature/release-candidate-hardening -> develop`) fusionada por rebase.
 - PR #6 (`develop -> main`) fusionada por rebase el 28 de julio de 2026.
@@ -22,8 +22,9 @@
 - PR #10 (`develop -> main`) fusionada el 28 de julio de 2026; GitHub registró como commit de fusión el propio `3c4cc72`.
 - PR #14 (`develop -> main`) fusionada por avance rápido el 28 de julio de 2026 para sincronizar la documentación previa al tag.
 - PR #16 (`feature/market-overview -> develop`) fusionada el 28 de julio de 2026; su CI posterior (`30381167190`) pasó en Python 3.11–3.14.
+- PR #17 (`feature/market-data-quality -> develop`) fusionada por rebase el 29 de julio de 2026; su CI posterior (`30444192200`) pasó en Python 3.11–3.14.
 - Respaldo previo a la realineación: `backup/develop-pre-realign-20260728-4a9010a` en `4a9010a8ddc48e057a3e6c49a6c028e4e063c47e`.
-- Rama activa `feature/market-data-quality`, basada en `develop` (`4521ced`); el Bloque 21 quedó publicado en el commit funcional `50a5af0` mediante la PR draft #17 hacia `develop`.
+- El Bloque 21 quedó integrado en `develop`; no hay otro bloque funcional autorizado.
 - El cambio no funcional de metadata gzip del catálogo quedó preservado en `stash@{0}` con el mensaje `local gzip metadata before syncing develop`.
 - Tag anotado `v1.3.0-rc.1` publicado sobre `5cf2bca1cd98954c1c71e191368432d2b242d9ae`; no existe GitHub Release ni despliegue.
 - Producto local de análisis y paper trading; no conecta brokers ni dinero real.
@@ -50,6 +51,7 @@ Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que sig
 - CI posterior a la promoción en `main` (run `30356214073`): verde en Python 3.11–3.14, incluido lock, `pip check`, Ruff, Black, mypy, pytest y empaquetado/verificación.
 - CI del commit etiquetado en `main` (run `30364715816`): verde en Python 3.11–3.14.
 - CI del commit funcional del Bloque 21 `50a5af0` (runs `30441977231` y `30442025065`): verde en Python 3.11–3.14, incluido lock, `pip check`, Ruff, Black, mypy, pytest y empaquetado/verificación.
+- CI posterior a la fusión del Bloque 21 en `develop@87379f0` (run `30444192200`): verde en Python 3.11–3.14.
 - La protección de `develop` se restauró tras la realineación: PR y checks estrictos obligatorios, historial lineal, conversaciones resueltas, force-push y borrado deshabilitados.
 
 ## Decisiones canónicas
@@ -153,10 +155,9 @@ gh pr view 6 --json state,mergeable,mergeStateStatus,statusCheckRollup,url
 
 ## Siguiente paso autorizado
 
-- **Bloque 21 — calidad y resiliencia de Market Data** está implementado y pasa el gate local completo.
-- PR draft #17 (`feature/market-data-quality -> develop`) abierta con CI verde en Python 3.11–3.14.
-- Siguiente paso pendiente de autorización explícita: marcar la PR #17 como lista y fusionarla en `develop`; después debe pasar la CI posterior a la fusión.
-- No hay otro bloque funcional autorizado. Fundamental Engine ya existe; cualquier ampliación queda para un bloque posterior.
+- **Bloque 21 — calidad y resiliencia de Market Data** está integrado en `develop@87379f0`; gate local y CI posterior a la fusión verdes.
+- Siguiente paso pendiente de autorización explícita: definir y acotar el próximo bloque funcional.
+- Fundamental Engine ya existe; cualquier ampliación queda para un bloque posterior autorizado.
 - El tag `v1.3.0-rc.1` está publicado; no hay ninguna acción adicional de release autorizada.
 - Publicar una GitHub Release o desplegar requieren autorizaciones explícitas independientes posteriores.
 - Mantener el producto en paper trading; cualquier activación de broker o dinero real queda fuera de alcance.
