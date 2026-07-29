@@ -10,7 +10,7 @@
 4. Trabajar desde “Siguiente paso autorizado” y resumir únicamente el delta.
 5. Al cerrar un bloque, actualizar esta memoria con hechos validados, no planes supuestos.
 
-## Estado validado — 28 de julio de 2026
+## Estado validado — 29 de julio de 2026
 
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
 - Base publicada `1.3.0rc1` en `main`: `5cf2bca1cd98954c1c71e191368432d2b242d9ae`.
@@ -23,7 +23,7 @@
 - PR #14 (`develop -> main`) fusionada por avance rápido el 28 de julio de 2026 para sincronizar la documentación previa al tag.
 - PR #16 (`feature/market-overview -> develop`) fusionada el 28 de julio de 2026; su CI posterior (`30381167190`) pasó en Python 3.11–3.14.
 - Respaldo previo a la realineación: `backup/develop-pre-realign-20260728-4a9010a` en `4a9010a8ddc48e057a3e6c49a6c028e4e063c47e`.
-- Rama activa `feature/market-data-quality`, basada en `develop` (`4521ced`); Bloque 21 validado localmente y aún pendiente de commit, push, PR y CI remota.
+- Rama activa `feature/market-data-quality`, basada en `develop` (`4521ced`); el Bloque 21 quedó publicado en el commit funcional `50a5af0` mediante la PR draft #17 hacia `develop`.
 - El cambio no funcional de metadata gzip del catálogo quedó preservado en `stash@{0}` con el mensaje `local gzip metadata before syncing develop`.
 - Tag anotado `v1.3.0-rc.1` publicado sobre `5cf2bca1cd98954c1c71e191368432d2b242d9ae`; no existe GitHub Release ni despliegue.
 - Producto local de análisis y paper trading; no conecta brokers ni dinero real.
@@ -49,6 +49,7 @@ Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que sig
 - CI del commit realineado (runs `30352036059`, `30352343392` y `30352346829`): verde en Python 3.11–3.14.
 - CI posterior a la promoción en `main` (run `30356214073`): verde en Python 3.11–3.14, incluido lock, `pip check`, Ruff, Black, mypy, pytest y empaquetado/verificación.
 - CI del commit etiquetado en `main` (run `30364715816`): verde en Python 3.11–3.14.
+- CI del commit funcional del Bloque 21 `50a5af0` (runs `30441977231` y `30442025065`): verde en Python 3.11–3.14, incluido lock, `pip check`, Ruff, Black, mypy, pytest y empaquetado/verificación.
 - La protección de `develop` se restauró tras la realineación: PR y checks estrictos obligatorios, historial lineal, conversaciones resueltas, force-push y borrado deshabilitados.
 
 ## Decisiones canónicas
@@ -153,7 +154,8 @@ gh pr view 6 --json state,mergeable,mergeStateStatus,statusCheckRollup,url
 ## Siguiente paso autorizado
 
 - **Bloque 21 — calidad y resiliencia de Market Data** está implementado y pasa el gate local completo.
-- Siguiente delta pendiente: revisar el diff final y, con autorización, crear commit, push y PR hacia `develop`; CI remota aún no ejecutada.
+- PR draft #17 (`feature/market-data-quality -> develop`) abierta con CI verde en Python 3.11–3.14.
+- Siguiente paso pendiente de autorización explícita: marcar la PR #17 como lista y fusionarla en `develop`; después debe pasar la CI posterior a la fusión.
 - No hay otro bloque funcional autorizado. Fundamental Engine ya existe; cualquier ampliación queda para un bloque posterior.
 - El tag `v1.3.0-rc.1` está publicado; no hay ninguna acción adicional de release autorizada.
 - Publicar una GitHub Release o desplegar requieren autorizaciones explícitas independientes posteriores.
