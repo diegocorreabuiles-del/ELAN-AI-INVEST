@@ -25,7 +25,7 @@
 - PR #17 (`feature/market-data-quality -> develop`) fusionada por rebase el 29 de julio de 2026; su CI posterior (`30444192200`) pasó en Python 3.11–3.14.
 - Respaldo previo a la realineación: `backup/develop-pre-realign-20260728-4a9010a` en `4a9010a8ddc48e057a3e6c49a6c028e4e063c47e`.
 - El Bloque 21 quedó integrado en `develop` y el Bloque 22 fue autorizado y acotado como News & Events Engine v1.
-- `feature/news-events-engine` contiene la implementación local sin confirmar; el gate Windows está verde y no se ha publicado ni abierto PR.
+- `feature/news-events-engine` contiene el Bloque 22 confirmado localmente en `76e97b710338e7b17c4132de29f24fb4ed781b46`; la rama no se ha publicado ni tiene PR.
 - El cambio no funcional de metadata gzip del catálogo quedó preservado en `stash@{0}` con el mensaje `local gzip metadata before syncing develop`.
 - Tag anotado `v1.3.0-rc.1` publicado sobre `5cf2bca1cd98954c1c71e191368432d2b242d9ae`; no existe GitHub Release ni despliegue.
 - Producto local de análisis y paper trading; no conecta brokers ni dinero real.
@@ -45,9 +45,10 @@ Datos dinámicos: confirmar estos SHA y la PR antes de actuar; no asumir que sig
 ### Linux reproducible
 
 - Docker Python 3.11, 3.12, 3.13 y 3.14: verde.
-- 129 pruebas por versión.
+- 162 pruebas por versión en el Bloque 22.
 - Lock, `pip check`, Ruff, Black, mypy, pytest y empaquetado/verificación: verdes.
 - Artefacto del commit realineado `3342c65`: SHA-256 `c24a7643503b39aaf6cd329c3574b08ff5a56278aec9ad5a2ae7793787882e55`.
+- Matriz local del Bloque 22 `76e97b7`: verde en Python 3.11–3.14; ZIP reproducible de 169 archivos con SHA-256 `80bfa9092c954b867577f725d05da327a9dcf9465960b8c229e7117a996f7427`.
 - CI del commit realineado (runs `30352036059`, `30352343392` y `30352346829`): verde en Python 3.11–3.14.
 - CI posterior a la promoción en `main` (run `30356214073`): verde en Python 3.11–3.14, incluido lock, `pip check`, Ruff, Black, mypy, pytest y empaquetado/verificación.
 - CI del commit etiquetado en `main` (run `30364715816`): verde en Python 3.11–3.14.
@@ -159,8 +160,8 @@ gh pr view 6 --json state,mergeable,mergeStateStatus,statusCheckRollup,url
 ## Siguiente paso autorizado
 
 - **Bloque 21 — calidad y resiliencia de Market Data** está integrado en `develop@ab06864`; su CI funcional y posterior a la fusión quedaron verdes.
-- **Bloque 22 — News & Events Engine v1** está implementado en el working tree de `feature/news-events-engine`: 162 pruebas, 81,17 % de cobertura, lock, `pip check`, Ruff, Black, mypy y healthcheck verdes.
-- Siguiente paso pendiente de autorización explícita: revisar el diff final y, si se aprueba, confirmar, publicar la rama y abrir PR hacia `develop` para ejecutar CI Python 3.11–3.14.
+- **Bloque 22 — News & Events Engine v1** está confirmado en `feature/news-events-engine@76e97b7`: gate Windows y matriz local Python 3.11–3.14 verdes, 162 pruebas por versión y artefacto reproducible.
+- Siguiente paso pendiente de autorización explícita: publicar la rama y abrir PR hacia `develop`; después vigilar la CI remota Python 3.11–3.14.
 - Sentimiento/NLP/IA, alertas, persistencia, ranking por noticias, multi-proveedor y cualquier conexión de broker permanecen fuera del Bloque 22.
 - El tag `v1.3.0-rc.1` está publicado; no hay ninguna acción adicional de release autorizada.
 - Publicar una GitHub Release o desplegar requieren autorizaciones explícitas independientes posteriores.
