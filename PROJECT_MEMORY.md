@@ -14,7 +14,7 @@
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
 - Rama `feature/interactive-asset-workspace` abierta desde `develop@11f7495e470982cc6e86bbf2d7d19f2810fb37e2`.
 - Bloques 21 y 22 integrados; PR documental #21 fusionada y CI posterior `30698354050` verde.
-- Bloque 23 implementado localmente: activo global sincronizado, selección por fila, barra de contexto y fragmentos locales; pendiente matriz Linux/Docker y publicación por PR.
+- Bloque 23 cerrado localmente en `2bc359fbbba125a16075eba712add7f5b0efa329`: activo global sincronizado, selección por fila, barra de contexto y fragmentos locales; pendiente publicación por PR.
 - `main@5cf2bca1cd98954c1c71e191368432d2b242d9ae`, con tag anotado `v1.3.0-rc.1`; no hay GitHub Release ni despliegue.
 - `stash@{0}` conserva metadata gzip local previa a la sincronización: `local gzip metadata before syncing develop`.
 - Producto local de análisis y paper trading; no conecta brokers ni dinero real.
@@ -24,8 +24,8 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 ## Gate vigente
 
 - Windows, Python 3.12.13: 177 pruebas, cobertura 81,40 % (mínimo 75 %), lock con 78 pins/distribuciones, `pip check`, Ruff, Black, mypy crítico y healthcheck verdes.
-- Linux/Docker, Python 3.11–3.14: último baseline integrado con 162 pruebas por versión; matriz del Bloque 23 pendiente.
-- Artefacto reproducible del Bloque 22: 169 archivos; SHA-256 `80bfa9092c954b867577f725d05da327a9dcf9465960b8c229e7117a996f7427`.
+- Linux/Docker, Python 3.11–3.14: 177 pruebas por versión; lock, dependencias, lint, formato, tests y paquete verdes. Python 3.14 registró 81,42 % de cobertura.
+- Artefacto reproducible del Bloque 23 sobre `2bc359f`: 171 archivos; SHA-256 `6ee8ccd76f89a758ea4d129f0700a6f815549d21f51c3a4616843410db10f7e6`.
 - Última evidencia remota: CI `30698354050` sobre `11f7495e470982cc6e86bbf2d7d19f2810fb37e2`, verde en Python 3.11–3.14.
 - `develop` exige PR, checks estrictos, historial lineal y conversaciones resueltas; force-push y borrado deshabilitados.
 
@@ -74,6 +74,6 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 
 ## Siguiente paso
 
-- Confirmar el candidato del Bloque 23 en la matriz Linux/Docker Python 3.11–3.14 y verificar su artefacto reproducible.
-- Después, publicar la rama y abrir PR hacia `develop` solo con autorización explícita.
+- Publicar `feature/interactive-asset-workspace` y abrir PR hacia `develop` solo con autorización explícita.
+- Mantener el Bloque 23 congelado salvo evidencia nueva; no ampliar alcance durante la integración.
 - Mantener fuera de alcance brokers/dinero real y cualquier promoción a `main`, release o despliegue.
