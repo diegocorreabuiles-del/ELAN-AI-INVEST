@@ -6,6 +6,8 @@ import streamlit as st
 
 from elan_ai_invest.fundamental import YahooFundamentalProvider, analyze_fundamentals
 
+from .workspace import activate_from_widget, symbol_options, sync_widget_to_active
+
 
 @st.cache_data(ttl=21600, max_entries=50, show_spinner=False)
 def _load_fundamental(symbol: str):
@@ -24,14 +26,20 @@ def _format_large(value: float | None) -> str:
     return f"{value:,.0f}"
 
 
-def render_fundamental_tab(ranking: pd.DataFrame):
+def render_fundamental_tab(ranking: pd.DataFrame, workspace_symbols=None):
     st.subheader("Fundamental Engine Institutional")
     st.caption("Calidad, crecimiento, valoración, balance y generación de caja.")
 
+    options = symbol_options(
+        workspace_symbols if workspace_symbols is not None else ranking["symbol"].tolist()
+    )
+    sync_widget_to_active(st.session_state, "fundamental_symbol", options)
     symbol = st.selectbox(
         "Empresa",
-        ranking["symbol"].tolist(),
+        options,
         key="fundamental_symbol",
+        on_change=activate_from_widget,
+        args=("fundamental_symbol", tuple(options)),
     )
 
     try:

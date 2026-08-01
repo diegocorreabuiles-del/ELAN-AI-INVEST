@@ -1,8 +1,17 @@
+from functools import partial
+
 import plotly.graph_objects as go
 import streamlit as st
 
+from .workspace import (
+    activate_from_table,
+    activate_from_widget,
+    symbol_options,
+    sync_widget_to_active,
+)
 
-def render_ranking_tab(ranking, prices):
+
+def render_ranking_tab(ranking, prices, workspace_symbols=None):
     columns = [
         c
         for c in [
@@ -18,8 +27,33 @@ def render_ranking_tab(ranking, prices):
         ]
         if c in ranking.columns
     ]
-    st.dataframe(ranking[columns], width="stretch", hide_index=True)
-    chosen = st.selectbox("Detalle", ranking["symbol"].tolist(), key="ranking_detail_symbol")
+    table_symbols = symbol_options(ranking["symbol"].tolist())
+    st.dataframe(
+        ranking[columns],
+        width="stretch",
+        hide_index=True,
+        key="ranking_asset_table",
+        on_select=partial(
+            activate_from_table,
+            "ranking_asset_table",
+            tuple(table_symbols),
+        ),
+        selection_mode="single-row",
+    )
+
+    options = symbol_options(workspace_symbols if workspace_symbols is not None else table_symbols)
+    sync_widget_to_active(st.session_state, "ranking_detail_symbol", options)
+    chosen = st.selectbox(
+        "Detalle",
+        options,
+        key="ranking_detail_symbol",
+        on_change=activate_from_widget,
+        args=("ranking_detail_symbol", tuple(options)),
+    )
+    if chosen not in prices or prices[chosen].dropna().empty:
+        st.info(f"{chosen} no dispone de precios en el análisis actual.")
+        return
+
     series = prices[chosen].dropna()
     chart = go.Figure()
     chart.add_trace(go.Scatter(x=series.index, y=series, name="Precio"))

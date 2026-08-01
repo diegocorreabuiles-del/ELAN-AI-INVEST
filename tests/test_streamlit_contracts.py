@@ -31,3 +31,20 @@ def test_deprecated_streamlit_width_api_is_absent() -> None:
 
 def test_safe_render_has_one_public_implementation() -> None:
     assert layout_safe_render is safe_render
+
+
+def test_connected_asset_tables_use_native_single_row_selection() -> None:
+    dashboard_root = ROOT / "src" / "elan_ai_invest" / "dashboard"
+    for filename in ("intelligence.py", "ranking.py"):
+        source = (dashboard_root / filename).read_text(encoding="utf-8")
+        assert "on_select=partial(" in source
+        assert 'selection_mode="single-row"' in source
+
+
+def test_market_local_controls_are_fragment_scoped() -> None:
+    source = (ROOT / "src" / "elan_ai_invest" / "dashboard" / "market.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "@st.fragment\ndef _render_history_detail" in source
+    assert "@st.fragment\ndef _render_comparator" in source

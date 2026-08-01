@@ -9,12 +9,12 @@
 3. Continuar desde «Siguiente paso» sin reabrir decisiones cerradas salvo evidencia nueva.
 4. Al cerrar un bloque, registrar únicamente estado, gates, decisiones nuevas y próximo paso.
 
-## Estado validado — 1 de agosto de 2026
+## Estado validado — 2 de agosto de 2026
 
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
-- `develop@8721fef7c260a067ea66a248fc7dceb096fdcbb8`, limpio y sincronizado con `origin/develop` al verificarlo.
-- Bloque 21 (calidad/resiliencia de Market Data) y Bloque 22 (News & Events Engine v1) integrados en `develop`.
-- PR funcional #19 y PR documental #20 fusionadas; CI final de `develop` `30469886339` verde.
+- Rama `feature/interactive-asset-workspace` abierta desde `develop@11f7495e470982cc6e86bbf2d7d19f2810fb37e2`.
+- Bloques 21 y 22 integrados; PR documental #21 fusionada y CI posterior `30698354050` verde.
+- Bloque 23 implementado localmente: activo global sincronizado, selección por fila, barra de contexto y fragmentos locales; pendiente matriz Linux/Docker y publicación por PR.
 - `main@5cf2bca1cd98954c1c71e191368432d2b242d9ae`, con tag anotado `v1.3.0-rc.1`; no hay GitHub Release ni despliegue.
 - `stash@{0}` conserva metadata gzip local previa a la sincronización: `local gzip metadata before syncing develop`.
 - Producto local de análisis y paper trading; no conecta brokers ni dinero real.
@@ -23,10 +23,10 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 
 ## Gate vigente
 
-- Windows, Python 3.12.13: 162 pruebas, cobertura 81,17 % (mínimo 75 %), lock con 78 pins/distribuciones, `pip check`, Ruff, Black, mypy crítico y healthcheck verdes.
-- Linux/Docker, Python 3.11–3.14: 162 pruebas por versión; lock, dependencias, lint, formato, tipos, tests y paquete verdes.
+- Windows, Python 3.12.13: 177 pruebas, cobertura 81,40 % (mínimo 75 %), lock con 78 pins/distribuciones, `pip check`, Ruff, Black, mypy crítico y healthcheck verdes.
+- Linux/Docker, Python 3.11–3.14: último baseline integrado con 162 pruebas por versión; matriz del Bloque 23 pendiente.
 - Artefacto reproducible del Bloque 22: 169 archivos; SHA-256 `80bfa9092c954b867577f725d05da327a9dcf9465960b8c229e7117a996f7427`.
-- Última evidencia remota: CI `30469886339` sobre `8721fef7c260a067ea66a248fc7dceb096fdcbb8`, verde en Python 3.11–3.14.
+- Última evidencia remota: CI `30698354050` sobre `11f7495e470982cc6e86bbf2d7d19f2810fb37e2`, verde en Python 3.11–3.14.
 - `develop` exige PR, checks estrictos, historial lineal y conversaciones resueltas; force-push y borrado deshabilitados.
 
 ## Decisiones canónicas
@@ -43,6 +43,7 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 10. **Instrumentos:** catálogo MIT de Adanos más `config/instruments.csv`; históricos en Yahoo. Catálogo disponible no garantiza histórico; no añadir `financedatabase` al runtime.
 11. **Market Data:** detalle OHLCV solo para activo/horizonte visible, caché de 15 minutos y comparaciones con rendimientos consecutivos alineados. Calidad es metadata aditiva y no altera precios.
 12. **Noticias:** Yahoo solo al abrir la pestaña, con caché y límites; contexto de solo lectura, sin efecto en scoring, señales, riesgo, cartera ni paper trading.
+13. **Workspace conectado:** Mercado, Inteligencia, Fundamental, Noticias y Ranking comparten un activo global; selección de filas y fragmentos locales no eliminan la carga lazy ni cambian semántica financiera.
 
 ## Reglas de implementación
 
@@ -73,6 +74,6 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 
 ## Siguiente paso
 
-- Definir y acotar formalmente el Bloque 23; su implementación aún no está autorizada.
+- Confirmar el candidato del Bloque 23 en la matriz Linux/Docker Python 3.11–3.14 y verificar su artefacto reproducible.
+- Después, publicar la rama y abrir PR hacia `develop` solo con autorización explícita.
 - Mantener fuera de alcance brokers/dinero real y cualquier promoción a `main`, release o despliegue.
-- Antes de implementar: abrir rama de trabajo desde `develop`, fijar criterios de aceptación y ejecutar los gates vigentes al cierre.

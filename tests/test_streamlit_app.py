@@ -444,6 +444,34 @@ def test_app_searches_and_adds_global_instrument(app_environment: FakeEngine) ->
     assert not app.exception
 
 
+def test_active_symbol_stays_synchronized_across_connected_views(
+    app_environment: FakeEngine,
+) -> None:
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
+    primary = next(item for item in app.selectbox if item.label == "Activo principal")
+
+    primary.set_value("MSFT").run(timeout=APP_TEST_TIMEOUT)
+
+    assert app.session_state["active_symbol"] == "MSFT"
+    active_metric = next(item for item in app.metric if item.label == "Activo conectado")
+    assert active_metric.value.startswith("MSFT ·")
+
+    tab_widget_id = _tab_widget_id(app)
+    connected_views = {
+        "Inteligencia": "Explicación profesional",
+        "Fundamental": "Empresa",
+        "Noticias y eventos": "Activo para noticias",
+        "Ranking": "Detalle",
+    }
+    for tab_label, selector_label in connected_views.items():
+        _select_tab(app, tab_widget_id, tab_label)
+        selector = next(item for item in app.selectbox if item.label == selector_label)
+        assert selector.value == "MSFT"
+        assert app.session_state["active_symbol"] == "MSFT"
+
+    assert app_environment.news_requests == ["MSFT"]
+
+
 def test_app_stops_when_no_asset_is_selected(app_environment: FakeEngine) -> None:
     app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
     app.multiselect[0].set_value([]).run(timeout=APP_TEST_TIMEOUT)
