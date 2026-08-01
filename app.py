@@ -10,6 +10,8 @@ from elan_ai_invest.core.models import AnalysisRequest
 from elan_ai_invest.dashboard import (
     clear_market_history_cache,
     configure_page,
+    ensure_active_symbol,
+    render_active_asset_context,
     render_backtesting_tab,
     render_fundamental_tab,
     render_header,
@@ -25,6 +27,7 @@ from elan_ai_invest.dashboard import (
     render_risk_tab,
     render_system_tab,
     safe_render,
+    set_active_symbol,
     show_safe_error,
 )
 from elan_ai_invest.instruments import (
@@ -159,7 +162,7 @@ with st.sidebar:
         if result_symbol not in current_symbols:
             current_symbols.append(result_symbol)
             st.session_state["workspace_symbols"] = current_symbols
-        st.session_state["market_primary_symbol"] = result_symbol
+        set_active_symbol(st.session_state, result_symbol, current_symbols)
 
     with st.expander("Añadir símbolo manual de Yahoo"):
         custom_symbol = st.text_input(
@@ -178,7 +181,7 @@ with st.sidebar:
                     current_symbols.append(normalized_symbol)
                     st.session_state["workspace_symbols"] = current_symbols
                     catalog_labels[normalized_symbol] = f"{normalized_symbol} — Símbolo manual"
-                st.session_state["market_primary_symbol"] = normalized_symbol
+                set_active_symbol(st.session_state, normalized_symbol, current_symbols)
 
     workspace_options = list(st.session_state["workspace_symbols"])
     selected = st.multiselect(
@@ -251,6 +254,14 @@ if prices.empty or ranking.empty:
     st.stop()
 
 ranking["name"] = ranking["symbol"].map(name_map).fillna(ranking["symbol"])
+current_active = st.session_state.get("active_symbol")
+preferred_active = ranking.iloc[0]["symbol"] if current_active not in selected else None
+active_symbol = ensure_active_symbol(
+    st.session_state,
+    selected,
+    preferred=preferred_active,
+)
+assert active_symbol is not None
 
 latest_prices = {
     symbol: float(prices[symbol].dropna().iloc[-1])
@@ -271,6 +282,7 @@ render_main_metrics(
     risk_report.var_95_pct,
     capital,
 )
+render_active_asset_context(ranking, active_symbol, catalog_labels)
 
 tabs = st.tabs(
     [
@@ -304,16 +316,22 @@ if tabs[0].open:
         )
 if tabs[1].open:
     with tabs[1]:
-        safe_render("Inteligencia", render_intelligence_tab, ranking)
+        safe_render("Inteligencia", render_intelligence_tab, ranking, selected)
 if tabs[2].open:
     with tabs[2]:
-        safe_render("Fundamental", render_fundamental_tab, ranking)
+        safe_render("Fundamental", render_fundamental_tab, ranking, selected)
 if tabs[3].open:
     with tabs[3]:
-        safe_render("Noticias y eventos", render_news_events_tab, ranking, ENGINE.settings.news)
+        safe_render(
+            "Noticias y eventos",
+            render_news_events_tab,
+            ranking,
+            ENGINE.settings.news,
+            selected,
+        )
 if tabs[4].open:
     with tabs[4]:
-        safe_render("Ranking", render_ranking_tab, ranking, prices)
+        safe_render("Ranking", render_ranking_tab, ranking, prices, selected)
 if tabs[5].open:
     with tabs[5]:
         safe_render("Riesgo", render_risk_tab, risk_report, ranking, capital, ENGINE.settings)

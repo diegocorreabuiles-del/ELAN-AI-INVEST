@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import math
+
 import streamlit as st
 
 from .safe import safe_render as safe_render
@@ -46,5 +48,43 @@ def render_main_metrics(
             f"{var_95_pct:.2f}%",
             f"€{capital * var_95_pct / 100:,.0f}",
             delta_color="inverse",
+            border=True,
+        )
+
+
+def _format_context_number(value, *, suffix: str = "", decimals: int = 1) -> str:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return "N/D"
+    if not math.isfinite(numeric):
+        return "N/D"
+    return f"{numeric:,.{decimals}f}{suffix}"
+
+
+def render_active_asset_context(ranking, active_symbol: str, labels=None) -> None:
+    matches = ranking.loc[ranking["symbol"].eq(active_symbol)]
+    row = matches.iloc[0] if not matches.empty else None
+    name = row.get("name", active_symbol) if row is not None else active_symbol
+    if labels and row is None:
+        name = labels.get(active_symbol, active_symbol)
+    signal = "N/D" if row is None else row.get("signal", row.get("decision", "N/D"))
+
+    with st.container(horizontal=True, gap="xsmall"):
+        st.metric("Activo conectado", f"{active_symbol} · {name}", border=True)
+        st.metric(
+            "Precio",
+            "N/D" if row is None else _format_context_number(row.get("price"), decimals=2),
+            border=True,
+        )
+        st.metric(
+            "Score",
+            "N/D" if row is None else _format_context_number(row.get("score"), suffix="/100"),
+            border=True,
+        )
+        st.metric("Señal", str(signal or "N/D"), border=True)
+        st.metric(
+            "Volatilidad",
+            "N/D" if row is None else _format_context_number(row.get("volatility_pct"), suffix="%"),
             border=True,
         )

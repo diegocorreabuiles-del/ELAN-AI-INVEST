@@ -1,8 +1,17 @@
+from functools import partial
+
 import plotly.express as px
 import streamlit as st
 
+from .workspace import (
+    activate_from_table,
+    activate_from_widget,
+    symbol_options,
+    sync_widget_to_active,
+)
 
-def render_intelligence_tab(ranking):
+
+def render_intelligence_tab(ranking, workspace_symbols=None):
     st.subheader("Intelligence Engine Professional")
     st.caption("Ranking multifactor: tendencia, momentum, fuerza relativa y riesgo ajustado.")
 
@@ -19,14 +28,35 @@ def render_intelligence_tab(ranking):
         "trend_quality_factor",
     ]
     available = [column for column in columns if column in ranking.columns]
-    st.dataframe(ranking[available], width="stretch", hide_index=True)
+    table_symbols = symbol_options(ranking["symbol"].tolist())
+    st.dataframe(
+        ranking[available],
+        width="stretch",
+        hide_index=True,
+        key="intelligence_asset_table",
+        on_select=partial(
+            activate_from_table,
+            "intelligence_asset_table",
+            tuple(table_symbols),
+        ),
+        selection_mode="single-row",
+    )
 
+    options = symbol_options(workspace_symbols if workspace_symbols is not None else table_symbols)
+    sync_widget_to_active(st.session_state, "professional_intelligence_symbol", options)
     selected = st.selectbox(
         "Explicación profesional",
-        ranking["symbol"].tolist(),
+        options,
         key="professional_intelligence_symbol",
+        on_change=activate_from_widget,
+        args=("professional_intelligence_symbol", tuple(options)),
     )
-    row = ranking.loc[ranking["symbol"] == selected].iloc[0]
+    matches = ranking.loc[ranking["symbol"] == selected]
+    if matches.empty:
+        st.info(f"{selected} no dispone de scoring en el análisis actual.")
+        return
+
+    row = matches.iloc[0]
     left, right = st.columns([0.65, 0.35])
     with left:
         st.markdown(f"### {selected} · {row.get('name', selected)}")

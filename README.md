@@ -5,10 +5,10 @@ Plataforma local de análisis cuantitativo, fundamental, noticias, riesgo, carte
 ## Estado recuperado en este PC
 
 - La aplicación local se ejecuta en Python 3.12; la suite y los gates pasan en Python 3.11–3.14 sobre Linux.
-- El gate local incluye 162 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
+- El gate local incluye 177 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
 - El cierre de dependencias está verificado: 78 pins activos y `pip check` sin conflictos.
 - La política Git aplica `trabajo -> develop -> main`; la PR #10 promovió `1.3.0rc1` a `main` y su CI posterior pasó en Python 3.11–3.14.
-- El gate global de cobertura pasa con 81,17 %, por encima del 75 % configurado.
+- El gate global de cobertura pasa con 81,40 %, por encima del 75 % configurado.
 - AppTest recorre las doce vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
 - El empaquetador seguro está reconstruido y cubierto por pruebas de integridad, rutas y reproducibilidad.
 
@@ -75,6 +75,19 @@ correlación móvil de sus rendimientos diarios. Para estudiar EUR/USD frente al
 dólar se pueden añadir `EURUSD=X` y `DX-Y.NYB`. La correlación no implica
 causalidad y puede cambiar con el tiempo.
 
+## Espacio de trabajo conectado
+
+Mercado, Inteligencia, Fundamental, Noticias y Ranking comparten un único activo
+activo. Cambiarlo en cualquiera de esas vistas actualiza el contexto del resto y
+la barra superior resume precio, score, señal y volatilidad disponibles. Las
+tablas de Inteligencia y Ranking permiten activar un instrumento seleccionando
+una fila.
+
+Los controles locales del gráfico histórico y del comparador usan fragmentos de
+Streamlit para actualizar solo su panel. Las doce pestañas conservan su carga
+perezosa: una vista cerrada no consulta proveedores ni altera scoring, señales,
+riesgo, cartera o paper trading.
+
 ## Noticias y eventos
 
 La pestaña **Noticias y eventos** consulta bajo demanda hasta diez noticias recientes y el
@@ -121,7 +134,7 @@ Calidad estática reproducida también por CI:
 .\.venv\Scripts\python.exe -m mypy
 ```
 
-Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,17 % con 162 pruebas superadas.
+Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,40 % con 177 pruebas superadas.
 
 ## Matriz Python 3.11–3.14
 

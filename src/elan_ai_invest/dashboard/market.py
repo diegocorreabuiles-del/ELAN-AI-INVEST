@@ -16,6 +16,8 @@ from elan_ai_invest.providers.base import (
     MarketDataQualityStatus,
 )
 
+from .workspace import activate_from_widget, sync_widget_to_active
+
 LOGGER = logging.getLogger(__name__)
 HORIZONS = {
     "1 mes": "1mo",
@@ -260,15 +262,9 @@ def _render_quality_summary(report: MarketDataQualityReport | None) -> None:
             st.dataframe(pd.DataFrame(_quality_rows(report)), hide_index=True, width="stretch")
 
 
-def _render_detail_panel(selected, labels, market_settings) -> str:
-    st.subheader(":material/candlestick_chart: Desempeño del activo")
+@st.fragment
+def _render_history_detail(primary_symbol: str, market_settings) -> None:
     with st.container(horizontal=True, vertical_alignment="bottom"):
-        primary_symbol = st.selectbox(
-            "Activo principal",
-            list(selected),
-            format_func=lambda symbol: labels.get(symbol, symbol),
-            key="market_primary_symbol",
-        )
         horizon_label = st.selectbox(
             "Horizonte del gráfico",
             list(HORIZONS),
@@ -297,7 +293,7 @@ def _render_detail_panel(selected, labels, market_settings) -> str:
             "No se pudo cargar el histórico detallado de este símbolo. "
             "Prueba otro horizonte o instrumento."
         )
-        return primary_symbol
+        return
 
     detail_quality_report = assess_market_data_quality(
         history[["Close"]].rename(columns={"Close": primary_symbol}),
@@ -355,9 +351,25 @@ def _render_detail_panel(selected, labels, market_settings) -> str:
     st.caption(
         "OHLCV ajustado de Yahoo · Los máximos y mínimos corresponden al horizonte seleccionado."
     )
+
+
+def _render_detail_panel(selected, labels, market_settings) -> str:
+    st.subheader(":material/candlestick_chart: Desempeño del activo")
+    options = list(selected)
+    sync_widget_to_active(st.session_state, "market_primary_symbol", options)
+    primary_symbol = st.selectbox(
+        "Activo principal",
+        options,
+        format_func=lambda symbol: labels.get(symbol, symbol),
+        key="market_primary_symbol",
+        on_change=activate_from_widget,
+        args=("market_primary_symbol", tuple(options)),
+    )
+    _render_history_detail(primary_symbol, market_settings)
     return primary_symbol
 
 
+@st.fragment
 def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> None:
     available = [symbol for symbol in prices.columns if not prices[symbol].dropna().empty]
     st.subheader(":material/compare_arrows: Comparador y correlación")

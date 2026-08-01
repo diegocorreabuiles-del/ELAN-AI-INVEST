@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from datetime import UTC, datetime
 
 import pandas as pd
@@ -12,6 +13,8 @@ from elan_ai_invest.news import (
     NewsEventsResult,
     YahooNewsEventsProvider,
 )
+
+from .workspace import activate_from_widget, symbol_options, sync_widget_to_active
 
 _EVENT_LABELS = {
     CorporateEventType.EARNINGS: "Resultados",
@@ -42,10 +45,16 @@ def _load_news_events(
     return YahooNewsEventsProvider().fetch(symbol, max_items=max_items)
 
 
-def _symbol_options(ranking: pd.DataFrame) -> tuple[list[str], dict[str, str]]:
+def _symbol_options(
+    ranking: pd.DataFrame,
+    workspace_symbols: Sequence[object] | None = None,
+) -> tuple[list[str], dict[str, str]]:
     if "symbol" not in ranking:
-        return [], {}
-    symbols = list(dict.fromkeys(ranking["symbol"].dropna().astype(str).str.upper()))
+        return symbol_options(workspace_symbols or []), {}
+    ranking_symbols = symbol_options(ranking["symbol"].dropna().tolist())
+    symbols = symbol_options(
+        workspace_symbols if workspace_symbols is not None else ranking_symbols
+    )
     labels = {symbol: symbol for symbol in symbols}
     if "name" in ranking:
         for row in ranking[["symbol", "name"]].dropna(subset=["symbol"]).itertuples(index=False):
@@ -55,7 +64,9 @@ def _symbol_options(ranking: pd.DataFrame) -> tuple[list[str], dict[str, str]]:
     return symbols, labels
 
 
-def render_news_events_tab(ranking: pd.DataFrame, settings: NewsConfig) -> None:
+def render_news_events_tab(
+    ranking: pd.DataFrame, settings: NewsConfig, workspace_symbols: Sequence[object] | None = None
+) -> None:
     st.subheader("Noticias y eventos")
     st.caption(
         "Contexto informativo por activo. No modifica scores, señales, carteras ni operaciones."
@@ -64,16 +75,19 @@ def render_news_events_tab(ranking: pd.DataFrame, settings: NewsConfig) -> None:
         st.info("News & Events Engine está desactivado en config/settings.yaml.")
         return
 
-    symbols, labels = _symbol_options(ranking)
+    symbols, labels = _symbol_options(ranking, workspace_symbols)
     if not symbols:
         st.info("No hay activos disponibles para consultar noticias.")
         return
 
+    sync_widget_to_active(st.session_state, "news_events_symbol", symbols)
     symbol = st.selectbox(
         "Activo para noticias",
         symbols,
         format_func=lambda value: labels.get(value, value),
         key="news_events_symbol",
+        on_change=activate_from_widget,
+        args=("news_events_symbol", tuple(symbols)),
     )
     with st.spinner("Consultando noticias y calendario...", show_time=True):
         result = _load_news_events(
