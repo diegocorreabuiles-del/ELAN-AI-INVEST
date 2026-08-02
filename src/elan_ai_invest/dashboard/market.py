@@ -435,6 +435,7 @@ def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> Non
             y="Base 100",
             color="Instrumento",
             title="Desempeño comparable · Base 100",
+            render_mode="svg",
         )
         normalized_chart.add_hline(y=100, line_dash="dash", line_color="#8B98A5")
         normalized_chart.update_layout(height=410, margin={"l": 20, "r": 20, "t": 55, "b": 20})
@@ -449,6 +450,7 @@ def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> Non
                 first_symbol: f"{first_symbol} · retorno",
                 second_symbol: f"{second_symbol} · retorno",
             },
+            render_mode="svg",
         )
         scatter.update_layout(height=410, margin={"l": 20, "r": 20, "t": 55, "b": 20})
         scatter.update_xaxes(tickformat=".2%")
@@ -465,6 +467,7 @@ def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> Non
             y="Correlación",
             title=f"Correlación móvil · {window} sesiones",
             range_y=[-1, 1],
+            render_mode="svg",
         )
         rolling_chart.add_hline(y=0, line_dash="dash", line_color="#8B98A5")
         rolling_chart.update_layout(height=330, margin={"l": 20, "r": 20, "t": 55, "b": 20})
