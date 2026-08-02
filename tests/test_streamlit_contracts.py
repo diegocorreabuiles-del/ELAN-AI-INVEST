@@ -48,3 +48,14 @@ def test_market_local_controls_are_fragment_scoped() -> None:
 
     assert "@st.fragment\ndef _render_history_detail" in source
     assert "@st.fragment\ndef _render_comparator" in source
+
+
+def test_comparator_charts_do_not_require_webgl() -> None:
+    source = (ROOT / "src" / "elan_ai_invest" / "dashboard" / "market.py").read_text(
+        encoding="utf-8"
+    )
+    comparator = source.split("def _render_comparator", maxsplit=1)[1].split(
+        "def render_market_tab", maxsplit=1
+    )[0]
+
+    assert comparator.count('render_mode="svg"') == 3
