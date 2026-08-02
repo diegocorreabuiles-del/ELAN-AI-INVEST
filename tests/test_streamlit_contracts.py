@@ -3,7 +3,10 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import pandas as pd
+
 from elan_ai_invest.dashboard.layout import safe_render as layout_safe_render
+from elan_ai_invest.dashboard.market import ComparisonData, _comparison_figures
 from elan_ai_invest.dashboard.safe import safe_render
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,11 +54,12 @@ def test_market_local_controls_are_fragment_scoped() -> None:
 
 
 def test_comparator_charts_do_not_require_webgl() -> None:
-    source = (ROOT / "src" / "elan_ai_invest" / "dashboard" / "market.py").read_text(
-        encoding="utf-8"
-    )
-    comparator = source.split("def _render_comparator", maxsplit=1)[1].split(
-        "def render_market_tab", maxsplit=1
-    )[0]
+    index = pd.date_range("2024-01-01", periods=1_500, freq="D")
+    normalized = pd.DataFrame({"SPY": range(100, 1_600), "QQQ": range(200, 1_700)}, index=index)
+    returns = normalized.pct_change(fill_method=None).dropna()
+    rolling = returns["SPY"].rolling(60).corr(returns["QQQ"]).dropna()
+    comparison = ComparisonData(normalized, returns, rolling, 1.0)
 
-    assert comparator.count('render_mode="svg"') == 3
+    figures = _comparison_figures(comparison, "SPY", "QQQ", 60)
+
+    assert all(trace.type == "scatter" for figure in figures for trace in figure.data)

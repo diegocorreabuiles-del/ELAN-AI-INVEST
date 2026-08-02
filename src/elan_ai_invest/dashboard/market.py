@@ -203,6 +203,71 @@ def _correlation_label(value: float) -> str:
     return f"{strength} {direction}"
 
 
+def _comparison_figures(
+    comparison: ComparisonData,
+    first_symbol: str,
+    second_symbol: str,
+    window: int,
+) -> tuple[go.Figure, go.Figure, go.Figure]:
+    normalized_chart = go.Figure()
+    for symbol in (first_symbol, second_symbol):
+        normalized_chart.add_trace(
+            go.Scatter(
+                x=comparison.normalized.index,
+                y=comparison.normalized[symbol],
+                mode="lines",
+                name=symbol,
+            )
+        )
+    normalized_chart.add_hline(y=100, line_dash="dash", line_color="#8B98A5")
+    normalized_chart.update_layout(
+        title="Desempeño comparable · Base 100",
+        xaxis_title="Fecha",
+        yaxis_title="Base 100",
+        legend_title_text="Instrumento",
+        height=410,
+        margin={"l": 20, "r": 20, "t": 55, "b": 20},
+    )
+
+    scatter = go.Figure(
+        go.Scatter(
+            x=comparison.returns[first_symbol],
+            y=comparison.returns[second_symbol],
+            mode="markers",
+            showlegend=False,
+        )
+    )
+    scatter.update_layout(
+        title="Dispersión de rendimientos diarios",
+        xaxis_title=f"{first_symbol} · retorno",
+        yaxis_title=f"{second_symbol} · retorno",
+        height=410,
+        margin={"l": 20, "r": 20, "t": 55, "b": 20},
+    )
+    scatter.update_xaxes(tickformat=".2%")
+    scatter.update_yaxes(tickformat=".2%")
+
+    rolling_chart = go.Figure(
+        go.Scatter(
+            x=comparison.rolling_correlation.index,
+            y=comparison.rolling_correlation,
+            mode="lines",
+            name="Correlación",
+        )
+    )
+    rolling_chart.add_hline(y=0, line_dash="dash", line_color="#8B98A5")
+    rolling_chart.update_layout(
+        title=f"Correlación móvil · {window} sesiones",
+        xaxis_title="Fecha",
+        yaxis_title="Correlación",
+        height=330,
+        margin={"l": 20, "r": 20, "t": 55, "b": 20},
+        showlegend=False,
+    )
+    rolling_chart.update_yaxes(range=[-1, 1])
+    return normalized_chart, scatter, rolling_chart
+
+
 def _format_observation(value) -> str:
     return value.strftime("%d/%m/%Y") if value is not None else "N/D"
 
@@ -422,57 +487,35 @@ def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> Non
         border=True,
     )
 
+    normalized_chart, scatter, rolling_chart = _comparison_figures(
+        comparison,
+        first_symbol,
+        second_symbol,
+        int(window),
+    )
+
     left, right = st.columns(2)
     with left:
-        normalized = (
-            comparison.normalized.rename_axis("Fecha")
-            .reset_index()
-            .melt(id_vars="Fecha", var_name="Instrumento", value_name="Base 100")
+        st.plotly_chart(
+            normalized_chart,
+            width="stretch",
+            key="market_comparator_base100_svg_v3",
         )
-        normalized_chart = px.line(
-            normalized,
-            x="Fecha",
-            y="Base 100",
-            color="Instrumento",
-            title="Desempeño comparable · Base 100",
-            render_mode="svg",
-        )
-        normalized_chart.add_hline(y=100, line_dash="dash", line_color="#8B98A5")
-        normalized_chart.update_layout(height=410, margin={"l": 20, "r": 20, "t": 55, "b": 20})
-        st.plotly_chart(normalized_chart, width="stretch")
     with right:
-        scatter = px.scatter(
-            comparison.returns.reset_index(),
-            x=first_symbol,
-            y=second_symbol,
-            title="Dispersión de rendimientos diarios",
-            labels={
-                first_symbol: f"{first_symbol} · retorno",
-                second_symbol: f"{second_symbol} · retorno",
-            },
-            render_mode="svg",
+        st.plotly_chart(
+            scatter,
+            width="stretch",
+            key="market_comparator_scatter_svg_v3",
         )
-        scatter.update_layout(height=410, margin={"l": 20, "r": 20, "t": 55, "b": 20})
-        scatter.update_xaxes(tickformat=".2%")
-        scatter.update_yaxes(tickformat=".2%")
-        st.plotly_chart(scatter, width="stretch")
 
     if comparison.rolling_correlation.empty:
         st.info("Aún no hay suficientes sesiones para dibujar la correlación móvil.")
     else:
-        rolling = comparison.rolling_correlation.rename_axis("Fecha").reset_index()
-        rolling_chart = px.line(
-            rolling,
-            x="Fecha",
-            y="Correlación",
-            title=f"Correlación móvil · {window} sesiones",
-            range_y=[-1, 1],
-            render_mode="svg",
+        st.plotly_chart(
+            rolling_chart,
+            width="stretch",
+            key="market_comparator_rolling_svg_v3",
         )
-        rolling_chart.add_hline(y=0, line_dash="dash", line_color="#8B98A5")
-        rolling_chart.update_layout(height=330, margin={"l": 20, "r": 20, "t": 55, "b": 20})
-        st.plotly_chart(rolling_chart, width="stretch")
-
     st.caption(
         "La correlación usa rendimientos diarios consecutivos y alineados. "
         "No implica causalidad ni garantiza que la relación se mantenga."
