@@ -9,6 +9,7 @@
   de mercado de 15 minutos y pruebas deterministas sin red.
 - Mostrado el PER histórico en el panel principal y en Fundamental para la acción seleccionada.
 - Ampliado el catálogo curado con criptomonedas, stablecoins y memecoins principales compatibles con Yahoo; el PER queda limitado a acciones.
+- Movido el selector buscable del activo principal por encima de los KPI, aclarando que procede del Universo activo y sincronizándolo con todas las vistas.
 
 - Conectado un activo global entre Mercado, Inteligencia, Fundamental, Noticias y Ranking.
 - Añadida selección por fila en Ranking e Inteligencia y una barra de contexto con precio, score, señal y volatilidad.

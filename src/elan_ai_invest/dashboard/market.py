@@ -423,7 +423,7 @@ def _render_detail_panel(selected, labels, market_settings) -> str:
     options = list(selected)
     sync_widget_to_active(st.session_state, "market_primary_symbol", options)
     primary_symbol = st.selectbox(
-        "Activo principal",
+        "Activo del gráfico",
         options,
         format_func=lambda symbol: labels.get(symbol, symbol),
         key="market_primary_symbol",
