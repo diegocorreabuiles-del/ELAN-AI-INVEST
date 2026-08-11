@@ -7,13 +7,14 @@
 - Alineadas las sesiones sin forward-fill ni retornos cero inventados, con caché
   de mercado de 15 minutos y pruebas deterministas sin red.
 - Mostrado el PER histórico en el panel principal y en Fundamental para la acción seleccionada.
+- Ampliado el catálogo curado con criptomonedas, stablecoins y memecoins principales compatibles con Yahoo; el PER queda limitado a acciones.
 
 - Conectado un activo global entre Mercado, Inteligencia, Fundamental, Noticias y Ranking.
 - Añadida selección por fila en Ranking e Inteligencia y una barra de contexto con precio, score, señal y volatilidad.
 - Aislados los controles locales de histórico y comparador mediante fragmentos de Streamlit, preservando la carga lazy y la semántica financiera existente.
 - Forzado el renderizado SVG del comparador para funcionar también en navegadores sin WebGL.
 - Persistida en SQLite la lista de `Universo activo` para restaurarla tras recargas y reinicios.
-- Elevado el gate local a 187 pruebas y 81,40 % de cobertura.
+- Elevado el gate local a 189 pruebas y 81,46 % de cobertura.
 
 - Añadido News & Events Engine v1 con noticias recientes y próximos resultados, dividendos y fechas ex-dividendo desde Yahoo Finance.
 - Incorporada una duodécima pestaña de carga perezosa, caché configurable de 15 minutos y límite de 50 entradas.

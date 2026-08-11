@@ -56,6 +56,8 @@ ASSET_TYPE_LABELS = {
     "Forex": "Divisa",
     "Fund": "Fondo",
     "Index": "Índice",
+    "Memecoin": "Memecoin",
+    "Stablecoin": "Stablecoin",
     "Stock": "Acción",
 }
 

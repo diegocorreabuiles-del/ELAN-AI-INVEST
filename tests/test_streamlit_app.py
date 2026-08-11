@@ -149,6 +149,7 @@ def _analysis_result() -> AnalysisResult:
             "MSFT": 300 + x * 0.16 + np.cos(x / 11),
             "NVDA": 100 + x * 0.20 + np.sin(x / 7),
             "SPY": 450 + x * 0.10 + np.cos(x / 13),
+            "BTC-USD": 60_000 + x * 20 + np.sin(x / 5) * 200,
         },
         index=index,
     )
@@ -172,7 +173,7 @@ def _analysis_result() -> AnalysisResult:
                 "explanation": "Fixture determinista sin red.",
             }
             for position, (symbol, score) in enumerate(
-                zip(prices.columns, [82.0, 78.0, 74.0, 70.0], strict=True)
+                zip(prices.columns, [82.0, 78.0, 74.0, 70.0, 66.0], strict=True)
             )
         ]
     )
@@ -526,6 +527,7 @@ def test_active_symbol_stays_synchronized_across_connected_views(
     primary.set_value("MSFT").run(timeout=APP_TEST_TIMEOUT)
 
     assert app.session_state["active_symbol"] == "MSFT"
+    assert any(item.label == "PER histórico" and item.value == "28.0x" for item in app.metric)
     active_metric = next(item for item in app.metric if item.label == "Activo conectado")
     assert active_metric.value.startswith("MSFT ·")
 
@@ -543,6 +545,34 @@ def test_active_symbol_stays_synchronized_across_connected_views(
         assert app.session_state["active_symbol"] == "MSFT"
 
     assert app_environment.news_requests == ["MSFT"]
+
+
+def test_crypto_asset_skips_stock_pe(
+    app_environment: FakeEngine,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fundamental_requests: list[str] = []
+
+    def fake_fundamental_loader(symbol: str) -> FundamentalAnalysis:
+        fundamental_requests.append(symbol)
+        return _fundamental_analysis()
+
+    monkeypatch.setattr(
+        fundamental_dashboard,
+        "_load_fundamental",
+        fake_fundamental_loader,
+    )
+    st.cache_data.clear()
+
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
+    assert fundamental_requests == ["AAPL"]
+    primary = next(item for item in app.selectbox if item.label == "Activo principal")
+
+    primary.set_value("BTC-USD").run(timeout=APP_TEST_TIMEOUT)
+
+    assert app.session_state["active_symbol"] == "BTC-USD"
+    assert any(item.label == "PER histórico" and item.value == "N/D" for item in app.metric)
+    assert fundamental_requests == ["AAPL"]
 
 
 def test_app_stops_when_no_asset_is_selected(app_environment: FakeEngine) -> None:

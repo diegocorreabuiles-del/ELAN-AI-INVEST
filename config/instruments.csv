@@ -14,6 +14,20 @@ HG=F,HG=F,Copper Futures,Commodity,Global,,COMEX,,copper cobre,ELAN curated
 ZC=F,ZC=F,Corn Futures,Commodity,Global,,CBOT,,corn maiz,ELAN curated
 BTC-USD,BTC-USD,Bitcoin USD,Crypto,Global,,CRYPTO,,bitcoin btc,ELAN curated
 ETH-USD,ETH-USD,Ethereum USD,Crypto,Global,,CRYPTO,,ethereum ether eth,ELAN curated
+BNB-USD,BNB-USD,BNB USD,Crypto,Global,,CRYPTO,,bnb binance coin,ELAN curated
+SOL-USD,SOL-USD,Solana USD,Crypto,Global,,CRYPTO,,solana sol,ELAN curated
+XRP-USD,XRP-USD,XRP USD,Crypto,Global,,CRYPTO,,xrp ripple,ELAN curated
+ADA-USD,ADA-USD,Cardano USD,Crypto,Global,,CRYPTO,,cardano ada,ELAN curated
+AVAX-USD,AVAX-USD,Avalanche USD,Crypto,Global,,CRYPTO,,avalanche avax,ELAN curated
+LINK-USD,LINK-USD,Chainlink USD,Crypto,Global,,CRYPTO,,chainlink link,ELAN curated
+DOT-USD,DOT-USD,Polkadot USD,Crypto,Global,,CRYPTO,,polkadot dot,ELAN curated
+USDT-USD,USDT-USD,Tether USD,Stablecoin,Global,,CRYPTO,,tether usdt stable coin stablecoin,ELAN curated
+USDC-USD,USDC-USD,USD Coin,Stablecoin,Global,,CRYPTO,,usd coin usdc stable coin stablecoin,ELAN curated
+DAI-USD,DAI-USD,Dai USD,Stablecoin,Global,,CRYPTO,,dai stable coin stablecoin,ELAN curated
+DOGE-USD,DOGE-USD,Dogecoin USD,Memecoin,Global,,CRYPTO,,dogecoin doge meme coin memecoin,ELAN curated
+SHIB-USD,SHIB-USD,Shiba Inu USD,Memecoin,Global,,CRYPTO,,shiba inu shib meme coin memecoin,ELAN curated
+PEPE24478-USD,PEPE24478-USD,Pepe USD,Memecoin,Global,,CRYPTO,,pepe meme coin memecoin,ELAN curated
+BONK-USD,BONK-USD,Bonk USD,Memecoin,Global,,CRYPTO,,bonk meme coin memecoin,ELAN curated
 EURUSD=X,EURUSD=X,EUR/USD,Forex,Global,,FX,,euro dollar dolar,ELAN curated
 AEDUSD=X,AEDUSD=X,AED/USD,Forex,United Arab Emirates,AE,FX,,dirham emiratos,ELAN curated
 CNYUSD=X,CNYUSD=X,CNY/USD,Forex,China,CN,FX,,yuan renminbi china,ELAN curated

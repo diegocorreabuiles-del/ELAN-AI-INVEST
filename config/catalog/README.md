@@ -11,8 +11,9 @@ publicada con licencia MIT. La copia local se descargó el 28 de julio de 2026:
 - licencia preservada en `ADANOS_LICENSE.txt`.
 
 La instantánea aporta acciones y ETF con ticker, nombre, bolsa, país e ISIN.
-`config/instruments.csv` añade índices, materias primas, divisas, criptoactivos,
-bonos y símbolos conocidos en formato Yahoo.
+`config/instruments.csv` añade índices, materias primas, divisas, bonos,
+criptomonedas principales, stablecoins, memecoins y símbolos conocidos en
+formato Yahoo.
 
 El catálogo sirve para descubrir instrumentos. Los precios siguen procediendo
 del proveedor Yahoo configurado por la aplicación: que un valor aparezca en el
