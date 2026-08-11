@@ -22,6 +22,7 @@ app.py (Streamlit)
   -> backtesting.engine.BacktestEngine              [Backtesting Engine canónico]
   -> fundamental
   -> news (Yahoo, carga bajo demanda; solo contexto)
+  -> forex (Yahoo, normalización USD/unidad; solo análisis)
   -> paper_trading (simulación SQLite; sin broker)
   -> dashboard/*
 ```
@@ -29,6 +30,12 @@ app.py (Streamlit)
 Los datos de mercado entran por el proveedor configurado, se validan con `market.interval` y `market.minimum_history`, y se convierten en un `AnalysisResult`. Yahoo usa timeout y retry/backoff acotados; los aciertos se guardan como CSV inerte con TTL y clave SHA-256. `DownloadResult` añade opcionalmente un reporte por instrumento con procedencia, observaciones, cobertura, huecos, última sesión, antigüedad y estado. Todas las vistas reciben ese resultado común. La primera pestaña evalúa además el OHLCV ajustado del activo visible; la consulta conserva timeout/retry y un caché Streamlit de 15 minutos y 50 entradas. Las pestañas costosas solo se renderizan cuando están abiertas; los cachés tienen TTL y límites de entradas.
 
 `news.YahooNewsEventsProvider` normaliza noticias y calendario corporativo fuera del Core Engine. La pestaña visible dispara la consulta, cacheada por `news.cache_ttl_seconds` y limitada a 50 entradas; un fallo parcial conserva la parte disponible y nunca alimenta scoring, señales, riesgo, cartera ni paper trading.
+
+`forex.build_forex_analysis()` normaliza los pares seleccionados a USD por una
+unidad de divisa, alinea sesiones y calcula rendimientos consecutivos, desempeño
+base 100, matriz de correlaciones y correlación móvil. La descarga solo ocurre al
+abrir la pestaña Divisas, usa caché Streamlit de 15 minutos y no alimenta el Core
+Engine, scoring, señales, riesgo, cartera ni paper trading.
 
 ## APIs canónicas
 
@@ -42,6 +49,7 @@ Los datos de mercado entran por el proveedor configurado, se validan con `market
 
 - La calidad de mercado es metadata: nunca rellena, recorta ni altera las series consumidas por scoring, riesgo o comparación.
 - Noticias y eventos son contexto de solo lectura: no participan en decisiones, puntuaciones ni ejecución.
+- Divisas es análisis de solo lectura: no rellena precios, no inventa retornos cero y no participa en decisiones ni ejecución.
 - El optimizador institucional nunca devuelve un peso superior a `max_weight`.
 - Si `n_activos * max_weight < 1`, falla con un `ValueError` que explica la inviabilidad.
 - Portfolio valida capital, posiciones, cap por posición y efectivo mínimo.
