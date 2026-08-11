@@ -13,6 +13,7 @@ from elan_ai_invest.dashboard import (
     ensure_active_symbol,
     render_active_asset_context,
     render_backtesting_tab,
+    render_forex_tab,
     render_fundamental_tab,
     render_header,
     render_history_tab,
@@ -312,6 +313,7 @@ tabs = st.tabs(
         "Paper Trading",
         "Backtesting",
         "Histórico",
+        "Divisas",
         "Sistema",
     ],
     on_change="rerun",
@@ -397,6 +399,9 @@ if tabs[10].open:
         safe_render("Histórico", render_history_tab, ENGINE, DB_PATH, selected, period)
 if tabs[11].open:
     with tabs[11]:
+        safe_render("Divisas", render_forex_tab, ENGINE.settings.market)
+if tabs[12].open:
+    with tabs[12]:
         safe_render("Sistema", render_system_tab, ROOT, ENGINE.settings)
 
 if analysis.errors:

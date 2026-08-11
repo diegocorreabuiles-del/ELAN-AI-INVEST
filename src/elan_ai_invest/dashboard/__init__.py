@@ -1,4 +1,5 @@
 from .backtesting import render_backtesting_tab
+from .forex import render_forex_tab
 from .fundamental import render_fundamental_tab
 from .history import render_history_tab
 from .institutional import render_institutional_tab
@@ -26,6 +27,7 @@ __all__ = [
     "render_active_asset_context",
     "render_backtesting_tab",
     "render_fundamental_tab",
+    "render_forex_tab",
     "render_header",
     "render_history_tab",
     "render_institutional_tab",

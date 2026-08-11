@@ -5,11 +5,11 @@ Plataforma local de análisis cuantitativo, fundamental, noticias, riesgo, carte
 ## Estado recuperado en este PC
 
 - La aplicación local se ejecuta en Python 3.12; la suite y los gates pasan en Python 3.11–3.14 sobre Linux.
-- El gate local incluye 183 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
+- El gate local incluye 187 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
 - El cierre de dependencias está verificado: 78 pins activos y `pip check` sin conflictos.
 - La política Git aplica `trabajo -> develop -> main`; la PR #10 promovió `1.3.0rc1` a `main` y su CI posterior pasó en Python 3.11–3.14.
-- El gate global de cobertura pasa con 81,48 %, por encima del 75 % configurado.
-- AppTest recorre las doce vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
+- El gate global de cobertura pasa con 81,47 %, por encima del 75 % configurado.
+- AppTest recorre las trece vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
 - El empaquetador seguro está reconstruido y cubierto por pruebas de integridad, rutas y reproducibilidad.
 
 Este es un proyecto de simulación y paper trading. No se conecta a brokers ni opera con dinero real.
@@ -75,6 +75,19 @@ correlación móvil de sus rendimientos diarios. Para estudiar EUR/USD frente al
 dólar se pueden añadir `EURUSD=X` y `DX-Y.NYB`. La correlación no implica
 causalidad y puede cambiar con el tiempo.
 
+## Divisas y correlaciones
+
+La pestaña **Divisas** compara entre dos y seis monedas con horizontes de seis
+meses a cinco años. Incluye desempeño base 100, matriz de correlaciones,
+correlación móvil de un par focal y una tabla resumen.
+
+Para que las comparaciones tengan una orientación coherente, todas las series se
+expresan como USD por una unidad de divisa. Los pares publicados por Yahoo como
+USD/JPY, USD/CHF, USD/CAD, USD/COP o USD/CNY se invierten antes de calcular
+rendimientos. Las fechas se alinean sin rellenar precios ni inventar retornos
+cero. La consulta solo se realiza al abrir la pestaña y se cachea durante 15
+minutos.
+
 ## Espacio de trabajo conectado
 
 Mercado, Inteligencia, Fundamental, Noticias y Ranking comparten un único activo
@@ -88,7 +101,7 @@ se restaura al recargar la página o reiniciar la aplicación. `config/watchlist
 solo actúa como valor inicial cuando todavía no existe una preferencia guardada.
 
 Los controles locales del gráfico histórico y del comparador usan fragmentos de
-Streamlit para actualizar solo su panel. Las doce pestañas conservan su carga
+Streamlit para actualizar solo su panel. Las trece pestañas conservan su carga
 perezosa: una vista cerrada no consulta proveedores ni altera scoring, señales,
 riesgo, cartera o paper trading.
 
@@ -138,7 +151,7 @@ Calidad estática reproducida también por CI:
 .\.venv\Scripts\python.exe -m mypy
 ```
 
-Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,48 % con 183 pruebas superadas.
+Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,47 % con 187 pruebas superadas.
 
 ## Matriz Python 3.11–3.14
 

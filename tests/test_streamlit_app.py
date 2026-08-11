@@ -12,6 +12,7 @@ import yfinance as yf
 from streamlit.testing.v1 import AppTest
 
 import elan_ai_invest.core.bootstrap as bootstrap
+import elan_ai_invest.dashboard.forex as forex_dashboard
 import elan_ai_invest.dashboard.fundamental as fundamental_dashboard
 import elan_ai_invest.dashboard.history as history_dashboard
 import elan_ai_invest.dashboard.market as market_dashboard
@@ -45,6 +46,7 @@ TAB_LABELS = (
     "Paper Trading",
     "Backtesting",
     "Histórico",
+    "Divisas",
     "Sistema",
 )
 
@@ -272,6 +274,20 @@ def _market_history() -> pd.DataFrame:
     )
 
 
+def _forex_prices() -> pd.DataFrame:
+    index = pd.bdate_range("2025-01-01", periods=260)
+    x = np.arange(len(index), dtype=float)
+    return pd.DataFrame(
+        {
+            "EUR": 1.08 + x * 0.0002 + np.sin(x / 11) * 0.005,
+            "GBP": 1.25 + x * 0.0003 + np.sin(x / 13) * 0.006,
+            "JPY": 0.0068 + x * 0.000001 + np.cos(x / 9) * 0.00002,
+            "COP": 0.00025 + x * 0.00000001 + np.cos(x / 15) * 0.000001,
+        },
+        index=index,
+    )
+
+
 def _forbid_network(*args, **kwargs):
     del args, kwargs
     raise AssertionError("Las pruebas AppTest no pueden usar Yahoo ni la red.")
@@ -290,6 +306,11 @@ def app_environment(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> FakeEngi
     monkeypatch.setattr(bootstrap, "build_core_engine", lambda root: engine)
     monkeypatch.setattr(paper_module, "PaperTradingEngine", FakePaperTradingEngine)
     monkeypatch.setattr(market_dashboard, "_load_history", lambda *args: _market_history())
+    monkeypatch.setattr(
+        forex_dashboard,
+        "_load_forex_prices",
+        lambda *args: (_forex_prices(), ()),
+    )
     monkeypatch.setattr(
         fundamental_dashboard,
         "_load_fundamental",
@@ -369,6 +390,10 @@ def test_app_renders_every_view_and_simulated_actions(app_environment: FakeEngin
     for label in TAB_LABELS:
         _select_tab(app, tab_widget_id, label)
     assert app_environment.news_requests == ["AAPL"]
+
+    _select_tab(app, tab_widget_id, "Divisas")
+    assert any(item.label == "Correlación focal" for item in app.metric)
+    assert any("USD por una unidad de divisa" in item.value for item in app.caption)
 
     calls_before_refresh = len(app_environment.requests)
     _button(app, "Actualizar datos").click().run(timeout=APP_TEST_TIMEOUT)
