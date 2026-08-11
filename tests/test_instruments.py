@@ -120,3 +120,19 @@ def test_custom_symbol_validation() -> None:
 
     with pytest.raises(ValueError):
         normalize_custom_symbol("AAPL; Remove-Item")
+
+
+def test_project_catalog_exposes_curated_crypto_groups() -> None:
+    catalog_path = Path(__file__).parents[1] / "config" / "instruments.csv"
+    catalog = load_instrument_catalog(catalog_path)
+
+    expected = {
+        "Crypto": {"BTC-USD", "ETH-USD", "BNB-USD", "SOL-USD", "XRP-USD"},
+        "Stablecoin": {"USDT-USD", "USDC-USD", "DAI-USD"},
+        "Memecoin": {"DOGE-USD", "SHIB-USD", "PEPE24478-USD", "BONK-USD"},
+    }
+    for asset_type, symbols in expected.items():
+        available = set(search_instruments(catalog, asset_type=asset_type)["symbol"])
+        assert symbols <= available
+
+    assert search_instruments(catalog, "pepe").iloc[0]["symbol"] == "PEPE24478-USD"

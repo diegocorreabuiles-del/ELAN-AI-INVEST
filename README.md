@@ -5,10 +5,10 @@ Plataforma local de análisis cuantitativo, fundamental, noticias, riesgo, carte
 ## Estado recuperado en este PC
 
 - La aplicación local se ejecuta en Python 3.12; la suite y los gates pasan en Python 3.11–3.14 sobre Linux.
-- El gate local incluye 187 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
+- El gate local incluye 189 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
 - El cierre de dependencias está verificado: 78 pins activos y `pip check` sin conflictos.
 - La política Git aplica `trabajo -> develop -> main`; la PR #10 promovió `1.3.0rc1` a `main` y su CI posterior pasó en Python 3.11–3.14.
-- El gate global de cobertura pasa con 81,40 %, por encima del 75 % configurado.
+- El gate global de cobertura pasa con 81,46 %, por encima del 75 % configurado.
 - AppTest recorre las trece vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
 - El empaquetador seguro está reconstruido y cubierto por pruebas de integridad, rutas y reproducibilidad.
 
@@ -37,7 +37,7 @@ bolsa, y filtrar por tipo de activo, país y mercado. La copia local combina:
   [Adanos Free Ticker Database](https://github.com/adanos-software/free-ticker-database),
   bajo licencia MIT;
 - una selección compatible con Yahoo de índices, materias primas, divisas,
-  criptoactivos y bonos;
+  bonos, criptomonedas principales, stablecoins y memecoins;
 - entrada manual para cualquier símbolo exacto aceptado por Yahoo Finance.
 
 El catálogo de búsqueda y el proveedor de precios son capas distintas. Un
@@ -106,6 +106,10 @@ Streamlit para actualizar solo su panel. Las trece pestañas conservan su carga
 perezosa: una vista cerrada no consulta proveedores ni altera scoring, señales,
 riesgo, cartera o paper trading.
 
+El buscador distingue `Crypto`, `Stablecoin` y `Memecoin`. Estos activos usan
+pares contra USD de Yahoo y son solo informativos; el PER se muestra como `N/D`
+porque no es una métrica aplicable a criptoactivos.
+
 ## Noticias y eventos
 
 La pestaña **Noticias y eventos** consulta bajo demanda hasta diez noticias recientes y el
@@ -152,7 +156,7 @@ Calidad estática reproducida también por CI:
 .\.venv\Scripts\python.exe -m mypy
 ```
 
-Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,40 % con 187 pruebas superadas.
+Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,46 % con 189 pruebas superadas.
 
 ## Matriz Python 3.11–3.14
 

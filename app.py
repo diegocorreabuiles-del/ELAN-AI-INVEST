@@ -79,6 +79,7 @@ except Exception as exc:
 
 catalog_labels = labels_by_symbol(catalog)
 name_map = dict(zip(catalog["symbol"], catalog["name"], strict=True))
+asset_type_map = dict(zip(catalog["symbol"], catalog["asset_type"], strict=True))
 default_symbols = [
     symbol
     for symbol in watchlist["symbol"].astype(str).str.upper().tolist()
@@ -303,7 +304,9 @@ render_active_asset_context(
     ranking,
     active_symbol,
     catalog_labels,
-    trailing_pe=load_trailing_pe(active_symbol),
+    trailing_pe=(
+        load_trailing_pe(active_symbol) if asset_type_map.get(active_symbol) == "Stock" else None
+    ),
 )
 
 tabs = st.tabs(
