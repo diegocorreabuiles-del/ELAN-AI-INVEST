@@ -14,8 +14,8 @@
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
 - Rama `feature/interactive-asset-workspace` abierta desde `develop@11f7495e470982cc6e86bbf2d7d19f2810fb37e2`.
 - Bloques 21 y 22 integrados; PR documental #21 fusionada y CI posterior `30698354050` verde.
-- Bloque 23 cerrado técnicamente en `0a23623`: activo global sincronizado, selección por fila, barra de contexto, fragmentos locales y comparador SVG; pendiente publicación por PR.
-- Bloque 24 cerrado técnicamente en la rama local `feature/persistent-watchlist`, apilada sobre el Bloque 23: la lista de seguimiento se restaura y guarda en SQLite; validación manual aceptada y gate Windows verde.
+- Bloque 23 integrado en `develop@765f94b` mediante PR #22; las matrices CI `31490174578` y `31490212493` pasaron en Python 3.11–3.14.
+- Bloque 24 cerrado técnicamente en la rama local `feature/persistent-watchlist`, realineada sobre `develop@765f94b`: la lista de seguimiento se restaura y guarda en SQLite; validación manual aceptada y gate Windows verde.
 - `main@5cf2bca1cd98954c1c71e191368432d2b242d9ae`, con tag anotado `v1.3.0-rc.1`; no hay GitHub Release ni despliegue.
 - `stash@{0}` conserva metadata gzip local previa a la sincronización: `local gzip metadata before syncing develop`.
 - Producto local de análisis y paper trading; no conecta brokers ni dinero real.
@@ -27,7 +27,7 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 - Windows, Python 3.12.13: 183 pruebas, cobertura 81,48 % (mínimo 75 %); persistencia de la lista con pruebas SQLite/AppTest, Ruff y Black verdes. Lock, `pip check`, mypy crítico y healthcheck verdes.
 - Linux/Docker sobre `0a23623`, Python 3.11–3.14: 178 pruebas por versión y paquete verdes para el cierre del Bloque 23.
 - Artefacto reproducible del Bloque 23 sobre `0a23623`: 171 archivos; SHA-256 `0d1275e36c945b8f3710fb42348fa91efac6a7e908b16a1f1f383e001e44eab1`.
-- Última evidencia remota: CI `30698354050` sobre `11f7495e470982cc6e86bbf2d7d19f2810fb37e2`, verde en Python 3.11–3.14.
+- Última evidencia remota: PR #22 fusionada en `develop@765f94b`; CI `31490174578` y `31490212493` verde en Python 3.11–3.14.
 - `develop` exige PR, checks estrictos, historial lineal y conversaciones resueltas; force-push y borrado deshabilitados.
 
 ## Decisiones canónicas
@@ -76,6 +76,6 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 
 ## Siguiente paso
 
-- Publicar el Bloque 23 y abrir PR hacia `develop` solo con autorización explícita; después integrar o realinear la rama local del Bloque 24.
-- Publicar el Bloque 24 mediante PR hacia `develop` solo después de resolver la dependencia con el Bloque 23 y con autorización explícita.
+- Publicar el Bloque 24 mediante PR hacia `develop` y comprobar su matriz CI.
+- Fusionar el Bloque 24 solo con autorización explícita y checks verdes.
 - Mantener fuera de alcance brokers/dinero real y cualquier promoción a `main`, release o despliegue.
