@@ -5,7 +5,7 @@ Plataforma local de análisis cuantitativo, fundamental, noticias, riesgo, carte
 ## Estado recuperado en este PC
 
 - La aplicación local se ejecuta en Python 3.12; la suite y los gates pasan en Python 3.11–3.14 sobre Linux.
-- El gate local incluye 189 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
+- El gate local incluye 190 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
 - El cierre de dependencias está verificado: 78 pins activos y `pip check` sin conflictos.
 - La política Git aplica `trabajo -> develop -> main`; la PR #10 promovió `1.3.0rc1` a `main` y su CI posterior pasó en Python 3.11–3.14.
 - El gate global de cobertura pasa con 81,46 %, por encima del 75 % configurado.
@@ -77,7 +77,7 @@ causalidad y puede cambiar con el tiempo.
 
 ## Divisas y correlaciones
 
-La pestaña **Divisas** compara entre dos y seis monedas con horizontes de seis
+La pestaña **Divisas** compara entre dos y doce monedas con horizontes de seis
 meses a cinco años. Incluye desempeño base 100, matriz de correlaciones,
 correlación móvil de un par focal y una tabla resumen.
 
@@ -156,7 +156,7 @@ Calidad estática reproducida también por CI:
 .\.venv\Scripts\python.exe -m mypy
 ```
 
-Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,46 % con 189 pruebas superadas.
+Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,46 % con 190 pruebas superadas.
 
 ## Matriz Python 3.11–3.14
 
