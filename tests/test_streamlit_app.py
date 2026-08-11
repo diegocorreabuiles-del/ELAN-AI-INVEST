@@ -381,6 +381,7 @@ def test_app_renders_every_view_and_simulated_actions(app_environment: FakeEngin
     assert app.title[0].value == "ELAN Quantum"
     assert len(app.metric) >= 10
     assert any(item.label == "Calidad global" for item in app.metric)
+    assert any(item.label == "PER histórico" and item.value == "28.0x" for item in app.metric)
     assert any("requieren atención" in item.value for item in app.warning)
     assert any(item.label == "Activo principal" for item in app.selectbox)
     assert any(item.label == "Instrumento A" for item in app.selectbox)

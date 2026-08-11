@@ -1,6 +1,6 @@
 from .backtesting import render_backtesting_tab
 from .forex import render_forex_tab
-from .fundamental import render_fundamental_tab
+from .fundamental import load_trailing_pe, render_fundamental_tab
 from .history import render_history_tab
 from .institutional import render_institutional_tab
 from .intelligence import render_intelligence_tab
@@ -24,6 +24,7 @@ __all__ = [
     "clear_market_history_cache",
     "configure_page",
     "ensure_active_symbol",
+    "load_trailing_pe",
     "render_active_asset_context",
     "render_backtesting_tab",
     "render_fundamental_tab",

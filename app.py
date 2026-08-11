@@ -11,6 +11,7 @@ from elan_ai_invest.dashboard import (
     clear_market_history_cache,
     configure_page,
     ensure_active_symbol,
+    load_trailing_pe,
     render_active_asset_context,
     render_backtesting_tab,
     render_forex_tab,
@@ -298,7 +299,12 @@ render_main_metrics(
     risk_report.var_95_pct,
     capital,
 )
-render_active_asset_context(ranking, active_symbol, catalog_labels)
+render_active_asset_context(
+    ranking,
+    active_symbol,
+    catalog_labels,
+    trailing_pe=load_trailing_pe(active_symbol),
+)
 
 tabs = st.tabs(
     [
