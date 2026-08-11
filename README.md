@@ -8,7 +8,7 @@ Plataforma local de análisis cuantitativo, fundamental, noticias, riesgo, carte
 - El gate local incluye 187 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
 - El cierre de dependencias está verificado: 78 pins activos y `pip check` sin conflictos.
 - La política Git aplica `trabajo -> develop -> main`; la PR #10 promovió `1.3.0rc1` a `main` y su CI posterior pasó en Python 3.11–3.14.
-- El gate global de cobertura pasa con 81,47 %, por encima del 75 % configurado.
+- El gate global de cobertura pasa con 81,46 %, por encima del 75 % configurado.
 - AppTest recorre las trece vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
 - El empaquetador seguro está reconstruido y cubierto por pruebas de integridad, rutas y reproducibilidad.
 
@@ -151,7 +151,7 @@ Calidad estática reproducida también por CI:
 .\.venv\Scripts\python.exe -m mypy
 ```
 
-Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,47 % con 187 pruebas superadas.
+Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,46 % con 187 pruebas superadas.
 
 ## Matriz Python 3.11–3.14
 

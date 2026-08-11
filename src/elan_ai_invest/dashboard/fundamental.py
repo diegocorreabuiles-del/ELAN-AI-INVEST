@@ -1,16 +1,23 @@
 from __future__ import annotations
 
+import math
+from collections.abc import Sequence
+
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from elan_ai_invest.fundamental import YahooFundamentalProvider, analyze_fundamentals
+from elan_ai_invest.fundamental import (
+    FundamentalAnalysis,
+    YahooFundamentalProvider,
+    analyze_fundamentals,
+)
 
 from .workspace import activate_from_widget, symbol_options, sync_widget_to_active
 
 
 @st.cache_data(ttl=21600, max_entries=50, show_spinner=False)
-def _load_fundamental(symbol: str):
+def _load_fundamental(symbol: str) -> FundamentalAnalysis:
     snapshot = YahooFundamentalProvider().get_snapshot(symbol)
     return analyze_fundamentals(snapshot)
 
@@ -26,7 +33,15 @@ def _format_large(value: float | None) -> str:
     return f"{value:,.0f}"
 
 
-def render_fundamental_tab(ranking: pd.DataFrame, workspace_symbols=None):
+def _format_ratio(value: float | None) -> str:
+    if value is None or not math.isfinite(float(value)):
+        return "N/D"
+    return f"{float(value):,.1f}x"
+
+
+def render_fundamental_tab(
+    ranking: pd.DataFrame, workspace_symbols: Sequence[object] | None = None
+) -> None:
     st.subheader("Fundamental Engine Institutional")
     st.caption("Calidad, crecimiento, valoración, balance y generación de caja.")
 
@@ -53,11 +68,12 @@ def render_fundamental_tab(ranking: pd.DataFrame, workspace_symbols=None):
     st.markdown(f"### {snapshot.company_name} · {snapshot.symbol}")
     st.caption(" · ".join(part for part in [snapshot.sector, snapshot.industry] if part))
 
-    a, b, c, d = st.columns(4)
-    a.metric("Fundamental Score", f"{analysis.score:.1f}/100")
-    b.metric("Confianza de datos", f"{analysis.confidence:.0f}%")
-    c.metric("Decisión", analysis.decision)
-    d.metric("Capitalización", _format_large(snapshot.market_cap))
+    with st.container(horizontal=True):
+        st.metric("Fundamental Score", f"{analysis.score:.1f}/100")
+        st.metric("Confianza de datos", f"{analysis.confidence:.0f}%")
+        st.metric("Decisión", analysis.decision)
+        st.metric("PER histórico", _format_ratio(snapshot.trailing_pe))
+        st.metric("Capitalización", _format_large(snapshot.market_cap))
     st.write(analysis.explanation)
 
     factor_data = pd.DataFrame(

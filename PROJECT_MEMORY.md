@@ -26,7 +26,7 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 
 ## Gate vigente
 
-- Windows, Python 3.12.13: 187 pruebas, cobertura 81,47 % (mínimo 75 %); 13 vistas AppTest, Ruff, Black, mypy, lock, `pip check` y healthcheck verdes.
+- Windows, Python 3.12.13: 187 pruebas, cobertura 81,46 % (mínimo 75 %); 13 vistas AppTest, Ruff, Black, mypy, lock, `pip check` y healthcheck verdes.
 - Linux/Docker sobre `0a23623`, Python 3.11–3.14: 178 pruebas por versión y paquete verdes para el cierre del Bloque 23.
 - Artefacto reproducible del Bloque 23 sobre `0a23623`: 171 archivos; SHA-256 `0d1275e36c945b8f3710fb42348fa91efac6a7e908b16a1f1f383e001e44eab1`.
 - Última evidencia remota: PR #23 fusionada en `develop@4c19d28`; CI posterior `31492357864` verde.

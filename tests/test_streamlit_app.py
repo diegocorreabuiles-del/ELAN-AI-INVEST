@@ -391,6 +391,9 @@ def test_app_renders_every_view_and_simulated_actions(app_environment: FakeEngin
         _select_tab(app, tab_widget_id, label)
     assert app_environment.news_requests == ["AAPL"]
 
+    _select_tab(app, tab_widget_id, "Fundamental")
+    assert any(item.label == "PER histórico" and item.value == "28.0x" for item in app.metric)
+
     _select_tab(app, tab_widget_id, "Divisas")
     assert any(item.label == "Correlación focal" for item in app.metric)
     assert any("USD por una unidad de divisa" in item.value for item in app.caption)
