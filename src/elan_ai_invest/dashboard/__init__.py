@@ -18,7 +18,7 @@ from .ranking import render_ranking_tab
 from .risk import render_risk_tab
 from .safe import safe_render, show_safe_error
 from .system import render_system_tab
-from .workspace import ensure_active_symbol, set_active_symbol
+from .workspace import ensure_active_symbol, render_primary_asset_selector, set_active_symbol
 
 __all__ = [
     "clear_market_history_cache",
@@ -38,6 +38,7 @@ __all__ = [
     "render_news_events_tab",
     "render_paper_trading_tab",
     "render_portfolio_tab",
+    "render_primary_asset_selector",
     "render_ranking_tab",
     "render_risk_tab",
     "render_system_tab",

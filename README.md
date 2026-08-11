@@ -91,9 +91,9 @@ minutos.
 ## Espacio de trabajo conectado
 
 Mercado, Inteligencia, Fundamental, Noticias y Ranking comparten un único activo
-activo. Cambiarlo en cualquiera de esas vistas actualiza el contexto del resto y
-la barra superior resume precio, PER histórico, score, señal y volatilidad
-disponibles. Las
+activo. Antes de los KPI aparece un selector buscable que explica que el activo
+procede del `Universo activo`; cambiarlo actualiza el contexto del resto. La barra
+superior resume precio, PER histórico, score, señal y volatilidad disponibles. Las
 tablas de Inteligencia y Ranking permiten activar un instrumento seleccionando
 una fila.
 

@@ -384,7 +384,8 @@ def test_app_renders_every_view_and_simulated_actions(app_environment: FakeEngin
     assert any(item.label == "Calidad global" for item in app.metric)
     assert any(item.label == "PER histórico" and item.value == "28.0x" for item in app.metric)
     assert any("requieren atención" in item.value for item in app.warning)
-    assert any(item.label == "Activo principal" for item in app.selectbox)
+    assert any(item.label == "Buscar o seleccionar activo" for item in app.selectbox)
+    assert any("Procede de tu Universo activo" in item.value for item in app.caption)
     assert any(item.label == "Instrumento A" for item in app.selectbox)
     assert any(item.label == "Instrumento B" for item in app.selectbox)
 
@@ -469,7 +470,7 @@ def test_app_searches_and_adds_global_instrument(app_environment: FakeEngine) ->
     _button(app, "Añadir seleccionado").click().run(timeout=APP_TEST_TIMEOUT)
 
     assert "EMAAR.DU" in app.multiselect[0].value
-    primary = next(item for item in app.selectbox if item.label == "Activo principal")
+    primary = next(item for item in app.selectbox if item.label == "Buscar o seleccionar activo")
     assert primary.value == "EMAAR.DU"
     assert "EMAAR.DU" in app_environment.requests[-1].symbols
     assert not app.exception
@@ -522,7 +523,7 @@ def test_active_symbol_stays_synchronized_across_connected_views(
     app_environment: FakeEngine,
 ) -> None:
     app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
-    primary = next(item for item in app.selectbox if item.label == "Activo principal")
+    primary = next(item for item in app.selectbox if item.label == "Buscar o seleccionar activo")
 
     primary.set_value("MSFT").run(timeout=APP_TEST_TIMEOUT)
 
@@ -566,7 +567,7 @@ def test_crypto_asset_skips_stock_pe(
 
     app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
     assert fundamental_requests == ["AAPL"]
-    primary = next(item for item in app.selectbox if item.label == "Activo principal")
+    primary = next(item for item in app.selectbox if item.label == "Buscar o seleccionar activo")
 
     primary.set_value("BTC-USD").run(timeout=APP_TEST_TIMEOUT)
 

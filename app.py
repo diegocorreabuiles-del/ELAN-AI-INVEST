@@ -25,6 +25,7 @@ from elan_ai_invest.dashboard import (
     render_news_events_tab,
     render_paper_trading_tab,
     render_portfolio_tab,
+    render_primary_asset_selector,
     render_ranking_tab,
     render_risk_tab,
     render_system_tab,
@@ -279,6 +280,9 @@ active_symbol = ensure_active_symbol(
     selected,
     preferred=preferred_active,
 )
+assert active_symbol is not None
+
+active_symbol = render_primary_asset_selector(selected, catalog_labels)
 assert active_symbol is not None
 
 latest_prices = {

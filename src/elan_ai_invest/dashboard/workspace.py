@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 import streamlit as st
@@ -69,6 +69,31 @@ def sync_widget_to_active(
 
 def activate_from_widget(widget_key: str, symbols: Sequence[object]) -> None:
     set_active_symbol(st.session_state, st.session_state.get(widget_key), symbols)
+
+
+def render_primary_asset_selector(
+    symbols: Sequence[object],
+    labels: Mapping[str, str] | None = None,
+) -> str | None:
+    options = symbol_options(symbols)
+    active = sync_widget_to_active(st.session_state, "dashboard_active_symbol", options)
+    if active is None:
+        return None
+
+    with st.container(border=True):
+        st.subheader(":material/search: Activo principal del análisis")
+        st.caption(
+            "Los KPI y las vistas conectadas usan este activo. Procede de tu Universo "
+            "activo; abre el desplegable y escribe para buscar."
+        )
+        return st.selectbox(
+            "Buscar o seleccionar activo",
+            options,
+            format_func=lambda symbol: (labels or {}).get(symbol, symbol),
+            key="dashboard_active_symbol",
+            on_change=activate_from_widget,
+            args=("dashboard_active_symbol", tuple(options)),
+        )
 
 
 def selected_symbol_from_table_state(
