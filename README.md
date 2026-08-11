@@ -5,10 +5,10 @@ Plataforma local de análisis cuantitativo, fundamental, noticias, riesgo, carte
 ## Estado recuperado en este PC
 
 - La aplicación local se ejecuta en Python 3.12; la suite y los gates pasan en Python 3.11–3.14 sobre Linux.
-- El gate local incluye 178 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
+- El gate local incluye 183 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
 - El cierre de dependencias está verificado: 78 pins activos y `pip check` sin conflictos.
 - La política Git aplica `trabajo -> develop -> main`; la PR #10 promovió `1.3.0rc1` a `main` y su CI posterior pasó en Python 3.11–3.14.
-- El gate global de cobertura pasa con 81,40 %, por encima del 75 % configurado.
+- El gate global de cobertura pasa con 81,48 %, por encima del 75 % configurado.
 - AppTest recorre las doce vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
 - El empaquetador seguro está reconstruido y cubierto por pruebas de integridad, rutas y reproducibilidad.
 
@@ -83,6 +83,10 @@ la barra superior resume precio, score, señal y volatilidad disponibles. Las
 tablas de Inteligencia y Ranking permiten activar un instrumento seleccionando
 una fila.
 
+La lista de `Universo activo` se guarda automáticamente en la base SQLite local y
+se restaura al recargar la página o reiniciar la aplicación. `config/watchlist.csv`
+solo actúa como valor inicial cuando todavía no existe una preferencia guardada.
+
 Los controles locales del gráfico histórico y del comparador usan fragmentos de
 Streamlit para actualizar solo su panel. Las doce pestañas conservan su carga
 perezosa: una vista cerrada no consulta proveedores ni altera scoring, señales,
@@ -134,7 +138,7 @@ Calidad estática reproducida también por CI:
 .\.venv\Scripts\python.exe -m mypy
 ```
 
-Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,40 % con 178 pruebas superadas.
+Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,48 % con 183 pruebas superadas.
 
 ## Matriz Python 3.11–3.14
 

@@ -6,7 +6,8 @@
 - Añadida selección por fila en Ranking e Inteligencia y una barra de contexto con precio, score, señal y volatilidad.
 - Aislados los controles locales de histórico y comparador mediante fragmentos de Streamlit, preservando las doce pestañas lazy y la semántica financiera existente.
 - Forzado el renderizado SVG del comparador para funcionar también en navegadores sin WebGL.
-- Elevado el gate local a 178 pruebas y 81,40 % de cobertura.
+- Persistida en SQLite la lista de `Universo activo` para restaurarla tras recargas y reinicios.
+- Elevado el gate local a 183 pruebas y 81,48 % de cobertura.
 
 - Añadido News & Events Engine v1 con noticias recientes y próximos resultados, dividendos y fechas ex-dividendo desde Yahoo Finance.
 - Incorporada una duodécima pestaña de carga perezosa, caché configurable de 15 minutos y límite de 50 entradas.

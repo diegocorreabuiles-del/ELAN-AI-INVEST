@@ -39,6 +39,7 @@ from elan_ai_invest.instruments import (
 )
 from elan_ai_invest.paper_trading import PaperTradingEngine
 from elan_ai_invest.risk import calculate_risk_report
+from elan_ai_invest.storage import load_workspace_symbols, save_workspace_symbols
 
 ROOT = Path(__file__).resolve().parent
 configure_page()
@@ -81,8 +82,18 @@ default_symbols = [
     for symbol in watchlist["symbol"].astype(str).str.upper().tolist()
     if symbol in catalog_labels
 ]
-if "workspace_symbols" not in st.session_state:
-    st.session_state["workspace_symbols"] = default_symbols
+
+
+def _persist_workspace_symbols() -> None:
+    save_workspace_symbols(DB_PATH, st.session_state.get("workspace_symbols", []))
+
+
+persisted_symbols = load_workspace_symbols(DB_PATH)
+st.session_state["workspace_symbols"] = (
+    default_symbols if persisted_symbols is None else persisted_symbols
+)
+if persisted_symbols is None:
+    _persist_workspace_symbols()
 
 render_header(ENGINE.settings.app.version)
 
@@ -162,6 +173,7 @@ with st.sidebar:
         if result_symbol not in current_symbols:
             current_symbols.append(result_symbol)
             st.session_state["workspace_symbols"] = current_symbols
+            _persist_workspace_symbols()
         set_active_symbol(st.session_state, result_symbol, current_symbols)
 
     with st.expander("Añadir símbolo manual de Yahoo"):
@@ -180,6 +192,7 @@ with st.sidebar:
                 if normalized_symbol not in current_symbols:
                     current_symbols.append(normalized_symbol)
                     st.session_state["workspace_symbols"] = current_symbols
+                    _persist_workspace_symbols()
                     catalog_labels[normalized_symbol] = f"{normalized_symbol} — Símbolo manual"
                 set_active_symbol(st.session_state, normalized_symbol, current_symbols)
 
@@ -189,8 +202,10 @@ with st.sidebar:
         workspace_options,
         format_func=lambda symbol: catalog_labels.get(symbol, symbol),
         key="workspace_symbols",
+        on_change=_persist_workspace_symbols,
         help="Elimina aquí los instrumentos que no quieras analizar.",
     )
+    st.caption("La lista se guarda automáticamente en este equipo.")
     period_options = ["1y", "2y", "5y"]
     if ENGINE.settings.market.period not in period_options:
         period_options.append(ENGINE.settings.market.period)
