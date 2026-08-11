@@ -62,7 +62,13 @@ def _format_context_number(value, *, suffix: str = "", decimals: int = 1) -> str
     return f"{numeric:,.{decimals}f}{suffix}"
 
 
-def render_active_asset_context(ranking, active_symbol: str, labels=None) -> None:
+def render_active_asset_context(
+    ranking,
+    active_symbol: str,
+    labels=None,
+    *,
+    trailing_pe: float | None = None,
+) -> None:
     matches = ranking.loc[ranking["symbol"].eq(active_symbol)]
     row = matches.iloc[0] if not matches.empty else None
     name = row.get("name", active_symbol) if row is not None else active_symbol
@@ -77,6 +83,7 @@ def render_active_asset_context(ranking, active_symbol: str, labels=None) -> Non
             "N/D" if row is None else _format_context_number(row.get("price"), decimals=2),
             border=True,
         )
+        st.metric("PER histórico", _format_context_number(trailing_pe, suffix="x"), border=True)
         st.metric(
             "Score",
             "N/D" if row is None else _format_context_number(row.get("score"), suffix="/100"),

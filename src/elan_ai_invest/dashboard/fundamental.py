@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import math
 from collections.abc import Sequence
 
@@ -14,6 +15,8 @@ from elan_ai_invest.fundamental import (
 )
 
 from .workspace import activate_from_widget, symbol_options, sync_widget_to_active
+
+LOGGER = logging.getLogger(__name__)
 
 
 @st.cache_data(ttl=21600, max_entries=50, show_spinner=False)
@@ -37,6 +40,17 @@ def _format_ratio(value: float | None) -> str:
     if value is None or not math.isfinite(float(value)):
         return "N/D"
     return f"{float(value):,.1f}x"
+
+
+def load_trailing_pe(symbol: str) -> float | None:
+    try:
+        value = _load_fundamental(symbol).snapshot.trailing_pe
+    except Exception:
+        LOGGER.warning("PER no disponible | symbol=%s", symbol, exc_info=True)
+        return None
+    if value is None or not math.isfinite(float(value)):
+        return None
+    return float(value)
 
 
 def render_fundamental_tab(
