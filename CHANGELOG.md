@@ -1,7 +1,8 @@
 # Changelog
 
 ## Unreleased
-- Añadida una decimotercera pestaña lazy para comparar entre dos y seis divisas.
+- Añadida una decimotercera pestaña lazy para comparar entre dos y doce divisas.
+- Ampliado el universo FX a 15 monedas y el máximo seleccionable a 12.
 - Normalizadas las cotizaciones a USD por unidad de divisa antes de calcular
   desempeño base 100, matriz de correlaciones y correlación móvil.
 - Alineadas las sesiones sin forward-fill ni retornos cero inventados, con caché
@@ -14,7 +15,7 @@
 - Aislados los controles locales de histórico y comparador mediante fragmentos de Streamlit, preservando la carga lazy y la semántica financiera existente.
 - Forzado el renderizado SVG del comparador para funcionar también en navegadores sin WebGL.
 - Persistida en SQLite la lista de `Universo activo` para restaurarla tras recargas y reinicios.
-- Elevado el gate local a 189 pruebas y 81,46 % de cobertura.
+- Elevado el gate local a 190 pruebas y 81,46 % de cobertura.
 
 - Añadido News & Events Engine v1 con noticias recientes y próximos resultados, dividendos y fechas ex-dividendo desde Yahoo Finance.
 - Incorporada una duodécima pestaña de carga perezosa, caché configurable de 15 minutos y límite de 50 entradas.

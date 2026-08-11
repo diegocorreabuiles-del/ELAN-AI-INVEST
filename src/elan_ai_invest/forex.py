@@ -24,6 +24,12 @@ CURRENCY_SPECS = {
     "NZD": CurrencySpec("NZD", "Dólar neozelandés", "NZDUSD=X"),
     "COP": CurrencySpec("COP", "Peso colombiano", "COP=X", invert=True),
     "CNY": CurrencySpec("CNY", "Yuan chino", "CNY=X", invert=True),
+    "MXN": CurrencySpec("MXN", "Peso mexicano", "MXN=X", invert=True),
+    "BRL": CurrencySpec("BRL", "Real brasileño", "BRL=X", invert=True),
+    "INR": CurrencySpec("INR", "Rupia india", "INR=X", invert=True),
+    "SEK": CurrencySpec("SEK", "Corona sueca", "SEK=X", invert=True),
+    "NOK": CurrencySpec("NOK", "Corona noruega", "NOK=X", invert=True),
+    "SGD": CurrencySpec("SGD", "Dólar de Singapur", "SGD=X", invert=True),
 }
 DEFAULT_CURRENCIES = ("EUR", "GBP", "JPY", "COP")
 

@@ -5,11 +5,18 @@ import pandas as pd
 import pytest
 
 from elan_ai_invest.dashboard.forex import (
+    MAX_SELECTED_CURRENCIES,
     _correlation_figure,
     _performance_figure,
     _rolling_figure,
 )
-from elan_ai_invest.forex import build_forex_analysis, normalize_fx_prices
+from elan_ai_invest.forex import CURRENCY_SPECS, build_forex_analysis, normalize_fx_prices
+
+
+def test_forex_selector_supports_up_to_twelve_currencies() -> None:
+    assert MAX_SELECTED_CURRENCIES == 12
+    assert len(CURRENCY_SPECS) >= MAX_SELECTED_CURRENCIES
+    assert {"MXN", "BRL", "INR", "SEK", "NOK", "SGD"} <= set(CURRENCY_SPECS)
 
 
 def test_fx_normalization_uses_usd_per_currency_unit() -> None:

@@ -25,6 +25,7 @@ HORIZONS = {
     "5 años": "5y",
 }
 WINDOWS = (20, 60, 120)
+MAX_SELECTED_CURRENCIES = 12
 
 
 def _currency_label(code: str) -> str:
@@ -175,9 +176,10 @@ def _render_forex_dashboard(market_settings: MarketConfig) -> None:
             "Divisas frente al USD",
             list(CURRENCY_SPECS),
             default=list(DEFAULT_CURRENCIES),
-            max_selections=6,
+            max_selections=MAX_SELECTED_CURRENCIES,
             format_func=_currency_label,
             key="forex_currencies",
+            help="Selecciona entre 2 y 12 divisas para comparar.",
         )
         horizon_label = st.selectbox(
             "Horizonte",
