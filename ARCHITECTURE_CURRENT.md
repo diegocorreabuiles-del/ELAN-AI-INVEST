@@ -66,7 +66,7 @@ core.pipeline
 
 - `paper_trading.PaperTradingEngine` crea cuenta, posiciones, órdenes y snapshots en SQLite.
 - No hay cliente, SDK, endpoint ni credenciales de broker.
-- `storage.py` mantiene `analysis_history` en otra base SQLite.
+- `storage.py` mantiene `analysis_history` y la preferencia `workspace_preferences` en otra base SQLite.
 - Logging usa consola y `RotatingFileHandler`.
 
 ## Inventario de paquetes

@@ -14,7 +14,8 @@
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
 - Rama `feature/interactive-asset-workspace` abierta desde `develop@11f7495e470982cc6e86bbf2d7d19f2810fb37e2`.
 - Bloques 21 y 22 integrados; PR documental #21 fusionada y CI posterior `30698354050` verde.
-- Bloque 23 tiene candidato local `186d474`: activo global sincronizado, selección por fila, barra de contexto, fragmentos locales y comparador con trazas `go.Scatter` SVG y claves versionadas; pendiente matriz del nuevo `HEAD` y publicación por PR.
+- Bloque 23 cerrado técnicamente en `0a23623`: activo global sincronizado, selección por fila, barra de contexto, fragmentos locales y comparador SVG; pendiente publicación por PR.
+- Bloque 24 cerrado técnicamente en la rama local `feature/persistent-watchlist`, apilada sobre el Bloque 23: la lista de seguimiento se restaura y guarda en SQLite; validación manual aceptada y gate Windows verde.
 - `main@5cf2bca1cd98954c1c71e191368432d2b242d9ae`, con tag anotado `v1.3.0-rc.1`; no hay GitHub Release ni despliegue.
 - `stash@{0}` conserva metadata gzip local previa a la sincronización: `local gzip metadata before syncing develop`.
 - Producto local de análisis y paper trading; no conecta brokers ni dinero real.
@@ -23,9 +24,9 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 
 ## Gate vigente
 
-- Windows, Python 3.12.13: 178 pruebas, cobertura 81,40 % (mínimo 75 %); parche SVG con suite Streamlit, Ruff y Black verdes. Lock, `pip check`, mypy crítico y healthcheck conservan el último gate verde.
-- Linux/Docker sobre `2bc359f`, Python 3.11–3.14: 177 pruebas por versión y paquete verdes; el candidato `186d474` requiere repetir la matriz antes de integrar.
-- Artefacto reproducible del Bloque 23 sobre `2bc359f`: 171 archivos; SHA-256 `6ee8ccd76f89a758ea4d129f0700a6f815549d21f51c3a4616843410db10f7e6`.
+- Windows, Python 3.12.13: 183 pruebas, cobertura 81,48 % (mínimo 75 %); persistencia de la lista con pruebas SQLite/AppTest, Ruff y Black verdes. Lock, `pip check`, mypy crítico y healthcheck verdes.
+- Linux/Docker sobre `0a23623`, Python 3.11–3.14: 178 pruebas por versión y paquete verdes para el cierre del Bloque 23.
+- Artefacto reproducible del Bloque 23 sobre `0a23623`: 171 archivos; SHA-256 `0d1275e36c945b8f3710fb42348fa91efac6a7e908b16a1f1f383e001e44eab1`.
 - Última evidencia remota: CI `30698354050` sobre `11f7495e470982cc6e86bbf2d7d19f2810fb37e2`, verde en Python 3.11–3.14.
 - `develop` exige PR, checks estrictos, historial lineal y conversaciones resueltas; force-push y borrado deshabilitados.
 
@@ -44,6 +45,7 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 11. **Market Data:** detalle OHLCV solo para activo/horizonte visible, caché de 15 minutos y comparaciones con rendimientos consecutivos alineados. Calidad es metadata aditiva y no altera precios.
 12. **Noticias:** Yahoo solo al abrir la pestaña, con caché y límites; contexto de solo lectura, sin efecto en scoring, señales, riesgo, cartera ni paper trading.
 13. **Workspace conectado:** Mercado, Inteligencia, Fundamental, Noticias y Ranking comparten un activo global; selección de filas y fragmentos locales no eliminan la carga lazy ni cambian semántica financiera.
+14. **Lista persistente:** `workspace_preferences` guarda el `Universo activo` en SQLite local; `config/watchlist.csv` solo es el valor inicial cuando no existe preferencia.
 
 ## Reglas de implementación
 
@@ -74,6 +76,6 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 
 ## Siguiente paso
 
-- Ejecutar la matriz Linux/Docker Python 3.11–3.14 y verificar el artefacto reproducible sobre el candidato con parche SVG.
-- Después, publicar `feature/interactive-asset-workspace` y abrir PR hacia `develop` solo con autorización explícita.
+- Publicar el Bloque 23 y abrir PR hacia `develop` solo con autorización explícita; después integrar o realinear la rama local del Bloque 24.
+- Publicar el Bloque 24 mediante PR hacia `develop` solo después de resolver la dependencia con el Bloque 23 y con autorización explícita.
 - Mantener fuera de alcance brokers/dinero real y cualquier promoción a `main`, release o despliegue.

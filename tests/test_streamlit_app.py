@@ -28,6 +28,7 @@ from elan_ai_invest.news import (
     NewsItem,
 )
 from elan_ai_invest.paper_trading import RiskReviewResult, TradeResult
+from elan_ai_invest.storage import load_workspace_symbols, save_workspace_symbols
 
 ROOT = Path(__file__).resolve().parents[1]
 APP_PATH = ROOT / "app.py"
@@ -441,6 +442,49 @@ def test_app_searches_and_adds_global_instrument(app_environment: FakeEngine) ->
     primary = next(item for item in app.selectbox if item.label == "Activo principal")
     assert primary.value == "EMAAR.DU"
     assert "EMAAR.DU" in app_environment.requests[-1].symbols
+    assert not app.exception
+
+
+def test_workspace_symbols_survive_a_fresh_browser_session(
+    app_environment: FakeEngine,
+) -> None:
+    db_path = Path(app_environment.settings.storage.database_path)
+    save_workspace_symbols(db_path, ["MSFT", "NVDA"])
+
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
+
+    assert app.multiselect[0].value == ["MSFT", "NVDA"]
+    assert app_environment.requests[-1].symbols == ["MSFT", "NVDA"]
+
+    app.multiselect[0].set_value(["NVDA"]).run(timeout=APP_TEST_TIMEOUT)
+
+    assert load_workspace_symbols(db_path) == ["NVDA"]
+    assert not app.exception
+
+
+def test_persisted_workspace_replaces_stale_session_after_storage_upgrade(
+    app_environment: FakeEngine,
+) -> None:
+    db_path = Path(app_environment.settings.storage.database_path)
+    save_workspace_symbols(db_path, ["CIB", "NU"])
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT)
+    app.session_state["workspace_symbols"] = ["SPY"]
+
+    app.run(timeout=APP_TEST_TIMEOUT)
+
+    assert app.multiselect[0].value == ["CIB", "NU"]
+    assert app_environment.requests[-1].symbols == ["CIB", "NU"]
+    assert not app.exception
+
+
+def test_default_workspace_is_persisted_on_first_session(
+    app_environment: FakeEngine,
+) -> None:
+    db_path = Path(app_environment.settings.storage.database_path)
+
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
+
+    assert load_workspace_symbols(db_path) == app.multiselect[0].value
     assert not app.exception
 
 
