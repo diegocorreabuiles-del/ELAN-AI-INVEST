@@ -5,10 +5,10 @@ Plataforma local de análisis cuantitativo, fundamental, noticias, riesgo, carte
 ## Estado recuperado en este PC
 
 - La aplicación local se ejecuta en Python 3.12; la suite y los gates pasan en Python 3.11–3.14 sobre Linux.
-- El gate local incluye 190 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
+- El gate local incluye 192 pruebas; Ruff, Black y el type checking crítico con mypy también pasan.
 - El cierre de dependencias está verificado: 78 pins activos y `pip check` sin conflictos.
 - La política Git aplica `trabajo -> develop -> main`; la PR #10 promovió `1.3.0rc1` a `main` y su CI posterior pasó en Python 3.11–3.14.
-- El gate global de cobertura pasa con 81,46 %, por encima del 75 % configurado.
+- El gate global de cobertura pasa con 81,49 %, por encima del 75 % configurado.
 - AppTest recorre las trece vistas con datos deterministas y bloquea cualquier acceso a Yahoo.
 - El empaquetador seguro está reconstruido y cubierto por pruebas de integridad, rutas y reproducibilidad.
 
@@ -70,10 +70,11 @@ mes hasta el máximo histórico disponible. El panel muestra último cierre,
 rentabilidad del periodo, máximo, mínimo, distancia al máximo y volatilidad
 anualizada.
 
-El comparador alinea dos instrumentos, los rebasa a 100 y muestra dispersión y
-correlación móvil de sus rendimientos diarios. Para estudiar EUR/USD frente al
-dólar se pueden añadir `EURUSD=X` y `DX-Y.NYB`. La correlación no implica
-causalidad y puede cambiar con el tiempo.
+El comparador permite seleccionar entre dos y ocho instrumentos, los alinea en
+sesiones comunes, los rebasa a 100 y muestra una matriz de correlaciones. Dentro
+del grupo se elige un par focal para la dispersión y la correlación móvil. Para
+estudiar EUR/USD frente al dólar se pueden añadir `EURUSD=X` y `DX-Y.NYB`. La
+correlación no implica causalidad y puede cambiar con el tiempo.
 
 ## Divisas y correlaciones
 
@@ -156,7 +157,7 @@ Calidad estática reproducida también por CI:
 .\.venv\Scripts\python.exe -m mypy
 ```
 
-Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,46 % con 190 pruebas superadas.
+Pytest exige al menos 75 % de cobertura; el baseline local de esta rama es 81,49 % con 192 pruebas superadas.
 
 ## Matriz Python 3.11–3.14
 
