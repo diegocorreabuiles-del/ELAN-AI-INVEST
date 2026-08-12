@@ -4,7 +4,13 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from elan_ai_invest.dashboard.market import _history_chart, build_comparison_data
+from elan_ai_invest.dashboard.market import (
+    MAX_COMPARISON_INSTRUMENTS,
+    _history_chart,
+    _multi_comparison_figures,
+    build_comparison_data,
+    build_multi_comparison_data,
+)
 from elan_ai_invest.market_data import download_market_history
 
 
@@ -98,6 +104,30 @@ def test_comparison_rejects_same_or_unavailable_instruments() -> None:
         build_comparison_data(prices, "AAPL", "AAPL")
     with pytest.raises(ValueError, match="no tiene datos"):
         build_comparison_data(prices, "AAPL", "MSFT")
+
+
+def test_multi_comparison_uses_common_sessions_without_filling() -> None:
+    index = pd.bdate_range("2026-01-01", periods=80)
+    base_returns = np.linspace(-0.01, 0.01, len(index))
+    prices = pd.DataFrame(
+        {
+            "AAPL": 100 * np.cumprod(1 + base_returns),
+            "MSFT": 100 * np.cumprod(1 + base_returns * 0.8),
+            "BTC-USD": 100 * np.cumprod(1 - base_returns),
+        },
+        index=index,
+    )
+    prices.loc[index[20], "BTC-USD"] = np.nan
+
+    result = build_multi_comparison_data(prices, ["AAPL", "MSFT", "BTC-USD"])
+
+    assert MAX_COMPARISON_INSTRUMENTS == 8
+    assert result.normalized.iloc[0].tolist() == pytest.approx([100.0, 100.0, 100.0])
+    assert len(result.returns) == 78
+    assert result.correlation.shape == (3, 3)
+    performance, matrix = _multi_comparison_figures(result)
+    assert all(trace.type == "scatter" for trace in performance.data)
+    assert [trace.type for trace in matrix.data] == ["heatmap"]
 
 
 @pytest.mark.parametrize(

@@ -10,13 +10,14 @@
 - Mostrado el PER histórico en el panel principal y en Fundamental para la acción seleccionada.
 - Ampliado el catálogo curado con criptomonedas, stablecoins y memecoins principales compatibles con Yahoo; el PER queda limitado a acciones.
 - Movido el selector buscable del activo principal por encima de los KPI, aclarando que procede del Universo activo y sincronizándolo con todas las vistas.
+- Ampliado el comparador de Mercado a una selección simultánea de hasta ocho instrumentos, con desempeño conjunto, matriz de correlaciones y par focal.
 
 - Conectado un activo global entre Mercado, Inteligencia, Fundamental, Noticias y Ranking.
 - Añadida selección por fila en Ranking e Inteligencia y una barra de contexto con precio, score, señal y volatilidad.
 - Aislados los controles locales de histórico y comparador mediante fragmentos de Streamlit, preservando la carga lazy y la semántica financiera existente.
 - Forzado el renderizado SVG del comparador para funcionar también en navegadores sin WebGL.
 - Persistida en SQLite la lista de `Universo activo` para restaurarla tras recargas y reinicios.
-- Elevado el gate local a 190 pruebas y 81,46 % de cobertura.
+- Elevado el gate local a 192 pruebas y 81,49 % de cobertura.
 
 - Añadido News & Events Engine v1 con noticias recientes y próximos resultados, dividendos y fechas ex-dividendo desde Yahoo Finance.
 - Incorporada una duodécima pestaña de carga perezosa, caché configurable de 15 minutos y límite de 50 entradas.

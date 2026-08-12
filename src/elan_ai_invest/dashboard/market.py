@@ -30,6 +30,7 @@ HORIZONS = {
     "Máximo": "max",
 }
 CHART_VIEWS = ("Velas", "Línea", "Rentabilidad", "Volumen")
+MAX_COMPARISON_INSTRUMENTS = 8
 QUALITY_STATUS_LABELS = {
     MarketDataQualityStatus.HEALTHY: "Saludable",
     MarketDataQualityStatus.DEGRADED: "Degradado",
@@ -50,6 +51,13 @@ class ComparisonData:
     returns: pd.DataFrame
     rolling_correlation: pd.Series
     correlation: float
+
+
+@dataclass(frozen=True)
+class MultiComparisonData:
+    normalized: pd.DataFrame
+    returns: pd.DataFrame
+    correlation: pd.DataFrame
 
 
 @st.cache_data(ttl=900, max_entries=50, show_spinner=False)
@@ -108,6 +116,28 @@ def build_comparison_data(
     )
     rolling.name = "Correlación"
     return ComparisonData(normalized, returns, rolling.dropna(), correlation)
+
+
+def build_multi_comparison_data(
+    prices: pd.DataFrame,
+    symbols: list[str],
+) -> MultiComparisonData:
+    selected = list(dict.fromkeys(symbols))
+    if len(selected) < 2:
+        raise ValueError("Selecciona al menos dos instrumentos distintos.")
+    if any(symbol not in prices for symbol in selected):
+        raise ValueError("Uno de los instrumentos no tiene datos en el análisis actual.")
+
+    aligned = prices[selected].apply(pd.to_numeric, errors="coerce")
+    aligned = aligned.replace([np.inf, -np.inf], np.nan).dropna()
+    if len(aligned) < 3:
+        raise ValueError("No hay suficientes sesiones comunes para comparar.")
+
+    normalized = aligned.div(aligned.iloc[0]).mul(100.0)
+    returns = aligned.pct_change(fill_method=None).replace([np.inf, -np.inf], np.nan).dropna()
+    if len(returns) < 2:
+        raise ValueError("No hay suficientes rendimientos consecutivos para correlacionar.")
+    return MultiComparisonData(normalized, returns, returns.corr())
 
 
 def _price_metrics(history: pd.DataFrame) -> dict[str, float]:
@@ -266,6 +296,53 @@ def _comparison_figures(
     )
     rolling_chart.update_yaxes(range=[-1, 1])
     return normalized_chart, scatter, rolling_chart
+
+
+def _multi_comparison_figures(
+    comparison: MultiComparisonData,
+) -> tuple[go.Figure, go.Figure]:
+    normalized_chart = go.Figure()
+    for symbol in comparison.normalized.columns:
+        normalized_chart.add_trace(
+            go.Scatter(
+                x=comparison.normalized.index,
+                y=comparison.normalized[symbol],
+                mode="lines",
+                name=symbol,
+            )
+        )
+    normalized_chart.add_hline(y=100, line_dash="dash", line_color="#8B98A5")
+    normalized_chart.update_layout(
+        title="Desempeño conjunto · Base 100",
+        xaxis_title="Fecha",
+        yaxis_title="Base 100",
+        legend_title_text="Instrumento",
+        height=430,
+        margin={"l": 20, "r": 20, "t": 55, "b": 20},
+    )
+
+    correlation = comparison.correlation
+    matrix = go.Figure(
+        go.Heatmap(
+            z=correlation.to_numpy(),
+            x=correlation.columns,
+            y=correlation.index,
+            zmin=-1,
+            zmax=1,
+            zmid=0,
+            colorscale=[[0, "#FF5C70"], [0.5, "#2A333D"], [1, "#21C994"]],
+            text=correlation.round(2).to_numpy(),
+            texttemplate="%{text:.2f}",
+            colorbar={"title": "Correlación"},
+            hovertemplate="%{y} / %{x}<br>Correlación %{z:.3f}<extra></extra>",
+        )
+    )
+    matrix.update_layout(
+        title="Matriz de correlaciones",
+        height=430,
+        margin={"l": 20, "r": 20, "t": 55, "b": 20},
+    )
+    return normalized_chart, matrix
 
 
 def _format_observation(value) -> str:
@@ -442,20 +519,52 @@ def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> Non
         st.info("Añade al menos dos instrumentos al universo para activar el comparador.")
         return
 
-    default_first = available.index(primary_symbol) if primary_symbol in available else 0
+    first_default = primary_symbol if primary_symbol in available else available[0]
+    second_default = next(symbol for symbol in available if symbol != first_default)
+    stored = st.session_state.get("comparison_symbols", [])
+    valid_stored = [symbol for symbol in stored if symbol in available]
+    if len(valid_stored) < 2:
+        st.session_state["comparison_symbols"] = [first_default, second_default]
+    elif valid_stored != list(stored):
+        st.session_state["comparison_symbols"] = valid_stored
+
+    selected_symbols = st.multiselect(
+        "Instrumentos a comparar",
+        available,
+        max_selections=MAX_COMPARISON_INSTRUMENTS,
+        format_func=lambda symbol: labels.get(symbol, symbol),
+        key="comparison_symbols",
+        help="Selecciona entre 2 y 8 instrumentos para el desempeño y la matriz.",
+    )
+    if len(selected_symbols) < 2:
+        st.info("Selecciona al menos dos instrumentos para comparar.")
+        return
+
+    if st.session_state.get("comparison_first_symbol") not in selected_symbols:
+        st.session_state["comparison_first_symbol"] = selected_symbols[0]
+    if st.session_state.get(
+        "comparison_second_symbol"
+    ) not in selected_symbols or st.session_state.get(
+        "comparison_second_symbol"
+    ) == st.session_state.get(
+        "comparison_first_symbol"
+    ):
+        st.session_state["comparison_second_symbol"] = next(
+            symbol
+            for symbol in selected_symbols
+            if symbol != st.session_state["comparison_first_symbol"]
+        )
+
     with st.container(horizontal=True, vertical_alignment="bottom"):
         first_symbol = st.selectbox(
-            "Instrumento A",
-            available,
-            index=default_first,
+            "Instrumento focal A",
+            selected_symbols,
             format_func=lambda symbol: labels.get(symbol, symbol),
             key="comparison_first_symbol",
         )
-        second_default = 1 if default_first == 0 else 0
         second_symbol = st.selectbox(
-            "Instrumento B",
-            available,
-            index=second_default,
+            "Instrumento focal B",
+            selected_symbols,
             format_func=lambda symbol: labels.get(symbol, symbol),
             key="comparison_second_symbol",
         )
@@ -468,17 +577,22 @@ def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> Non
         )
 
     try:
-        comparison = build_comparison_data(
-            prices,
-            first_symbol,
-            second_symbol,
-            window=int(window),
-        )
+        group = build_multi_comparison_data(prices, selected_symbols)
     except ValueError as exc:
         st.info(str(exc))
         return
 
-    correlation_value = comparison.correlation
+    correlation_value = float(group.correlation.loc[first_symbol, second_symbol])
+    minimum_periods = min(20, int(window))
+    rolling = (
+        group.returns[first_symbol]
+        .rolling(int(window), min_periods=minimum_periods)
+        .corr(group.returns[second_symbol])
+        .dropna()
+    )
+    rolling.name = "Correlación"
+    comparison = ComparisonData(group.normalized, group.returns, rolling, correlation_value)
+
     correlation_text = f"{correlation_value:.3f}" if np.isfinite(correlation_value) else "N/D"
     st.metric(
         "Correlación de rendimientos diarios",
@@ -487,7 +601,8 @@ def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> Non
         border=True,
     )
 
-    normalized_chart, scatter, rolling_chart = _comparison_figures(
+    group_chart, matrix = _multi_comparison_figures(group)
+    _, scatter, rolling_chart = _comparison_figures(
         comparison,
         first_symbol,
         second_symbol,
@@ -497,28 +612,37 @@ def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> Non
     left, right = st.columns(2)
     with left:
         st.plotly_chart(
-            normalized_chart,
+            group_chart,
             width="stretch",
-            key="market_comparator_base100_svg_v3",
+            key="market_comparator_base100_svg_v4",
         )
     with right:
         st.plotly_chart(
-            scatter,
+            matrix,
             width="stretch",
-            key="market_comparator_scatter_svg_v3",
+            key="market_comparator_matrix_svg_v4",
         )
 
-    if comparison.rolling_correlation.empty:
-        st.info("Aún no hay suficientes sesiones para dibujar la correlación móvil.")
-    else:
+    focus_left, focus_right = st.columns(2)
+    with focus_left:
         st.plotly_chart(
-            rolling_chart,
+            scatter,
             width="stretch",
-            key="market_comparator_rolling_svg_v3",
+            key="market_comparator_scatter_svg_v4",
         )
+    with focus_right:
+        if comparison.rolling_correlation.empty:
+            st.info("Aún no hay suficientes sesiones para dibujar la correlación móvil.")
+        else:
+            st.plotly_chart(
+                rolling_chart,
+                width="stretch",
+                key="market_comparator_rolling_svg_v4",
+            )
     st.caption(
-        "La correlación usa rendimientos diarios consecutivos y alineados. "
-        "No implica causalidad ni garantiza que la relación se mantenga."
+        "Todos los instrumentos usan las mismas sesiones comunes y rendimientos diarios "
+        "consecutivos, sin rellenar datos. No implica causalidad ni garantiza que la "
+        "relación se mantenga."
     )
 
 
