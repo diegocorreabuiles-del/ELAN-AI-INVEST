@@ -40,7 +40,7 @@ def render_main_metrics(
 ) -> None:
     with st.container(horizontal=True, gap="xsmall"):
         st.metric("Régimen", market_regime, border=True)
-        st.metric("Score medio", f"{average_score:.1f}/100", border=True)
+        st.metric("Score global", f"{average_score:.1f}/100", border=True)
         st.metric("Riesgo cartera", risk_level, border=True)
         st.metric("Volatilidad", f"{annual_volatility_pct:.1f}%", border=True)
         st.metric(
