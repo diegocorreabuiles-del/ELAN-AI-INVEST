@@ -5,6 +5,8 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
+from elan_ai_invest.fx.registry import load_currency_registry
+
 
 @dataclass(frozen=True)
 class CurrencySpec:
@@ -14,23 +16,23 @@ class CurrencySpec:
     invert: bool = False
 
 
-CURRENCY_SPECS = {
-    "EUR": CurrencySpec("EUR", "Euro", "EURUSD=X"),
-    "GBP": CurrencySpec("GBP", "Libra esterlina", "GBPUSD=X"),
-    "JPY": CurrencySpec("JPY", "Yen japonés", "JPY=X", invert=True),
-    "CHF": CurrencySpec("CHF", "Franco suizo", "CHF=X", invert=True),
-    "CAD": CurrencySpec("CAD", "Dólar canadiense", "CAD=X", invert=True),
-    "AUD": CurrencySpec("AUD", "Dólar australiano", "AUDUSD=X"),
-    "NZD": CurrencySpec("NZD", "Dólar neozelandés", "NZDUSD=X"),
-    "COP": CurrencySpec("COP", "Peso colombiano", "COP=X", invert=True),
-    "CNY": CurrencySpec("CNY", "Yuan chino", "CNY=X", invert=True),
-    "MXN": CurrencySpec("MXN", "Peso mexicano", "MXN=X", invert=True),
-    "BRL": CurrencySpec("BRL", "Real brasileño", "BRL=X", invert=True),
-    "INR": CurrencySpec("INR", "Rupia india", "INR=X", invert=True),
-    "SEK": CurrencySpec("SEK", "Corona sueca", "SEK=X", invert=True),
-    "NOK": CurrencySpec("NOK", "Corona noruega", "NOK=X", invert=True),
-    "SGD": CurrencySpec("SGD", "Dólar de Singapur", "SGD=X", invert=True),
-}
+def _legacy_currency_specs() -> dict[str, CurrencySpec]:
+    registry = load_currency_registry()
+    specs: dict[str, CurrencySpec] = {}
+    for currency in registry.enabled():
+        if currency.code == "USD" or not currency.provider_symbol:
+            continue
+        invert = currency.provider_base == "USD" and currency.provider_quote == currency.code
+        specs[currency.code] = CurrencySpec(
+            currency.code,
+            currency.name,
+            currency.provider_symbol,
+            invert=invert,
+        )
+    return specs
+
+
+CURRENCY_SPECS = _legacy_currency_specs()
 DEFAULT_CURRENCIES = ("EUR", "GBP", "JPY", "COP")
 
 

@@ -1,0 +1,37 @@
+code,name,symbol,region,country,decimal_precision,enabled,data_provider,provider_symbol,provider_base,provider_quote,last_updated
+USD,Dólar estadounidense,$,Norteamérica,Estados Unidos,2,true,,,,,2026-08-14
+EUR,Euro,€,Europa,Zona euro,2,true,Yahoo,EURUSD=X,EUR,USD,2026-08-14
+GBP,Libra esterlina,£,Europa,Reino Unido,2,true,Yahoo,GBPUSD=X,GBP,USD,2026-08-14
+JPY,Yen japonés,¥,Asia,Japón,0,true,Yahoo,JPY=X,USD,JPY,2026-08-14
+CHF,Franco suizo,CHF,Europa,Suiza,2,true,Yahoo,CHF=X,USD,CHF,2026-08-14
+CAD,Dólar canadiense,C$,Norteamérica,Canadá,2,true,Yahoo,CAD=X,USD,CAD,2026-08-14
+AUD,Dólar australiano,A$,Oceanía,Australia,2,true,Yahoo,AUDUSD=X,AUD,USD,2026-08-14
+NZD,Dólar neozelandés,NZ$,Oceanía,Nueva Zelanda,2,true,Yahoo,NZDUSD=X,NZD,USD,2026-08-14
+COP,Peso colombiano,$,Latinoamérica,Colombia,2,true,Yahoo,COP=X,USD,COP,2026-08-14
+MXN,Peso mexicano,$,Latinoamérica,México,2,true,Yahoo,MXN=X,USD,MXN,2026-08-14
+CLP,Peso chileno,$,Latinoamérica,Chile,2,true,Yahoo,CLP=X,USD,CLP,2026-08-14
+BRL,Real brasileño,R$,Latinoamérica,Brasil,2,true,Yahoo,BRL=X,USD,BRL,2026-08-14
+ARS,Peso argentino,$,Latinoamérica,Argentina,2,true,Yahoo,ARS=X,USD,ARS,2026-08-14
+PEN,Sol peruano,S/,Latinoamérica,Perú,2,true,Yahoo,PEN=X,USD,PEN,2026-08-14
+UYU,Peso uruguayo,$U,Latinoamérica,Uruguay,2,true,Yahoo,UYU=X,USD,UYU,2026-08-14
+PYG,Guaraní paraguayo,₲,Latinoamérica,Paraguay,0,true,Yahoo,PYG=X,USD,PYG,2026-08-14
+BOB,Boliviano,Bs,Latinoamérica,Bolivia,2,true,Yahoo,BOB=X,USD,BOB,2026-08-14
+CRC,Colón costarricense,₡,Latinoamérica,Costa Rica,2,true,Yahoo,CRC=X,USD,CRC,2026-08-14
+DOP,Peso dominicano,RD$,Latinoamérica,República Dominicana,2,true,Yahoo,DOP=X,USD,DOP,2026-08-14
+GTQ,Quetzal guatemalteco,Q,Latinoamérica,Guatemala,2,true,Yahoo,GTQ=X,USD,GTQ,2026-08-14
+HNL,Lempira hondureño,L,Latinoamérica,Honduras,2,true,Yahoo,HNL=X,USD,HNL,2026-08-14
+CNY,Yuan chino,¥,Asia,China,2,true,Yahoo,CNY=X,USD,CNY,2026-08-14
+HKD,Dólar de Hong Kong,HK$,Asia,Hong Kong,2,true,Yahoo,HKD=X,USD,HKD,2026-08-14
+SGD,Dólar de Singapur,S$,Asia,Singapur,2,true,Yahoo,SGD=X,USD,SGD,2026-08-14
+INR,Rupia india,₹,Asia,India,2,true,Yahoo,INR=X,USD,INR,2026-08-14
+KRW,Won surcoreano,₩,Asia,Corea del Sur,0,true,Yahoo,KRW=X,USD,KRW,2026-08-14
+TRY,Lira turca,₺,Europa/Asia,Turquía,2,true,Yahoo,TRY=X,USD,TRY,2026-08-14
+ZAR,Rand sudafricano,R,África,Sudáfrica,2,true,Yahoo,ZAR=X,USD,ZAR,2026-08-14
+SEK,Corona sueca,kr,Europa,Suecia,2,true,Yahoo,SEK=X,USD,SEK,2026-08-14
+NOK,Corona noruega,kr,Europa,Noruega,2,true,Yahoo,NOK=X,USD,NOK,2026-08-14
+DKK,Corona danesa,kr,Europa,Dinamarca,2,true,Yahoo,DKK=X,USD,DKK,2026-08-14
+PLN,Zloty polaco,zł,Europa,Polonia,2,true,Yahoo,PLN=X,USD,PLN,2026-08-14
+CZK,Corona checa,Kč,Europa,República Checa,2,true,Yahoo,CZK=X,USD,CZK,2026-08-14
+HUF,Forinto húngaro,Ft,Europa,Hungría,2,true,Yahoo,HUF=X,USD,HUF,2026-08-14
+AED,Dirham de EAU,د.إ,Oriente Medio,Emiratos Árabes Unidos,2,true,Yahoo,AED=X,USD,AED,2026-08-14
+SAR,Riyal saudí,ر.س,Oriente Medio,Arabia Saudí,2,true,Yahoo,SAR=X,USD,SAR,2026-08-14

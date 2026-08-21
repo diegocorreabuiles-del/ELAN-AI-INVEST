@@ -18,9 +18,11 @@ import elan_ai_invest.dashboard.history as history_dashboard
 import elan_ai_invest.dashboard.market as market_dashboard
 import elan_ai_invest.dashboard.news as news_dashboard
 import elan_ai_invest.paper_trading as paper_module
+from elan_ai_invest.analysis import AssetProfile, AssetType, build_asset_analysis
 from elan_ai_invest.core.config import Settings
 from elan_ai_invest.core.models import AnalysisRequest, AnalysisResult
 from elan_ai_invest.fundamental.models import FundamentalAnalysis, FundamentalSnapshot
+from elan_ai_invest.fx import FxHistory, FxPair, FxRoute, FxRouteLeg, FxSourceType, ProviderPair
 from elan_ai_invest.market.quality import assess_market_data_quality
 from elan_ai_invest.news import (
     CorporateEvent,
@@ -289,6 +291,48 @@ def _forex_prices() -> pd.DataFrame:
     )
 
 
+def _fx_history(asset_id: str) -> FxHistory:
+    pair = FxPair(*asset_id.removeprefix("FX_").split("_"))
+    prices = _market_history().copy()
+    prices[["Open", "High", "Low", "Close"]] = prices[["Open", "High", "Low", "Close"]].div(100)
+    provider_pair = ProviderPair("Test", f"{pair.base}{pair.quote}=X", pair.base, pair.quote)
+    route = FxRoute(
+        pair,
+        FxSourceType.DIRECT,
+        (FxRouteLeg(pair.base, pair.quote, provider_pair, False),),
+    )
+    return FxHistory(
+        pair=pair,
+        prices=prices,
+        route=route,
+        coverage_ratio=1.0,
+        market_timestamp=pd.Timestamp(prices.index[-1]).tz_localize("UTC"),
+        received_at=datetime(2026, 8, 14, 12, tzinfo=UTC),
+    )
+
+
+def test_fx_comparison_normalizes_naive_and_aware_dates() -> None:
+    naive = pd.Series(
+        [1.0, 2.0],
+        index=pd.date_range("2026-01-01", periods=2),
+        name="naive",
+    )
+    aware = pd.Series(
+        [3.0, 4.0],
+        index=pd.date_range("2026-01-01", periods=2, tz="UTC"),
+        name="aware",
+    )
+    normalized = [
+        forex_dashboard._normalize_comparison_series(naive),
+        forex_dashboard._normalize_comparison_series(aware),
+    ]
+    combined = pd.concat(normalized, axis=1)
+
+    assert isinstance(combined.index, pd.DatetimeIndex)
+    assert str(combined.index.tz) == "UTC"
+    assert combined.notna().all().all()
+
+
 def _forbid_network(*args, **kwargs):
     del args, kwargs
     raise AssertionError("Las pruebas AppTest no pueden usar Yahoo ni la red.")
@@ -311,6 +355,16 @@ def app_environment(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> FakeEngi
         forex_dashboard,
         "_load_forex_prices",
         lambda *args: (_forex_prices(), ()),
+    )
+    monkeypatch.setattr(
+        forex_dashboard,
+        "_load_fx_pair_history",
+        lambda asset_id, *args: _fx_history(asset_id),
+    )
+    monkeypatch.setattr(
+        forex_dashboard,
+        "_load_comparison_close",
+        lambda symbol, *args: _market_history()["Close"].rename(symbol),
     )
     monkeypatch.setattr(
         fundamental_dashboard,
@@ -366,6 +420,28 @@ def _multiselect(app: AppTest, label: str):
     return next(item for item in app.multiselect if item.label == label)
 
 
+def _decision_terminal_script(asset_analysis):
+    import pandas as pd
+
+    from elan_ai_invest.dashboard.decision_terminal import render_decision_terminal
+
+    ranking = pd.DataFrame(
+        [
+            {
+                "symbol": asset_analysis.profile.symbol,
+                "score": 50.0,
+                "signal": "COMPRAR",
+            }
+        ]
+    )
+    render_decision_terminal(
+        asset_analysis,
+        ranking,
+        asset_analysis.profile.symbol,
+        {asset_analysis.profile.symbol: asset_analysis.profile.name},
+    )
+
+
 def _paper_view_script(paper_engine, latest_prices, selected, settings):
     from elan_ai_invest.dashboard.paper_trading import render_paper_trading_tab
 
@@ -386,7 +462,11 @@ def test_app_renders_every_view_and_simulated_actions(app_environment: FakeEngin
     assert app.title[0].value == "ELAN Quantum"
     assert len(app.metric) >= 10
     assert any(item.label == "Calidad global" for item in app.metric)
-    assert any(item.label == "PER histórico" and item.value == "28.0x" for item in app.metric)
+    assert any(item.label == "Score global" for item in app.metric)
+    assert any(item.label == "Convicción" for item in app.metric)
+    assert any(item.label == "Decisión" for item in app.metric)
+    assert any(item.label == "Confianza datos" for item in app.metric)
+    assert not any(item.label == "PER histórico" for item in app.metric)
     assert any("requieren atención" in item.value for item in app.warning)
     assert any(item.label == "Buscar o seleccionar activo" for item in app.selectbox)
     assert any("Procede de tu Universo activo" in item.value for item in app.caption)
@@ -403,8 +483,9 @@ def test_app_renders_every_view_and_simulated_actions(app_environment: FakeEngin
     assert any(item.label == "PER histórico" and item.value == "28.0x" for item in app.metric)
 
     _select_tab(app, tab_widget_id, "Divisas")
-    assert any(item.label == "Correlación focal" for item in app.metric)
-    assert any("USD por una unidad de divisa" in item.value for item in app.caption)
+    assert any(item.label == "Precio actual" for item in app.metric)
+    assert any(item.label == "Cobertura" for item in app.metric)
+    assert any("convención BASE/QUOTE" in item.value for item in app.caption)
 
     calls_before_refresh = len(app_environment.requests)
     _button(app, "Actualizar datos").click().run(timeout=APP_TEST_TIMEOUT)
@@ -533,8 +614,8 @@ def test_active_symbol_stays_synchronized_across_connected_views(
     primary.set_value("MSFT").run(timeout=APP_TEST_TIMEOUT)
 
     assert app.session_state["active_symbol"] == "MSFT"
-    assert any(item.label == "PER histórico" and item.value == "28.0x" for item in app.metric)
-    active_metric = next(item for item in app.metric if item.label == "Activo conectado")
+    assert not any(item.label == "PER histórico" for item in app.metric)
+    active_metric = next(item for item in app.metric if item.label == "Activo")
     assert active_metric.value.startswith("MSFT ·")
 
     tab_widget_id = _tab_widget_id(app)
@@ -585,14 +666,14 @@ def test_crypto_asset_skips_stock_pe(
     st.cache_data.clear()
 
     app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
-    assert fundamental_requests == ["AAPL"]
+    assert fundamental_requests == []
     primary = next(item for item in app.selectbox if item.label == "Buscar o seleccionar activo")
 
     primary.set_value("BTC-USD").run(timeout=APP_TEST_TIMEOUT)
 
     assert app.session_state["active_symbol"] == "BTC-USD"
-    assert any(item.label == "PER histórico" and item.value == "N/D" for item in app.metric)
-    assert fundamental_requests == ["AAPL"]
+    assert not any(item.label == "PER histórico" for item in app.metric)
+    assert fundamental_requests == []
 
 
 def test_app_stops_when_no_asset_is_selected(app_environment: FakeEngine) -> None:
@@ -648,6 +729,133 @@ def test_app_stops_on_empty_analysis(app_environment: FakeEngine) -> None:
 
     assert any("No hay datos suficientes" in item.value for item in app.error)
     assert not app.exception
+
+
+def test_decision_terminal_contains_history_failure(
+    app_environment: FakeEngine,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fail_history(*args, **kwargs):
+        del args, kwargs
+        raise RuntimeError("history fixture")
+
+    monkeypatch.setattr(market_dashboard, "_load_history", fail_history)
+
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
+
+    assert [tab.label for tab in app.tabs] == list(TAB_LABELS)
+    assert any("terminal de decisión" in item.value for item in app.error)
+    assert any("Referencia:" in item.value for item in app.error)
+    assert any(item.label == "Activo" for item in app.metric)
+    assert any("Decisión no disponible" in item.value for item in app.info)
+    assert all("history fixture" not in item.value for item in app.error)
+    assert not app.exception
+
+
+def test_crypto_terminal_separates_market_derivatives_and_onchain_data() -> None:
+    history = _market_history()
+    analysis = build_asset_analysis(
+        AssetProfile(
+            symbol="ETH-USD",
+            name="Ethereum",
+            asset_type=AssetType.CRYPTO,
+        ),
+        history,
+        benchmark_history=history["Close"] * 0.95,
+    )
+
+    app = AppTest.from_function(
+        _decision_terminal_script,
+        args=(analysis,),
+        default_timeout=20,
+    ).run()
+
+    _assert_no_ui_failure(app, "crypto terminal")
+    assert any(item.value == "Contexto crypto" for item in app.subheader)
+    assert any(item.label == "Fuerza vs BTC · 30D" for item in app.metric)
+    assert any("Funding: N/D" in item.value for item in app.caption)
+    assert any("MVRV: N/D" in item.value for item in app.caption)
+    assert not any(item.label == "Fundamental" for item in app.metric)
+
+
+def test_stablecoin_terminal_uses_peg_language_not_directional_metrics() -> None:
+    history = _market_history()
+    history["Open"] = 1.0
+    history["High"] = 1.002
+    history["Low"] = 0.998
+    history["Close"] = 1.0
+    analysis = build_asset_analysis(
+        AssetProfile(
+            symbol="USDC-USD",
+            name="USD Coin",
+            asset_type=AssetType.STABLECOIN,
+        ),
+        history,
+    )
+
+    app = AppTest.from_function(
+        _decision_terminal_script,
+        args=(analysis,),
+        default_timeout=20,
+    ).run()
+
+    _assert_no_ui_failure(app, "stablecoin terminal")
+    assert any(item.value == "Salud de stablecoin" for item in app.subheader)
+    assert any(item.label == "Peg health" for item in app.metric)
+    assert any(item.label == "Riesgo de depeg" and item.value == "BAJO" for item in app.metric)
+    assert not any(item.label == "Tendencia" for item in app.metric)
+    assert not any(item.label == "Fundamental" for item in app.metric)
+    assert any("no aplica a stablecoins" in item.value for item in app.info)
+
+
+def test_stablecoin_terminal_warns_when_observed_depeg_is_critical() -> None:
+    history = _market_history()
+    history["Open"] = 1.0
+    history["High"] = 1.002
+    history["Low"] = 0.998
+    history["Close"] = 1.0
+    history.loc[history.index[-10], "Close"] = 0.94
+    analysis = build_asset_analysis(
+        AssetProfile(
+            symbol="USDC-USD",
+            name="USD Coin",
+            asset_type=AssetType.STABLECOIN,
+        ),
+        history,
+    )
+
+    app = AppTest.from_function(
+        _decision_terminal_script,
+        args=(analysis,),
+        default_timeout=20,
+    ).run()
+
+    _assert_no_ui_failure(app, "critical stablecoin terminal")
+    assert any(item.label == "Riesgo de depeg" and item.value == "CRÍTICO" for item in app.metric)
+    assert any("riesgo material" in item.value.casefold() for item in app.warning)
+
+
+def test_meme_terminal_exposes_speculative_warning_and_missing_sources() -> None:
+    analysis = build_asset_analysis(
+        AssetProfile(
+            symbol="DOGE-USD",
+            name="Dogecoin",
+            asset_type=AssetType.MEME_COIN,
+        ),
+        _market_history(),
+    )
+
+    app = AppTest.from_function(
+        _decision_terminal_script,
+        args=(analysis,),
+        default_timeout=20,
+    ).run()
+
+    _assert_no_ui_failure(app, "meme terminal")
+    assert any(item.value == "Perfil meme coin" for item in app.subheader)
+    assert any("altamente especulativo" in item.value for item in app.warning)
+    assert any("Liquidez DEX: N/D" in item.value for item in app.caption)
+    assert not any(item.label == "Fundamental" for item in app.metric)
 
 
 def test_safe_render_contains_view_failure() -> None:

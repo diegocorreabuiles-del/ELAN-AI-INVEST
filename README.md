@@ -76,18 +76,19 @@ del grupo se elige un par focal para la dispersión y la correlación móvil. Pa
 estudiar EUR/USD frente al dólar se pueden añadir `EURUSD=X` y `DX-Y.NYB`. La
 correlación no implica causalidad y puede cambiar con el tiempo.
 
-## Divisas y correlaciones
+## Motor FX
 
-La pestaña **Divisas** compara entre dos y doce monedas con horizontes de seis
-meses a cinco años. Incluye desempeño base 100, matriz de correlaciones,
-correlación móvil de un par focal y una tabla resumen.
+La pestaña **Divisas** usa un catálogo maestro de 36 monedas y construye pares
+virtuales con identificadores `FX_BASE_QUOTE`. Permite buscar por código, nombre,
+país o par, invertir la orientación, consultar histórico y KPIs y conocer si la
+serie procede de un dato directo, inverso o sintético.
 
-Para que las comparaciones tengan una orientación coherente, todas las series se
-expresan como USD por una unidad de divisa. Los pares publicados por Yahoo como
-USD/JPY, USD/CHF, USD/CAD, USD/COP o USD/CNY se invierten antes de calcular
-rendimientos. Las fechas se alinean sin rellenar precios ni inventar retornos
-cero. La consulta solo se realiza al abrir la pestaña y se cachea durante 15
-minutos.
+El routing prioriza directo, inverso y rutas cortas mediante USD/EUR, sin
+almacenar todas las combinaciones. El comparador admite pares FX junto con
+acciones, índices, materias primas y criptomonedas. Las correlaciones usan log
+returns alineados por combinación y muestran observaciones, cobertura y fechas;
+no hay forward-fill, interpolación ni retornos cero inventados. Consulta el
+[contrato del motor FX](docs/fx_engine.md).
 
 ## Espacio de trabajo conectado
 
@@ -107,9 +108,15 @@ Streamlit para actualizar solo su panel. Las trece pestañas conservan su carga
 perezosa: una vista cerrada no consulta proveedores ni altera scoring, señales,
 riesgo, cartera o paper trading.
 
-El buscador distingue `Crypto`, `Stablecoin` y `Memecoin`. Estos activos usan
-pares contra USD de Yahoo y son solo informativos; el PER se muestra como `N/D`
-porque no es una métrica aplicable a criptoactivos.
+El buscador distingue `Crypto`, `Stablecoin` y `Memecoin`. La Terminal de
+Decisión aplica modelos separados: crypto muestra mercado/liquidez y fuerza frente
+a BTC; meme coins priorizan momentum, volumen y una advertencia especulativa;
+stablecoins evalúan peg y riesgo de depeg sin emitir una señal direccional ni plan
+tradicional. El PER y demás métricas corporativas no se aplican a estos activos.
+
+Funding, derivados, on-chain, DEX, holders, supply, reservas y riesgo del emisor se
+muestran como `N/D` mientras no exista una fuente verificable. Consulta el
+[inventario de fuentes y fallbacks](docs/decision_terminal_data_sources.md).
 
 ## Noticias y eventos
 
