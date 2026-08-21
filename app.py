@@ -5,15 +5,16 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
+from elan_ai_invest.analysis import classify_asset
 from elan_ai_invest.core.bootstrap import build_core_engine
 from elan_ai_invest.core.models import AnalysisRequest
 from elan_ai_invest.dashboard import (
     clear_market_history_cache,
     configure_page,
     ensure_active_symbol,
-    load_trailing_pe,
-    render_active_asset_context,
+    load_decision_analysis,
     render_backtesting_tab,
+    render_decision_terminal,
     render_forex_tab,
     render_fundamental_tab,
     render_header,
@@ -80,7 +81,6 @@ except Exception as exc:
 
 catalog_labels = labels_by_symbol(catalog)
 name_map = dict(zip(catalog["symbol"], catalog["name"], strict=True))
-asset_type_map = dict(zip(catalog["symbol"], catalog["asset_type"], strict=True))
 default_symbols = [
     symbol
     for symbol in watchlist["symbol"].astype(str).str.upper().tolist()
@@ -304,13 +304,39 @@ render_main_metrics(
     risk_report.var_95_pct,
     capital,
 )
-render_active_asset_context(
+active_profile = classify_asset(active_symbol, catalog)
+benchmark_history = (
+    prices[active_profile.benchmark]
+    if active_profile.benchmark in prices and active_profile.benchmark != active_symbol
+    else None
+)
+terminal_quality = (
+    analysis.quality.assets.get(active_symbol) if analysis.quality is not None else None
+)
+try:
+    terminal_analysis = load_decision_analysis(
+        active_profile,
+        period=period,
+        market_config=ENGINE.settings.market,
+        quality=terminal_quality,
+        benchmark_history=benchmark_history,
+        market_regime=analysis.market_regime,
+        annualisation_days=ENGINE.settings.risk.annualisation_days,
+        error_count=int(active_symbol in analysis.errors),
+    )
+except Exception as exc:
+    terminal_analysis = None
+    show_safe_error(
+        "La terminal de decisión no pudo completar el histórico del activo.",
+        exc,
+        context="app:decision-terminal",
+    )
+
+render_decision_terminal(
+    terminal_analysis,
     ranking,
     active_symbol,
     catalog_labels,
-    trailing_pe=(
-        load_trailing_pe(active_symbol) if asset_type_map.get(active_symbol) == "Stock" else None
-    ),
 )
 
 tabs = st.tabs(
@@ -412,7 +438,7 @@ if tabs[10].open:
         safe_render("Histórico", render_history_tab, ENGINE, DB_PATH, selected, period)
 if tabs[11].open:
     with tabs[11]:
-        safe_render("Divisas", render_forex_tab, ENGINE.settings.market)
+        safe_render("Divisas", render_forex_tab, ENGINE.settings.market, catalog)
 if tabs[12].open:
     with tabs[12]:
         safe_render("Sistema", render_system_tab, ROOT, ENGINE.settings)

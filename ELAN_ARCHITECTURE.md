@@ -22,7 +22,7 @@ app.py (Streamlit)
   -> backtesting.engine.BacktestEngine              [Backtesting Engine canónico]
   -> fundamental
   -> news (Yahoo, carga bajo demanda; solo contexto)
-  -> forex (Yahoo, normalización USD/unidad; solo análisis)
+  -> fx (registro, routing y cruces Yahoo; solo análisis)
   -> paper_trading (simulación SQLite; sin broker)
   -> dashboard/*
 ```
@@ -31,11 +31,13 @@ Los datos de mercado entran por el proveedor configurado, se validan con `market
 
 `news.YahooNewsEventsProvider` normaliza noticias y calendario corporativo fuera del Core Engine. La pestaña visible dispara la consulta, cacheada por `news.cache_ttl_seconds` y limitada a 50 entradas; un fallo parcial conserva la parte disponible y nunca alimenta scoring, señales, riesgo, cartera ni paper trading.
 
-`forex.build_forex_analysis()` normaliza los pares seleccionados a USD por una
-unidad de divisa, alinea sesiones y calcula rendimientos consecutivos, desempeño
-base 100, matriz de correlaciones y correlación móvil. La descarga solo ocurre al
-abrir la pestaña Divisas, usa caché Streamlit de 15 minutos y no alimenta el Core
-Engine, scoring, señales, riesgo, cartera ni paper trading.
+`fx.HistoricalFxService` resuelve pares canónicos `FX_BASE_QUOTE` con prioridad
+directa, inversa y sintética mediante rutas cortas. Normaliza timestamps a UTC,
+compone OHLC sobre fechas comunes y conserva proveedor, ruta y cobertura. La UI
+calcula log returns, correlaciones pareadas y rolling, reutiliza la caché CSV de
+mercado más una caché Streamlit de 15 minutos y no alimenta el Core Engine,
+scoring, señales, riesgo, cartera ni paper trading. `forex.py` permanece como
+fachada compatible para el comparador anterior.
 
 ## APIs canónicas
 

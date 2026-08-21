@@ -1,6 +1,13 @@
 # Changelog
 
 ## Unreleased
+- Sustituido el universo FX fijo por un catálogo maestro de 36 monedas y pares
+  virtuales `FX_BASE_QUOTE`, sin almacenar combinaciones redundantes.
+- Añadidos routing directo/inverso/sintético, históricos OHLC alineados en UTC,
+  log returns, cobertura, KPIs, validación triangular y caché CSV persistente.
+- Renovada la pestaña Divisas con búsqueda por moneda/país/par, botón invertir,
+  trazabilidad de cálculo y comparador FX con acciones, índices, materias primas
+  y criptomonedas.
 - Añadida una decimotercera pestaña lazy para comparar entre dos y doce divisas.
 - Ampliado el universo FX a 15 monedas y el máximo seleccionable a 12.
 - Normalizadas las cotizaciones a USD por unidad de divisa antes de calcular

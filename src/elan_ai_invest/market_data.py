@@ -91,6 +91,7 @@ def download_market_history(
     timeout_seconds: float = 10.0,
     max_retries: int = 2,
     backoff_seconds: float = 0.5,
+    cache: MarketCache | None = None,
     downloader: Callable[..., pd.DataFrame] | None = None,
     sleep: Callable[[float], None] = time.sleep,
 ) -> pd.DataFrame:
@@ -103,6 +104,17 @@ def download_market_history(
         raise ValueError("Los reintentos de mercado no pueden ser negativos")
     if backoff_seconds < 0:
         raise ValueError("El backoff de mercado no puede ser negativo")
+
+    if cache is not None:
+        cached = cache.load(normalized_symbol, period, interval)
+        if cached is not None:
+            try:
+                history = _extract_history(cached, normalized_symbol)
+            except ValueError:
+                pass
+            else:
+                if len(history) >= 2:
+                    return history
 
     download = downloader or _load_yfinance_downloader()
     attempts = max_retries + 1
@@ -124,6 +136,8 @@ def download_market_history(
             history = _extract_history(frame, normalized_symbol)
             if len(history) < 2:
                 raise ValueError("historial insuficiente: menos de 2 sesiones")
+            if cache is not None:
+                cache.save(normalized_symbol, history, period, interval)
             return history
         except Exception as exc:
             last_error = exc

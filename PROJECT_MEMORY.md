@@ -9,7 +9,7 @@
 3. Continuar desde «Siguiente paso» sin reabrir decisiones cerradas salvo evidencia nueva.
 4. Al cerrar un bloque, registrar únicamente estado, gates, decisiones nuevas y próximo paso.
 
-## Estado validado — 11 de agosto de 2026
+## Estado validado — 14 de agosto de 2026
 
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
 - Rama activa `feature/fx-correlation-module`, abierta desde `develop@4c19d28`.
@@ -21,12 +21,16 @@
 - `main@5cf2bca1cd98954c1c71e191368432d2b242d9ae`, con tag anotado `v1.3.0-rc.1`; no hay GitHub Release ni despliegue.
 - `stash@{0}` conserva metadata gzip local previa a la sincronización: `local gzip metadata before syncing develop`.
 - Producto local de análisis y paper trading; no conecta brokers ni dinero real.
+- Refactorización incremental de la Terminal de Decisión: Fases 3–9 implementadas localmente. `analysis/` ensambla clasificación, técnico/riesgo, Score Engine, Data Confidence, decisión, Trade Plan y modelos específicos Crypto/Meme Coin/Stablecoin; la UI los presenta sin alterar scoring productivo, cartera ni paper trading.
+- Motor FX estructural implementado localmente: registro versionado de 36 monedas, pares virtuales `FX_BASE_QUOTE`, routing directo/inverso/sintético, históricos OHLC UTC, log returns, cobertura, KPIs, calidad, caché CSV y comparador multiactivo; sin tablas nuevas, Supabase, scoring productivo, cartera ni paper trading.
 
 Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea actual.
 
 ## Gate vigente
 
-- Windows, Python 3.12.13: 192 pruebas, cobertura 81,49 % (mínimo 75 %); 13 vistas AppTest, Ruff, Black, mypy, lock, `pip check` y healthcheck verdes.
+- Windows, Python 3.12.13: gate local posterior al Motor FX certificado por segmentos equivalentes a la suite completa: 307/307 pruebas, incluidos 20 AppTests; cobertura global de ramas 80,4 % (mínimo 75 %); Ruff y Black globales, mypy de los 12 módulos FX afectados y `git diff --check` verdes. Mypy global conserva 55 errores históricos fuera de alcance. La segmentación evita el bloqueo observado en la ejecución monolítica de AppTest; no equivale a CI remoto ni integración.
+- Corrección UTC posterior: 23/23 pruebas enfocadas, AppTest integral de las 13 vistas, Ruff, Black, mypy dirigido y `git diff --check` verdes; Yahoo real validado para USD/COP, USD/MXN, USD/CLP, USD/BRL, USD/PEN y Brent; app local HTTP 200 en `8501`. La inspección visual automatizada no estuvo disponible por fallo DPAPI del navegador integrado.
+- Merge gate final de Terminal de Decisión y Motor FX: 308/308 pruebas, 20 AppTests, cobertura global de ramas 80,5 %, Ruff, Black, mypy configurado y dirigido a FX, lock, `pip check` y `git diff --check` verdes. La validación remota queda a cargo de la PR #24.
 - Linux/Docker sobre `0a23623`, Python 3.11–3.14: 178 pruebas por versión y paquete verdes para el cierre del Bloque 23.
 - Artefacto reproducible del Bloque 23 sobre `0a23623`: 171 archivos; SHA-256 `0d1275e36c945b8f3710fb42348fa91efac6a7e908b16a1f1f383e001e44eab1`.
 - Última evidencia remota: PR #23 fusionada en `develop@4c19d28`; CI posterior `31492357864` verde.
@@ -50,6 +54,12 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 14. **Lista persistente:** `workspace_preferences` guarda el `Universo activo` en SQLite local; `config/watchlist.csv` solo es el valor inicial cuando no existe preferencia.
 15. **Divisas:** todas las series se expresan como USD por una unidad de divisa; los pares USD/XXX se invierten antes de alinear sesiones y calcular retornos consecutivos, sin forward-fill ni retornos cero inventados. Es análisis de solo lectura.
 16. **Explicabilidad v1:** el Bloque 26 será local y determinista; explicará resultados existentes sin llamar LLM/API, sin consumir tokens, sin crear nuevas señales y sin modificar scoring, riesgo, cartera ni paper trading.
+17. **Score Engine de la Terminal de Decisión:** pesos centralizados por tipo de activo, ausencia como `None` con redistribución proporcional, stablecoins con componentes propios y decisión determinista limitada por riesgo, tendencia, régimen y Data Confidence. Permanece en investigación y no altera el scoring productivo ni paper trading.
+18. **Trade Plan de la Terminal de Decisión:** módulo long-only de investigación; entrada desde soporte observado, invalidación bajo soporte con colchón ATR, targets únicamente en resistencias observadas y R/R desde `entry_high`. Falla cerrado y no publica niveles parciales si falta histórico, ATR, soporte, dos resistencias o coherencia OHLC; no crea órdenes ni altera paper trading.
+19. **UI de Terminal de Decisión:** la cabecera separa visión global y activo seleccionado; PER permanece en Fundamental. Decisión, sub-scores, confianza, desglose técnico, plan y explicaciones estructuradas consumen `AssetAnalysis`; reutilizan el OHLCV cacheado de Mercado y fallan de forma contenida. Las 13 pestañas y `tab.open` permanecen intactas.
+20. **Modelos Crypto/Meme/Stablecoin:** solo derivan de OHLCV Yahoo ya disponible la fuerza relativa frente a BTC, actividad de volumen, ADV, momentum/RVOL y salud/desviación del peg. Derivados, on-chain, DEX, holders, social, reservas, emisor, supply y liquidez profunda permanecen `N/D` hasta disponer de proveedor explícito. Stablecoins usan decisión `ESPERAR`, lenguaje de depeg y ningún plan direccional tradicional. Todo permanece en investigación y sin ejecución real.
+21. **Gate adverso de la Terminal de Decisión:** la matriz cubre los 11 tipos de activo, histórico corto/incompleto, duplicados, valores no finitos, volumen cero, escalas extremas, volatilidad extrema y depeg transitorio o vigente. Scores y confianza permanecen finitos y acotados; ante evidencia insuficiente el análisis falla cerrado, no publica planes parciales, stablecoins permanecen en `ESPERAR` sin plan y meme/activos desconocidos no emiten decisiones alcistas no justificadas.
+22. **Motor FX:** `config/currencies.csv` es el catálogo maestro; los pares se generan virtualmente y usan `FX_BASE_QUOTE`. La resolución prioriza directo, inverso y rutas cortas vía USD/EUR con máximo dos intermediarios; los históricos se alinean en UTC mediante inner join, las correlaciones usan log returns pareados y reportan cobertura. Yahoo es el único proveedor y falla como `N/D`; la caché es CSV inerte. No hay tablas FX/Supabase ni integración con scoring productivo, cartera o paper trading.
 
 ## Reglas de implementación
 
@@ -80,7 +90,6 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 
 ## Siguiente paso
 
-- Publicar el Bloque 25 por PR hacia `develop` y esperar su matriz CI.
-- Fusionar el Bloque 25 solo con autorización explícita y checks verdes.
-- Iniciar el Bloque 26 desde el develop actualizado tras integrar el Bloque 25.
-- Mantener fuera de alcance brokers/dinero real y cualquier promoción a `main`, release o despliegue.
+- Validar visualmente con Yahoo real los pares prioritarios COP/MXN/CLP/BRL/PEN y una comparación macro con Brent; después preparar el cierre Git de las Fases 3–9 y el Motor FX mediante PR hacia `develop` cuando exista autorización explícita.
+- Mantener las Fases 3–9 aisladas del scoring productivo, cartera y paper trading; no añadir proveedores ni APIs sin inventario de fuente, campo, disponibilidad y fallback.
+- Publicar o integrar los cambios solo mediante PR hacia `develop` y con autorización explícita; mantener fuera brokers/dinero real y cualquier promoción a `main`, release o despliegue.

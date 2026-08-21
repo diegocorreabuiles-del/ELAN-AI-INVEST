@@ -9,6 +9,7 @@ GLD,GLD,SPDR Gold Shares,Commodity,United States,US,NYSE ARCA,US78463V1070,gold 
 GC=F,GC=F,Gold Futures,Commodity,Global,,COMEX,,gold oro futuro,ELAN curated
 SI=F,SI=F,Silver Futures,Commodity,Global,,COMEX,,silver plata futuro,ELAN curated
 CL=F,CL=F,Crude Oil WTI Futures,Commodity,Global,,NYMEX,,oil petroleo crudo wti,ELAN curated
+BZ=F,BZ=F,Brent Crude Oil Futures,Commodity,Global,,NYMEX,,brent oil petroleo crudo,ELAN curated
 NG=F,NG=F,Natural Gas Futures,Commodity,Global,,NYMEX,,natural gas gas natural,ELAN curated
 HG=F,HG=F,Copper Futures,Commodity,Global,,COMEX,,copper cobre,ELAN curated
 ZC=F,ZC=F,Corn Futures,Commodity,Global,,CBOT,,corn maiz,ELAN curated
