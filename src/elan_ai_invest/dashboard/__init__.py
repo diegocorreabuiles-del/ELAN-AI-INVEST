@@ -1,4 +1,5 @@
 from .backtesting import render_backtesting_tab
+from .decision_terminal import load_decision_analysis, render_decision_terminal
 from .forex import render_forex_tab
 from .fundamental import load_trailing_pe, render_fundamental_tab
 from .history import render_history_tab
@@ -24,9 +25,11 @@ __all__ = [
     "clear_market_history_cache",
     "configure_page",
     "ensure_active_symbol",
+    "load_decision_analysis",
     "load_trailing_pe",
     "render_active_asset_context",
     "render_backtesting_tab",
+    "render_decision_terminal",
     "render_fundamental_tab",
     "render_forex_tab",
     "render_header",
