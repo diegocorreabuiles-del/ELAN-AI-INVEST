@@ -210,13 +210,30 @@ with st.sidebar:
         help="Elimina aquí los instrumentos que no quieras analizar.",
     )
     st.caption("La lista se guarda automáticamente en este equipo.")
-    period_options = ["1y", "2y", "5y"]
-    if ENGINE.settings.market.period not in period_options:
-        period_options.append(ENGINE.settings.market.period)
+    period_labels = {
+        "1mo": "1 mes",
+        "3mo": "3 meses",
+        "6mo": "6 meses",
+        "1y": "1 año",
+        "2y": "2 años",
+        "5y": "5 años",
+        "10y": "10 años",
+        "max": "Máximo",
+    }
+    period_options = list(period_labels)
+    configured_period = str(ENGINE.settings.market.period)
+    if configured_period not in period_options:
+        period_options.append(configured_period)
+    requested_period = st.session_state.pop("market_period_request", None)
+    if requested_period in period_options:
+        st.session_state["analysis_period"] = requested_period
+    if st.session_state.get("analysis_period") not in period_options:
+        st.session_state["analysis_period"] = configured_period
     period = st.selectbox(
         "Horizonte histórico",
         period_options,
-        index=period_options.index(ENGINE.settings.market.period),
+        key="analysis_period",
+        format_func=lambda value: period_labels.get(value, value),
     )
     capital = st.number_input(
         "Capital simulado (€)",

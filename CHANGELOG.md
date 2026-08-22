@@ -18,6 +18,9 @@
 - Ampliado el catálogo curado con criptomonedas, stablecoins y memecoins principales compatibles con Yahoo; el PER queda limitado a acciones.
 - Movido el selector buscable del activo principal por encima de los KPI, aclarando que procede del Universo activo y sincronizándolo con todas las vistas.
 - Ampliado el comparador de Mercado a una selección simultánea de hasta ocho instrumentos, con desempeño conjunto, matriz de correlaciones y par focal.
+- Sincronizados los horizontes global y local de Mercado para que cambiar entre
+  un mes, uno, dos, cinco o diez años y máximo recargue tanto el histórico del
+  activo como el desempeño comparable.
 
 - Conectado un activo global entre Mercado, Inteligencia, Fundamental, Noticias y Ranking.
 - Añadida selección por fila en Ranking e Inteligencia y una barra de contexto con precio, score, señal y volatilidad.
