@@ -29,6 +29,8 @@ HORIZONS = {
     "10 años": "10y",
     "Máximo": "max",
 }
+ANALYSIS_PERIOD_KEY = "analysis_period"
+MARKET_PERIOD_REQUEST_KEY = "market_period_request"
 CHART_VIEWS = ("Velas", "Línea", "Rentabilidad", "Volumen")
 MAX_COMPARISON_INSTRUMENTS = 8
 QUALITY_STATUS_LABELS = {
@@ -81,6 +83,15 @@ def clear_market_history_cache() -> None:
     clear = getattr(_load_history, "clear", None)
     if callable(clear):
         clear()
+
+
+def _request_market_period() -> None:
+    horizon_label = st.session_state.get("market_detail_horizon")
+    requested_period = HORIZONS.get(horizon_label)
+    if requested_period is None:
+        return
+    st.session_state[MARKET_PERIOD_REQUEST_KEY] = requested_period
+    st.rerun(scope="app")
 
 
 def build_comparison_data(
@@ -406,12 +417,19 @@ def _render_quality_summary(report: MarketDataQualityReport | None) -> None:
 
 @st.fragment
 def _render_history_detail(primary_symbol: str, market_settings) -> None:
+    active_period = str(st.session_state.get(ANALYSIS_PERIOD_KEY, market_settings.period))
+    period_to_label = {period: label for label, period in HORIZONS.items()}
+    active_horizon_label = period_to_label.get(active_period, "1 año")
+    stored_horizon_label = st.session_state.get("market_detail_horizon")
+    if stored_horizon_label not in HORIZONS or HORIZONS[stored_horizon_label] != active_period:
+        st.session_state["market_detail_horizon"] = active_horizon_label
+
     with st.container(horizontal=True, vertical_alignment="bottom"):
         horizon_label = st.selectbox(
             "Horizonte del gráfico",
             list(HORIZONS),
-            index=3,
             key="market_detail_horizon",
+            on_change=_request_market_period,
         )
         chart_view = st.segmented_control(
             "Vista",

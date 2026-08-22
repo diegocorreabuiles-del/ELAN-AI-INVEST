@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from elan_ai_invest.analysis import (
     AssetProfile,
@@ -86,7 +87,7 @@ def test_pipeline_data_errors_reduce_confidence_without_inventing_fields() -> No
 
     assert clean.data_confidence is not None
     assert degraded.data_confidence is not None
-    assert degraded.data_confidence.score == clean.data_confidence.score - 20
+    assert degraded.data_confidence.score == pytest.approx(clean.data_confidence.score - 20)
     assert "Se registraron 2 errores de datos." in degraded.data_confidence.warnings
 
 

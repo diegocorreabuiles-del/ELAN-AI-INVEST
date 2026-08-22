@@ -31,6 +31,7 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 - Windows, Python 3.12.13: gate local posterior al Motor FX certificado por segmentos equivalentes a la suite completa: 307/307 pruebas, incluidos 20 AppTests; cobertura global de ramas 80,4 % (mínimo 75 %); Ruff y Black globales, mypy de los 12 módulos FX afectados y `git diff --check` verdes. Mypy global conserva 55 errores históricos fuera de alcance. La segmentación evita el bloqueo observado en la ejecución monolítica de AppTest; no equivale a CI remoto ni integración.
 - Corrección UTC posterior: 23/23 pruebas enfocadas, AppTest integral de las 13 vistas, Ruff, Black, mypy dirigido y `git diff --check` verdes; Yahoo real validado para USD/COP, USD/MXN, USD/CLP, USD/BRL, USD/PEN y Brent; app local HTTP 200 en `8501`. La inspección visual automatizada no estuvo disponible por fallo DPAPI del navegador integrado.
 - Merge gate final de Terminal de Decisión y Motor FX: 308/308 pruebas, 20 AppTests, cobertura global de ramas 80,5 %, Ruff, Black, mypy configurado y dirigido a FX, lock, `pip check` y `git diff --check` verdes. La validación remota queda a cargo de la PR #24.
+- Punto estable local del horizonte sincronizado de Mercado: 309/309 pruebas y cobertura global de ramas 82,7 %; Ruff, Black, mypy, lock, `pip check` y `git diff --check` verdes. El selector local actualiza el periodo global y el comparador; Yahoo real confirmó 251 sesiones para SPY `1y` frente a 1.255 para `5y`. La validación remota corresponde a la PR #24 después del push.
 - Linux/Docker sobre `0a23623`, Python 3.11–3.14: 178 pruebas por versión y paquete verdes para el cierre del Bloque 23.
 - Artefacto reproducible del Bloque 23 sobre `0a23623`: 171 archivos; SHA-256 `0d1275e36c945b8f3710fb42348fa91efac6a7e908b16a1f1f383e001e44eab1`.
 - Última evidencia remota: PR #23 fusionada en `develop@4c19d28`; CI posterior `31492357864` verde.
@@ -90,6 +91,6 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 
 ## Siguiente paso
 
-- Validar visualmente con Yahoo real los pares prioritarios COP/MXN/CLP/BRL/PEN y una comparación macro con Brent; después preparar el cierre Git de las Fases 3–9 y el Motor FX mediante PR hacia `develop` cuando exista autorización explícita.
+- Publicar el punto estable del horizonte sincronizado en `feature/fx-correlation-module` y esperar la matriz CI Python 3.11–3.14 de la PR #24; mantenerla sin fusionar hasta autorización explícita.
 - Mantener las Fases 3–9 aisladas del scoring productivo, cartera y paper trading; no añadir proveedores ni APIs sin inventario de fuente, campo, disponibilidad y fallback.
 - Publicar o integrar los cambios solo mediante PR hacia `develop` y con autorización explícita; mantener fuera brokers/dinero real y cualquier promoción a `main`, release o despliegue.

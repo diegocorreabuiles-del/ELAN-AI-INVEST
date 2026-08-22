@@ -493,6 +493,30 @@ def test_app_renders_every_view_and_simulated_actions(app_environment: FakeEngin
     _assert_no_ui_failure(app, "refresh")
 
 
+def test_market_chart_horizon_updates_full_analysis_and_history_loader(
+    app_environment: FakeEngine,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    loaded_periods: list[str] = []
+
+    def load_history(symbol, period, *args):
+        del symbol, args
+        loaded_periods.append(period)
+        return _market_history()
+
+    monkeypatch.setattr(market_dashboard, "_load_history", load_history)
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
+    horizon = next(item for item in app.selectbox if item.label == "Horizonte del gráfico")
+
+    horizon.set_value("5 años").run(timeout=APP_TEST_TIMEOUT)
+
+    _assert_no_ui_failure(app, "market horizon")
+    assert app_environment.requests[-1].period == "5y"
+    assert loaded_periods[-1] == "5y"
+    global_horizon = next(item for item in app.selectbox if item.label == "Horizonte histórico")
+    assert global_horizon.value == "5y"
+
+
 def test_paper_view_executes_only_simulated_actions(app_environment: FakeEngine) -> None:
     latest_prices = {
         symbol: float(series.dropna().iloc[-1])
