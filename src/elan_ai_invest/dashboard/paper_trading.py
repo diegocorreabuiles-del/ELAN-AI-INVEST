@@ -1,8 +1,21 @@
+from collections.abc import Mapping, Sequence
+from typing import Any
+
 import plotly.express as px
 import streamlit as st
 
+from elan_ai_invest.fx import is_fx_asset_id
 
-def _render_risk_control(paper_engine, positions, latest_prices):
+
+def _is_read_only_fx(symbol: str) -> bool:
+    return is_fx_asset_id(symbol) or str(symbol).upper().endswith("=X")
+
+
+def _render_risk_control(
+    paper_engine: Any,
+    positions: Any,
+    latest_prices: Mapping[str, float],
+) -> None:
     st.subheader("Control de riesgo simulado")
     st.caption(
         "Revisión manual con los últimos precios disponibles. No es tiempo real, "
@@ -54,7 +67,12 @@ def _render_risk_control(paper_engine, positions, latest_prices):
     st.rerun()
 
 
-def render_paper_trading_tab(paper_engine, latest_prices, selected, settings):
+def render_paper_trading_tab(
+    paper_engine: Any,
+    latest_prices: Mapping[str, float],
+    selected: Sequence[str],
+    settings: Any,
+) -> None:
     st.caption("Solo simulación. No existe conexión con broker ni dinero real.")
     if not settings.paper_trading.enabled or paper_engine is None:
         st.info("Paper trading está desactivado en config/settings.yaml.")
@@ -62,6 +80,10 @@ def render_paper_trading_tab(paper_engine, latest_prices, selected, settings):
     feedback = st.session_state.pop("paper_risk_review_feedback", None)
     if feedback:
         st.success(feedback)
+
+    tradable = [symbol for symbol in selected if not _is_read_only_fx(symbol)]
+    if len(tradable) != len(selected):
+        st.info("Las divisas son de solo lectura y no participan en el simulador de órdenes.")
 
     valuation = paper_engine.valuation(latest_prices)
     cols = st.columns(4)
@@ -71,15 +93,18 @@ def render_paper_trading_tab(paper_engine, latest_prices, selected, settings):
     cols[3].metric("Rentabilidad", f"{valuation['total_return_pct']:+.2f}%")
     buy_col, sell_col = st.columns(2)
     with buy_col:
-        symbol = st.selectbox("Activo a comprar", selected, key="paper_buy_symbol")
-        amount = st.number_input("Importe (€)", min_value=100.0, value=5000.0, step=500.0)
-        if st.button("Comprar en simulador", type="primary", width="stretch"):
-            result = paper_engine.buy(
-                symbol, amount, latest_prices.get(symbol, 0.0), reason="manual_dashboard"
-            )
-            st.success(result.message) if result.success else st.error(result.message)
-            if result.success:
-                st.rerun()
+        if not tradable:
+            st.info("Añade un activo no FX para habilitar compras simuladas.")
+        else:
+            symbol = st.selectbox("Activo a comprar", tradable, key="paper_buy_symbol")
+            amount = st.number_input("Importe (€)", min_value=100.0, value=5000.0, step=500.0)
+            if st.button("Comprar en simulador", type="primary", width="stretch"):
+                result = paper_engine.buy(
+                    symbol, amount, latest_prices.get(symbol, 0.0), reason="manual_dashboard"
+                )
+                st.success(result.message) if result.success else st.error(result.message)
+                if result.success:
+                    st.rerun()
     positions = paper_engine.positions(latest_prices)
     with sell_col:
         if positions.empty:

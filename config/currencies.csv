@@ -1,37 +1,156 @@
 code,name,symbol,region,country,decimal_precision,enabled,data_provider,provider_symbol,provider_base,provider_quote,last_updated
-USD,Dólar estadounidense,$,Norteamérica,Estados Unidos,2,true,,,,,2026-08-14
-EUR,Euro,€,Europa,Zona euro,2,true,Yahoo,EURUSD=X,EUR,USD,2026-08-14
-GBP,Libra esterlina,£,Europa,Reino Unido,2,true,Yahoo,GBPUSD=X,GBP,USD,2026-08-14
-JPY,Yen japonés,¥,Asia,Japón,0,true,Yahoo,JPY=X,USD,JPY,2026-08-14
-CHF,Franco suizo,CHF,Europa,Suiza,2,true,Yahoo,CHF=X,USD,CHF,2026-08-14
-CAD,Dólar canadiense,C$,Norteamérica,Canadá,2,true,Yahoo,CAD=X,USD,CAD,2026-08-14
-AUD,Dólar australiano,A$,Oceanía,Australia,2,true,Yahoo,AUDUSD=X,AUD,USD,2026-08-14
-NZD,Dólar neozelandés,NZ$,Oceanía,Nueva Zelanda,2,true,Yahoo,NZDUSD=X,NZD,USD,2026-08-14
-COP,Peso colombiano,$,Latinoamérica,Colombia,2,true,Yahoo,COP=X,USD,COP,2026-08-14
-MXN,Peso mexicano,$,Latinoamérica,México,2,true,Yahoo,MXN=X,USD,MXN,2026-08-14
-CLP,Peso chileno,$,Latinoamérica,Chile,2,true,Yahoo,CLP=X,USD,CLP,2026-08-14
-BRL,Real brasileño,R$,Latinoamérica,Brasil,2,true,Yahoo,BRL=X,USD,BRL,2026-08-14
-ARS,Peso argentino,$,Latinoamérica,Argentina,2,true,Yahoo,ARS=X,USD,ARS,2026-08-14
-PEN,Sol peruano,S/,Latinoamérica,Perú,2,true,Yahoo,PEN=X,USD,PEN,2026-08-14
-UYU,Peso uruguayo,$U,Latinoamérica,Uruguay,2,true,Yahoo,UYU=X,USD,UYU,2026-08-14
-PYG,Guaraní paraguayo,₲,Latinoamérica,Paraguay,0,true,Yahoo,PYG=X,USD,PYG,2026-08-14
-BOB,Boliviano,Bs,Latinoamérica,Bolivia,2,true,Yahoo,BOB=X,USD,BOB,2026-08-14
-CRC,Colón costarricense,₡,Latinoamérica,Costa Rica,2,true,Yahoo,CRC=X,USD,CRC,2026-08-14
-DOP,Peso dominicano,RD$,Latinoamérica,República Dominicana,2,true,Yahoo,DOP=X,USD,DOP,2026-08-14
-GTQ,Quetzal guatemalteco,Q,Latinoamérica,Guatemala,2,true,Yahoo,GTQ=X,USD,GTQ,2026-08-14
-HNL,Lempira hondureño,L,Latinoamérica,Honduras,2,true,Yahoo,HNL=X,USD,HNL,2026-08-14
-CNY,Yuan chino,¥,Asia,China,2,true,Yahoo,CNY=X,USD,CNY,2026-08-14
-HKD,Dólar de Hong Kong,HK$,Asia,Hong Kong,2,true,Yahoo,HKD=X,USD,HKD,2026-08-14
-SGD,Dólar de Singapur,S$,Asia,Singapur,2,true,Yahoo,SGD=X,USD,SGD,2026-08-14
-INR,Rupia india,₹,Asia,India,2,true,Yahoo,INR=X,USD,INR,2026-08-14
-KRW,Won surcoreano,₩,Asia,Corea del Sur,0,true,Yahoo,KRW=X,USD,KRW,2026-08-14
-TRY,Lira turca,₺,Europa/Asia,Turquía,2,true,Yahoo,TRY=X,USD,TRY,2026-08-14
-ZAR,Rand sudafricano,R,África,Sudáfrica,2,true,Yahoo,ZAR=X,USD,ZAR,2026-08-14
-SEK,Corona sueca,kr,Europa,Suecia,2,true,Yahoo,SEK=X,USD,SEK,2026-08-14
-NOK,Corona noruega,kr,Europa,Noruega,2,true,Yahoo,NOK=X,USD,NOK,2026-08-14
-DKK,Corona danesa,kr,Europa,Dinamarca,2,true,Yahoo,DKK=X,USD,DKK,2026-08-14
-PLN,Zloty polaco,zł,Europa,Polonia,2,true,Yahoo,PLN=X,USD,PLN,2026-08-14
-CZK,Corona checa,Kč,Europa,República Checa,2,true,Yahoo,CZK=X,USD,CZK,2026-08-14
-HUF,Forinto húngaro,Ft,Europa,Hungría,2,true,Yahoo,HUF=X,USD,HUF,2026-08-14
-AED,Dirham de EAU,د.إ,Oriente Medio,Emiratos Árabes Unidos,2,true,Yahoo,AED=X,USD,AED,2026-08-14
-SAR,Riyal saudí,ر.س,Oriente Medio,Arabia Saudí,2,true,Yahoo,SAR=X,USD,SAR,2026-08-14
+USD,Dólar estadounidense,$,Norteamérica,Estados Unidos,2,true,,,,,2026-08-22
+EUR,Euro,€,Europa,Zona euro,2,true,Yahoo,EURUSD=X,EUR,USD,2026-08-22
+GBP,Libra esterlina,£,Europa,Reino Unido,2,true,Yahoo,GBPUSD=X,GBP,USD,2026-08-22
+JPY,Yen japonés,¥,Asia,Japón,0,true,Yahoo,JPY=X,USD,JPY,2026-08-22
+CHF,Franco suizo,CHF,Europa,Suiza,2,true,Yahoo,CHF=X,USD,CHF,2026-08-22
+CAD,Dólar canadiense,C$,Norteamérica,Canadá,2,true,Yahoo,CAD=X,USD,CAD,2026-08-22
+AUD,Dólar australiano,A$,Oceanía,Australia,2,true,Yahoo,AUDUSD=X,AUD,USD,2026-08-22
+NZD,Dólar neozelandés,NZ$,Oceanía,Nueva Zelanda,2,true,Yahoo,NZDUSD=X,NZD,USD,2026-08-22
+COP,Peso colombiano,$,Latinoamérica,Colombia,2,true,Yahoo,COP=X,USD,COP,2026-08-22
+MXN,Peso mexicano,$,Latinoamérica,México,2,true,Yahoo,MXN=X,USD,MXN,2026-08-22
+CLP,Peso chileno,$,Latinoamérica,Chile,0,true,Yahoo,CLP=X,USD,CLP,2026-08-22
+BRL,Real brasileño,R$,Latinoamérica,Brasil,2,true,Yahoo,BRL=X,USD,BRL,2026-08-22
+ARS,Peso argentino,$,Latinoamérica,Argentina,2,true,Yahoo,ARS=X,USD,ARS,2026-08-22
+PEN,Sol peruano,S/,Latinoamérica,Perú,2,true,Yahoo,PEN=X,USD,PEN,2026-08-22
+UYU,Peso uruguayo,$U,Latinoamérica,Uruguay,2,true,Yahoo,UYU=X,USD,UYU,2026-08-22
+PYG,Guaraní paraguayo,₲,Latinoamérica,Paraguay,0,true,Yahoo,PYG=X,USD,PYG,2026-08-22
+BOB,Boliviano,Bs,Latinoamérica,Bolivia,2,true,Yahoo,BOB=X,USD,BOB,2026-08-22
+CRC,Colón costarricense,₡,Latinoamérica,Costa Rica,2,true,Yahoo,CRC=X,USD,CRC,2026-08-22
+DOP,Peso dominicano,RD$,Latinoamérica,República Dominicana,2,true,Yahoo,DOP=X,USD,DOP,2026-08-22
+GTQ,Quetzal guatemalteco,Q,Latinoamérica,Guatemala,2,true,Yahoo,GTQ=X,USD,GTQ,2026-08-22
+HNL,Lempira hondureño,L,Latinoamérica,Honduras,2,true,Yahoo,HNL=X,USD,HNL,2026-08-22
+CNY,Yuan chino,¥,Asia,China,2,true,Yahoo,CNY=X,USD,CNY,2026-08-22
+HKD,Dólar de Hong Kong,HK$,Asia,Hong Kong,2,true,Yahoo,HKD=X,USD,HKD,2026-08-22
+SGD,Dólar de Singapur,S$,Asia,Singapur,2,true,Yahoo,SGD=X,USD,SGD,2026-08-22
+INR,Rupia india,₹,Asia,India,2,true,Yahoo,INR=X,USD,INR,2026-08-22
+KRW,Won surcoreano,₩,Asia,Corea del Sur,0,true,Yahoo,KRW=X,USD,KRW,2026-08-22
+TRY,Lira turca,₺,Europa/Asia,Turquía,2,true,Yahoo,TRY=X,USD,TRY,2026-08-22
+ZAR,Rand sudafricano,R,África,Sudáfrica,2,true,Yahoo,ZAR=X,USD,ZAR,2026-08-22
+SEK,Corona sueca,kr,Europa,Suecia,2,true,Yahoo,SEK=X,USD,SEK,2026-08-22
+NOK,Corona noruega,kr,Europa,Noruega,2,true,Yahoo,NOK=X,USD,NOK,2026-08-22
+DKK,Corona danesa,kr,Europa,Dinamarca,2,true,Yahoo,DKK=X,USD,DKK,2026-08-22
+PLN,Zloty polaco,zł,Europa,Polonia,2,true,Yahoo,PLN=X,USD,PLN,2026-08-22
+CZK,Corona checa,Kč,Europa,República Checa,2,true,Yahoo,CZK=X,USD,CZK,2026-08-22
+HUF,Forinto húngaro,Ft,Europa,Hungría,2,true,Yahoo,HUF=X,USD,HUF,2026-08-22
+AED,Dirham de EAU,د.إ,Oriente Medio,Emiratos Árabes Unidos,2,true,Yahoo,AED=X,USD,AED,2026-08-22
+SAR,Riyal saudí,ر.س,Oriente Medio,Arabia Saudí,2,true,Yahoo,SAR=X,USD,SAR,2026-08-22
+AFN,Afghani,AFN,Global FX,AFGHANISTAN,2,true,Yahoo,AFN=X,USD,AFN,2026-08-22
+ALL,Lek,ALL,Global FX,ALBANIA,2,true,Yahoo,ALL=X,USD,ALL,2026-08-22
+AMD,Armenian Dram,AMD,Global FX,ARMENIA,2,false,,,,,2026-08-22
+AOA,Kwanza,AOA,Global FX,ANGOLA,2,false,,,,,2026-08-22
+AWG,Aruban Florin,AWG,Global FX,ARUBA,2,true,Yahoo,AWG=X,USD,AWG,2026-08-22
+AZN,Azerbaijan Manat,AZN,Global FX,AZERBAIJAN,2,false,,,,,2026-08-22
+BAM,Convertible Mark,BAM,Global FX,BOSNIA AND HERZEGOVINA,2,false,,,,,2026-08-22
+BBD,Barbados Dollar,BBD,Global FX,BARBADOS,2,true,Yahoo,BBD=X,USD,BBD,2026-08-22
+BDT,Taka,BDT,Global FX,BANGLADESH,2,true,Yahoo,BDT=X,USD,BDT,2026-08-22
+BHD,Bahraini Dinar,BHD,Global FX,BAHRAIN,3,true,Yahoo,BHD=X,USD,BHD,2026-08-22
+BIF,Burundi Franc,BIF,Global FX,BURUNDI,0,true,Yahoo,BIF=X,USD,BIF,2026-08-22
+BMD,Bermudian Dollar,BMD,Global FX,BERMUDA,2,true,Yahoo,BMD=X,USD,BMD,2026-08-22
+BND,Brunei Dollar,BND,Global FX,BRUNEI DARUSSALAM,2,true,Yahoo,BND=X,USD,BND,2026-08-22
+BSD,Bahamian Dollar,BSD,Global FX,BAHAMAS (THE),2,true,Yahoo,BSD=X,USD,BSD,2026-08-22
+BTN,Ngultrum,BTN,Global FX,BHUTAN,2,false,,,,,2026-08-22
+BWP,Pula,BWP,Global FX,BOTSWANA,2,true,Yahoo,BWP=X,USD,BWP,2026-08-22
+BYN,Belarusian Ruble,BYN,Global FX,BELARUS,2,true,Yahoo,BYN=X,USD,BYN,2026-08-22
+BZD,Belize Dollar,BZD,Global FX,BELIZE,2,true,Yahoo,BZD=X,USD,BZD,2026-08-22
+CDF,Congolese Franc,CDF,Global FX,CONGO (THE DEMOCRATIC REPUBLIC OF THE),2,true,Yahoo,CDF=X,USD,CDF,2026-08-22
+CUP,Cuban Peso,CUP,Global FX,CUBA,2,true,Yahoo,CUP=X,USD,CUP,2026-08-22
+CVE,Cabo Verde Escudo,CVE,Global FX,CABO VERDE,2,true,Yahoo,CVE=X,USD,CVE,2026-08-22
+DJF,Djibouti Franc,DJF,Global FX,DJIBOUTI,0,true,Yahoo,DJF=X,USD,DJF,2026-08-22
+DZD,Algerian Dinar,DZD,Global FX,ALGERIA,2,true,Yahoo,DZD=X,USD,DZD,2026-08-22
+EGP,Egyptian Pound,EGP,Global FX,EGYPT,2,true,Yahoo,EGP=X,USD,EGP,2026-08-22
+ERN,Nakfa,ERN,Global FX,ERITREA,2,false,,,,,2026-08-22
+ETB,Ethiopian Birr,ETB,Global FX,ETHIOPIA,2,true,Yahoo,ETB=X,USD,ETB,2026-08-22
+FJD,Fiji Dollar,FJD,Global FX,FIJI,2,true,Yahoo,FJD=X,USD,FJD,2026-08-22
+FKP,Falkland Islands Pound,FKP,Global FX,FALKLAND ISLANDS (THE) [MALVINAS],2,false,,,,,2026-08-22
+GEL,Lari,GEL,Global FX,GEORGIA,2,false,,,,,2026-08-22
+GHS,Ghana Cedi,GHS,Global FX,GHANA,2,true,Yahoo,GHS=X,USD,GHS,2026-08-22
+GIP,Gibraltar Pound,GIP,Global FX,GIBRALTAR,2,false,,,,,2026-08-22
+GMD,Dalasi,GMD,Global FX,GAMBIA (THE),2,true,Yahoo,GMD=X,USD,GMD,2026-08-22
+GNF,Guinean Franc,GNF,Global FX,GUINEA,0,true,Yahoo,GNF=X,USD,GNF,2026-08-22
+GYD,Guyana Dollar,GYD,Global FX,GUYANA,2,true,Yahoo,GYD=X,USD,GYD,2026-08-22
+HTG,Gourde,HTG,Global FX,HAITI,2,true,Yahoo,HTG=X,USD,HTG,2026-08-22
+IDR,Rupiah,IDR,Global FX,INDONESIA,2,true,Yahoo,IDR=X,USD,IDR,2026-08-22
+ILS,New Israeli Sheqel,ILS,Global FX,ISRAEL,2,true,Yahoo,ILS=X,USD,ILS,2026-08-22
+IQD,Iraqi Dinar,IQD,Global FX,IRAQ,3,true,Yahoo,IQD=X,USD,IQD,2026-08-22
+IRR,Iranian Rial,IRR,Global FX,IRAN (ISLAMIC REPUBLIC OF),2,true,Yahoo,IRR=X,USD,IRR,2026-08-22
+ISK,Iceland Krona,ISK,Global FX,ICELAND,0,true,Yahoo,ISK=X,USD,ISK,2026-08-22
+JMD,Jamaican Dollar,JMD,Global FX,JAMAICA,2,true,Yahoo,JMD=X,USD,JMD,2026-08-22
+JOD,Jordanian Dinar,JOD,Global FX,JORDAN,3,true,Yahoo,JOD=X,USD,JOD,2026-08-22
+KES,Kenyan Shilling,KES,Global FX,KENYA,2,true,Yahoo,KES=X,USD,KES,2026-08-22
+KGS,Som,KGS,Global FX,KYRGYZSTAN,2,false,,,,,2026-08-22
+KHR,Riel,KHR,Global FX,CAMBODIA,2,true,Yahoo,KHR=X,USD,KHR,2026-08-22
+KMF,Comorian Franc,KMF,Global FX,COMOROS (THE),0,true,Yahoo,KMF=X,USD,KMF,2026-08-22
+KPW,North Korean Won,KPW,Global FX,KOREA (THE DEMOCRATIC PEOPLE’S REPUBLIC OF),2,false,,,,,2026-08-22
+KWD,Kuwaiti Dinar,KWD,Global FX,KUWAIT,3,true,Yahoo,KWD=X,USD,KWD,2026-08-22
+KYD,Cayman Islands Dollar,KYD,Global FX,CAYMAN ISLANDS (THE),2,true,Yahoo,KYD=X,USD,KYD,2026-08-22
+KZT,Tenge,KZT,Global FX,KAZAKHSTAN,2,true,Yahoo,KZT=X,USD,KZT,2026-08-22
+LAK,Lao Kip,LAK,Global FX,LAO PEOPLE’S DEMOCRATIC REPUBLIC (THE),2,true,Yahoo,LAK=X,USD,LAK,2026-08-22
+LBP,Lebanese Pound,LBP,Global FX,LEBANON,2,true,Yahoo,LBP=X,USD,LBP,2026-08-22
+LKR,Sri Lanka Rupee,LKR,Global FX,SRI LANKA,2,true,Yahoo,LKR=X,USD,LKR,2026-08-22
+LRD,Liberian Dollar,LRD,Global FX,LIBERIA,2,true,Yahoo,LRD=X,USD,LRD,2026-08-22
+LSL,Loti,LSL,Global FX,LESOTHO,2,true,Yahoo,LSL=X,USD,LSL,2026-08-22
+LYD,Libyan Dinar,LYD,Global FX,LIBYA,3,true,Yahoo,LYD=X,USD,LYD,2026-08-22
+MAD,Moroccan Dirham,MAD,Global FX,MOROCCO; WESTERN SAHARA,2,true,Yahoo,MAD=X,USD,MAD,2026-08-22
+MDL,Moldovan Leu,MDL,Global FX,MOLDOVA (THE REPUBLIC OF),2,true,Yahoo,MDL=X,USD,MDL,2026-08-22
+MGA,Malagasy Ariary,MGA,Global FX,MADAGASCAR,2,true,Yahoo,MGA=X,USD,MGA,2026-08-22
+MKD,Denar,MKD,Global FX,NORTH MACEDONIA,2,true,Yahoo,MKD=X,USD,MKD,2026-08-22
+MMK,Kyat,MMK,Global FX,MYANMAR,2,false,,,,,2026-08-22
+MNT,Tugrik,MNT,Global FX,MONGOLIA,2,false,,,,,2026-08-22
+MOP,Pataca,MOP,Global FX,MACAO,2,true,Yahoo,MOP=X,USD,MOP,2026-08-22
+MRU,Ouguiya,MRU,Global FX,MAURITANIA,2,true,Yahoo,MRU=X,USD,MRU,2026-08-22
+MUR,Mauritius Rupee,MUR,Global FX,MAURITIUS,2,true,Yahoo,MUR=X,USD,MUR,2026-08-22
+MVR,Rufiyaa,MVR,Global FX,MALDIVES,2,true,Yahoo,MVR=X,USD,MVR,2026-08-22
+MWK,Malawi Kwacha,MWK,Global FX,MALAWI,2,true,Yahoo,MWK=X,USD,MWK,2026-08-22
+MYR,Malaysian Ringgit,MYR,Global FX,MALAYSIA,2,true,Yahoo,MYR=X,USD,MYR,2026-08-22
+MZN,Mozambique Metical,MZN,Global FX,MOZAMBIQUE,2,true,Yahoo,MZN=X,USD,MZN,2026-08-22
+NAD,Namibia Dollar,NAD,Global FX,NAMIBIA,2,true,Yahoo,NAD=X,USD,NAD,2026-08-22
+NGN,Naira,NGN,Global FX,NIGERIA,2,true,Yahoo,NGN=X,USD,NGN,2026-08-22
+NIO,Cordoba Oro,NIO,Global FX,NICARAGUA,2,true,Yahoo,NIO=X,USD,NIO,2026-08-22
+NPR,Nepalese Rupee,NPR,Global FX,NEPAL,2,true,Yahoo,NPR=X,USD,NPR,2026-08-22
+OMR,Rial Omani,OMR,Global FX,OMAN,3,true,Yahoo,OMR=X,USD,OMR,2026-08-22
+PAB,Balboa,PAB,Global FX,PANAMA,2,true,Yahoo,PAB=X,USD,PAB,2026-08-22
+PGK,Kina,PGK,Global FX,PAPUA NEW GUINEA,2,true,Yahoo,PGK=X,USD,PGK,2026-08-22
+PHP,Philippine Peso,PHP,Global FX,PHILIPPINES (THE),2,true,Yahoo,PHP=X,USD,PHP,2026-08-22
+PKR,Pakistan Rupee,PKR,Global FX,PAKISTAN,2,true,Yahoo,PKR=X,USD,PKR,2026-08-22
+QAR,Qatari Rial,QAR,Global FX,QATAR,2,true,Yahoo,QAR=X,USD,QAR,2026-08-22
+RON,Romanian Leu,RON,Global FX,ROMANIA,2,true,Yahoo,RON=X,USD,RON,2026-08-22
+RSD,Serbian Dinar,RSD,Global FX,SERBIA,2,true,Yahoo,RSD=X,USD,RSD,2026-08-22
+RUB,Russian Ruble,RUB,Global FX,RUSSIAN FEDERATION (THE),2,true,Yahoo,RUB=X,USD,RUB,2026-08-22
+RWF,Rwanda Franc,RWF,Global FX,RWANDA,0,true,Yahoo,RWF=X,USD,RWF,2026-08-22
+SBD,Solomon Islands Dollar,SBD,Global FX,SOLOMON ISLANDS,2,false,,,,,2026-08-22
+SCR,Seychelles Rupee,SCR,Global FX,SEYCHELLES,2,true,Yahoo,SCR=X,USD,SCR,2026-08-22
+SDG,Sudanese Pound,SDG,Global FX,SUDAN (THE),2,true,Yahoo,SDG=X,USD,SDG,2026-08-22
+SHP,Saint Helena Pound,SHP,Global FX,"SAINT HELENA, ASCENSION AND TRISTAN DA CUNHA",2,false,,,,,2026-08-22
+SLE,Leone,SLE,Global FX,SIERRA LEONE,2,false,,,,,2026-08-22
+SOS,Somali Shilling,SOS,Global FX,SOMALIA,2,true,Yahoo,SOS=X,USD,SOS,2026-08-22
+SRD,Surinam Dollar,SRD,Global FX,SURINAME,2,false,,,,,2026-08-22
+SSP,South Sudanese Pound,SSP,Global FX,SOUTH SUDAN,2,false,,,,,2026-08-22
+STN,Dobra,STN,Global FX,SAO TOME AND PRINCIPE,2,false,,,,,2026-08-22
+SVC,El Salvador Colon,SVC,Global FX,EL SALVADOR,2,true,Yahoo,SVC=X,USD,SVC,2026-08-22
+SYP,Syrian Pound,SYP,Global FX,SYRIAN ARAB REPUBLIC,2,false,,,,,2026-08-22
+SZL,Lilangeni,SZL,Global FX,ESWATINI,2,true,Yahoo,SZL=X,USD,SZL,2026-08-22
+THB,Baht,THB,Global FX,THAILAND,2,true,Yahoo,THB=X,USD,THB,2026-08-22
+TJS,Somoni,TJS,Global FX,TAJIKISTAN,2,false,,,,,2026-08-22
+TMT,Turkmenistan New Manat,TMT,Global FX,TURKMENISTAN,2,true,Yahoo,TMT=X,USD,TMT,2026-08-22
+TND,Tunisian Dinar,TND,Global FX,TUNISIA,3,true,Yahoo,TND=X,USD,TND,2026-08-22
+TOP,Pa’anga,TOP,Global FX,TONGA,2,false,,,,,2026-08-22
+TTD,Trinidad and Tobago Dollar,TTD,Global FX,TRINIDAD AND TOBAGO,2,true,Yahoo,TTD=X,USD,TTD,2026-08-22
+TWD,New Taiwan Dollar,TWD,Global FX,TAIWAN (PROVINCE OF CHINA),2,true,Yahoo,TWD=X,USD,TWD,2026-08-22
+TZS,Tanzanian Shilling,TZS,Global FX,"TANZANIA, UNITED REPUBLIC OF",2,true,Yahoo,TZS=X,USD,TZS,2026-08-22
+UAH,Hryvnia,UAH,Global FX,UKRAINE,2,true,Yahoo,UAH=X,USD,UAH,2026-08-22
+UGX,Uganda Shilling,UGX,Global FX,UGANDA,0,true,Yahoo,UGX=X,USD,UGX,2026-08-22
+UZS,Uzbekistan Sum,UZS,Global FX,UZBEKISTAN,2,true,Yahoo,UZS=X,USD,UZS,2026-08-22
+VED,Bolívar Soberano,VED,Global FX,VENEZUELA (BOLIVARIAN REPUBLIC OF),2,false,,,,,2026-08-22
+VES,Bolívar Soberano,VES,Global FX,VENEZUELA (BOLIVARIAN REPUBLIC OF),2,true,Yahoo,VES=X,USD,VES,2026-08-22
+VND,Dong,VND,Global FX,VIET NAM,0,true,Yahoo,VND=X,USD,VND,2026-08-22
+VUV,Vatu,VUV,Global FX,VANUATU,0,false,,,,,2026-08-22
+WST,Tala,WST,Global FX,SAMOA,2,false,,,,,2026-08-22
+XAF,CFA Franc BEAC,XAF,Global FX,CAMEROON; CENTRAL AFRICAN REPUBLIC (THE); CHAD; CONGO (THE); EQUATORIAL GUINEA; GABON,0,true,Yahoo,XAF=X,USD,XAF,2026-08-22
+XCD,East Caribbean Dollar,XCD,Global FX,ANGUILLA; ANTIGUA AND BARBUDA; DOMINICA; GRENADA; MONTSERRAT; SAINT KITTS AND NEVIS; SAINT LUCIA; SAINT VINCENT AND THE GRENADINES,2,true,Yahoo,XCD=X,USD,XCD,2026-08-22
+XCG,Caribbean Guilder,XCG,Global FX,CURAÇAO; SINT MAARTEN (DUTCH PART),2,false,,,,,2026-08-22
+XOF,CFA Franc BCEAO,XOF,Global FX,BENIN; BURKINA FASO; CÔTE D'IVOIRE; GUINEA-BISSAU; MALI; NIGER (THE); SENEGAL; TOGO,0,true,Yahoo,XOF=X,USD,XOF,2026-08-22
+XPF,CFP Franc,XPF,Global FX,FRENCH POLYNESIA; NEW CALEDONIA; WALLIS AND FUTUNA,0,true,Yahoo,XPF=X,USD,XPF,2026-08-22
+YER,Yemeni Rial,YER,Global FX,YEMEN,2,true,Yahoo,YER=X,USD,YER,2026-08-22
+ZMW,Zambian Kwacha,ZMW,Global FX,ZAMBIA,2,true,Yahoo,ZMW=X,USD,ZMW,2026-08-22
+ZWG,Zimbabwe Gold,ZWG,Global FX,ZIMBABWE,2,false,,,,,2026-08-22

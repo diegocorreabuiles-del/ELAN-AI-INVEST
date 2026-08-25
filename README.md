@@ -36,8 +36,12 @@ bolsa, y filtrar por tipo de activo, país y mercado. La copia local combina:
 - 63.185 acciones y ETF de 91 países procedentes de
   [Adanos Free Ticker Database](https://github.com/adanos-software/free-ticker-database),
   bajo licencia MIT;
-- una selección compatible con Yahoo de índices, materias primas, divisas,
-  bonos, criptomonedas principales, stablecoins y memecoins;
+- una selección compatible con Yahoo de índices, materias primas y bonos, más
+  54 criptoactivos con histórico verificado: 30 criptomonedas, 11 stablecoins y
+  13 memecoins;
+- los 127 pares directos de Yahoo derivados de las 128 divisas habilitadas en
+  `config/currencies.csv`; USD actúa como moneda de referencia y no crea un par
+  consigo misma;
 - entrada manual para cualquier símbolo exacto aceptado por Yahoo Finance.
 
 El catálogo de búsqueda y el proveedor de precios son capas distintas. Un
@@ -45,6 +49,9 @@ instrumento puede estar identificado correctamente aunque Yahoo no ofrezca
 histórico para esa bolsa. Los mercados compatibles se traducen automáticamente,
 por ejemplo BME (`.MC`), Hong Kong (`.HK`), Shanghái (`.SS`), Shenzhen (`.SZ`),
 Abu Dabi (`.AD`) y Dubái (`.DU`).
+
+Los filtros `Divisa`, país y mercado `FX` consumen el mismo registro maestro que
+la pestaña Divisas; no mantienen una lista Forex paralela.
 
 Actualizar la instantánea abierta:
 
@@ -78,10 +85,19 @@ correlación no implica causalidad y puede cambiar con el tiempo.
 
 ## Motor FX
 
-La pestaña **Divisas** usa un catálogo maestro de 36 monedas y construye pares
-virtuales con identificadores `FX_BASE_QUOTE`. Permite buscar por código, nombre,
-país o par, invertir la orientación, consultar histórico y KPIs y conocer si la
-serie procede de un dato directo, inverso o sintético.
+La pestaña **Divisas** usa un catálogo maestro de 155 monedas ISO 4217 activas.
+La instantánea actual habilita las 128 que tienen al menos dos sesiones
+utilizables en Yahoo y construye 16.256 pares virtuales con identificadores
+`FX_BASE_QUOTE`. Permite buscar por código, nombre, país o par, invertir la
+orientación, consultar histórico y KPIs y conocer si la serie procede de un
+dato directo, inverso o sintético.
+Los cruces virtuales también se pueden buscar desde el selector principal
+escribiendo, por ejemplo, `EUR/GBP` o `NGN/XOF`. Una vez añadidos al universo,
+participan en precios, calidad, ranking, riesgo, gráficos y correlaciones. Se
+mantienen como instrumentos de solo lectura: PER y fundamentales aparecen como
+`N/D`, y quedan excluidos de la cartera propuesta y de paper trading.
+
+
 
 El routing prioriza directo, inverso y rutas cortas mediante USD/EUR, sin
 almacenar todas las combinaciones. El comparador admite pares FX junto con
@@ -104,15 +120,19 @@ se restaura al recargar la página o reiniciar la aplicación. `config/watchlist
 solo actúa como valor inicial cuando todavía no existe una preferencia guardada.
 
 Los controles locales del gráfico histórico y del comparador usan fragmentos de
-Streamlit para actualizar solo su panel. Las trece pestañas conservan su carga
-perezosa: una vista cerrada no consulta proveedores ni altera scoring, señales,
-riesgo, cartera o paper trading.
+Streamlit para actualizar solo su panel. Las trece vistas usan una navegación
+superior compacta y conservan su carga perezosa: solo la vista seleccionada
+consulta proveedores, sin alterar scoring, señales, riesgo, cartera o paper
+trading.
 
-El buscador distingue `Crypto`, `Stablecoin` y `Memecoin`. La Terminal de
-Decisión aplica modelos separados: crypto muestra mercado/liquidez y fuerza frente
-a BTC; meme coins priorizan momentum, volumen y una advertencia especulativa;
-stablecoins evalúan peg y riesgo de depeg sin emitir una señal direccional ni plan
-tradicional. El PER y demás métricas corporativas no se aplican a estos activos.
+El filtro `Criptoactivos (todos)` reúne `Crypto`, `Stablecoin` y `Memecoin` sin
+perder sus filtros especializados. La Terminal de Decisión aplica modelos
+separados: crypto muestra mercado/liquidez y fuerza frente a BTC; meme coins
+priorizan momentum, volumen y una advertencia especulativa; stablecoins evalúan
+peg y riesgo de depeg sin emitir una señal direccional ni plan tradicional. El PER
+y demás métricas corporativas no se aplican a estos activos. Las CBDC no se
+presentan como instrumentos de mercado: son pasivos de bancos centrales y no
+tienen un ticker público negociable en Yahoo.
 
 Funding, derivados, on-chain, DEX, holders, supply, reservas y riesgo del emisor se
 muestran como `N/D` mientras no exista una fuente verificable. Consulta el

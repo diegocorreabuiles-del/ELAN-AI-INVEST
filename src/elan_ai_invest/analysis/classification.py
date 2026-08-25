@@ -18,8 +18,34 @@ _CATALOG_TYPES = {
     "index": AssetType.INDEX,
     "fund": AssetType.FUND,
 }
-_STABLECOINS = {"USDT-USD", "USDC-USD", "DAI-USD"}
-_MEME_COINS = {"DOGE-USD", "SHIB-USD", "PEPE24478-USD", "BONK-USD"}
+_STABLECOINS = {
+    "DAI-USD",
+    "FDUSD-USD",
+    "FRAX-USD",
+    "GUSD-USD",
+    "PYUSD-USD",
+    "RLUSD-USD",
+    "TUSD-USD",
+    "USDC-USD",
+    "USDD-USD",
+    "USDE29470-USD",
+    "USDT-USD",
+}
+_MEME_COINS = {
+    "BONK-USD",
+    "BRETT29743-USD",
+    "DOGE-USD",
+    "FARTCOIN-USD",
+    "FLOKI-USD",
+    "MOG-USD",
+    "PENGU34466-USD",
+    "PEPE24478-USD",
+    "SHIB-USD",
+    "SPX28081-USD",
+    "TRUMP35336-USD",
+    "TURBO-USD",
+    "WIF-USD",
+}
 _EQUITY_SUFFIXES = (
     ".AD",
     ".AX",
@@ -76,11 +102,13 @@ def _profile_from_row(symbol: str, row: Mapping[str, object]) -> AssetProfile:
 
 
 def _infer_profile(symbol: str) -> AssetProfile:
+    from elan_ai_invest.fx.models import is_fx_asset_id
+
     if symbol in _STABLECOINS:
         asset_type = AssetType.STABLECOIN
     elif symbol in _MEME_COINS:
         asset_type = AssetType.MEME_COIN
-    elif symbol.endswith("=X"):
+    elif is_fx_asset_id(symbol) or symbol.endswith("=X"):
         asset_type = AssetType.FOREX
     elif symbol.startswith("^"):
         asset_type = AssetType.INDEX

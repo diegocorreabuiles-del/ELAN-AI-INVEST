@@ -11,9 +11,10 @@ publicada con licencia MIT. La copia local se descargó el 28 de julio de 2026:
 - licencia preservada en `ADANOS_LICENSE.txt`.
 
 La instantánea aporta acciones y ETF con ticker, nombre, bolsa, país e ISIN.
-`config/instruments.csv` añade índices, materias primas, divisas, bonos,
-criptomonedas principales, stablecoins, memecoins y símbolos conocidos en
-formato Yahoo.
+`config/instruments.csv` añade índices, materias primas, divisas y bonos, además
+de 30 criptomonedas, 11 stablecoins y 13 memecoins con símbolos Yahoo y
+histórico mensual comprobado el 26 de agosto de 2026. Las CBDC se excluyen
+porque no son instrumentos públicos cotizados.
 
 El catálogo sirve para descubrir instrumentos. Los precios siguen procediendo
 del proveedor Yahoo configurado por la aplicación: que un valor aparezca en el

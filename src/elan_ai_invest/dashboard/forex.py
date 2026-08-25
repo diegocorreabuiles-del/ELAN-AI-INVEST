@@ -763,6 +763,41 @@ def _render_fx_engine_dashboard(
     registry = load_currency_registry()
     virtual_catalog = build_virtual_fx_catalog(registry)
     codes = list(registry.codes())
+    disabled = registry.disabled()
+    with st.container(horizontal=True):
+        st.metric("Divisas con histórico", str(len(codes)), border=True)
+        st.metric("Pares virtuales", f"{len(virtual_catalog):,}".replace(",", "."), border=True)
+        st.metric("Cobertura ISO", f"{len(codes)}/{len(registry.all())}", border=True)
+        st.metric("Proveedor", "Yahoo", border=True)
+    st.caption(
+        "El universo incluye monedas ISO 4217 con histórico verificado en Yahoo. "
+        "La disponibilidad de una cotización no implica libre convertibilidad, "
+        "liquidez institucional ni posibilidad de negociación minorista."
+    )
+    coverage = st.expander("Cobertura del catálogo FX", on_change="rerun")
+    if coverage.open:
+        with coverage:
+            currencies = registry.all()
+            catalog_frame = pd.DataFrame(
+                {
+                    "Código": [currency.code for currency in currencies],
+                    "Moneda": [currency.name for currency in currencies],
+                    "País o zona": [currency.country for currency in currencies],
+                    "Región": [currency.region for currency in currencies],
+                    "Estado": [
+                        "Disponible" if currency.enabled else "Sin histórico Yahoo"
+                        for currency in currencies
+                    ],
+                    "Símbolo Yahoo": [currency.provider_symbol or "N/D" for currency in currencies],
+                }
+            )
+            st.dataframe(catalog_frame, hide_index=True, width="stretch")
+            if disabled:
+                st.caption(
+                    "Sin histórico Yahoo en la última sincronización: "
+                    + ", ".join(currency.code for currency in disabled)
+                    + "."
+                )
     if st.session_state.get("fx_engine_base") not in codes:
         st.session_state["fx_engine_base"] = "EUR"
     if st.session_state.get("fx_engine_quote") not in codes:

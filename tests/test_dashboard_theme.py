@@ -19,6 +19,10 @@ def test_trading_workspace_theme_uses_accessible_dark_palette() -> None:
     assert theme["redColor"] == "#FF5C70"
     assert theme["showWidgetBorder"] is True
     assert theme["showSidebarBorder"] is True
+    assert theme["font"] == theme["headingFont"] == "sans-serif"
+    assert theme["baseFontSize"] == 14
+    assert theme["headingFontSizes"] == ["28px", "22px", "18px", "16px", "14px", "13px"]
+    assert theme["headingFontWeights"] == [650, 600, 600, 600, 600, 600]
 
 
 def test_sidebar_is_visually_distinct_from_the_trading_canvas() -> None:

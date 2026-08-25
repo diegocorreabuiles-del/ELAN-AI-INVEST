@@ -1,6 +1,6 @@
 # Arquitectura canónica de ELAN Quantum v1.3.0rc1
 
-> **Estado verificado (29 de julio de 2026).** `1.3.0rc1` está etiquetada en `main`; `develop` integra calidad de Market Data y esta rama añade noticias y eventos de solo lectura sin activar broker, dinero real, release ni despliegue.
+> **Estado local verificado (25 de agosto de 2026).** `1.3.0rc1` permanece etiquetada en `main`; la rama `feature/fx-correlation-module` añade el proveedor compuesto FX sin activar broker, dinero real, release ni despliegue.
 
 Estado: arquitectura vigente tras la Fase 1 de estabilización. `ARCHITECTURE_CURRENT.md` conserva la fotografía anterior a la limpieza.
 
@@ -10,8 +10,10 @@ Estado: arquitectura vigente tras la Fase 1 de estabilización. `ARCHITECTURE_CU
 app.py (Streamlit)
   -> core.bootstrap.build_core_engine()
   -> core.engine.CoreEngine                         [pipeline canónico]
-       -> providers.yahoo.YahooMarketDataProvider
-       -> market_data.download_adjusted_close()
+       -> providers.fx_aware.FxAwareMarketDataProvider
+            -> providers.yahoo.YahooMarketDataProvider
+            -> fx.HistoricalFxService
+       -> market_data / fx history
             -> market.quality.assess_market_data_quality()
             -> market.cache.MarketCache (CSV inerte, TTL, escritura atómica)
        -> scoring + quant
@@ -33,11 +35,13 @@ Los datos de mercado entran por el proveedor configurado, se validan con `market
 
 `fx.HistoricalFxService` resuelve pares canónicos `FX_BASE_QUOTE` con prioridad
 directa, inversa y sintética mediante rutas cortas. Normaliza timestamps a UTC,
-compone OHLC sobre fechas comunes y conserva proveedor, ruta y cobertura. La UI
-calcula log returns, correlaciones pareadas y rolling, reutiliza la caché CSV de
-mercado más una caché Streamlit de 15 minutos y no alimenta el Core Engine,
-scoring, señales, riesgo, cartera ni paper trading. `forex.py` permanece como
-fachada compatible para el comparador anterior.
+compone OHLC sobre fechas comunes y conserva proveedor, ruta y cobertura.
+`FxAwareMarketDataProvider` combina estas series con los símbolos Yahoo y
+entrega al Core Engine la matriz usada por calidad, scoring, ranking y riesgo.
+La UI añade gráficos, correlaciones pareadas, rolling y Terminal de Decisión,
+reutilizando la caché de mercado. FX permanece fuera de Portfolio y paper
+trading; Fundamental y PER degradan a `N/D`. `forex.py` conserva la vista
+especializada.
 
 ## APIs canónicas
 
@@ -51,7 +55,7 @@ fachada compatible para el comparador anterior.
 
 - La calidad de mercado es metadata: nunca rellena, recorta ni altera las series consumidas por scoring, riesgo o comparación.
 - Noticias y eventos son contexto de solo lectura: no participan en decisiones, puntuaciones ni ejecución.
-- Divisas es análisis de solo lectura: no rellena precios, no inventa retornos cero y no participa en decisiones ni ejecución.
+- Divisas es análisis de solo lectura: no rellena precios ni inventa retornos cero; sus señales son informativas y nunca habilitan Portfolio, paper trading ni ejecución.
 - El optimizador institucional nunca devuelve un peso superior a `max_weight`.
 - Si `n_activos * max_weight < 1`, falla con un `ValueError` que explica la inviabilidad.
 - Portfolio valida capital, posiciones, cap por posición y efectivo mínimo.

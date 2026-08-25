@@ -18,8 +18,8 @@ font = "sans-serif"
 headingFont = "sans-serif"
 baseFontSize = 14
 baseFontWeight = 400
-headingFontSizes = ["30px", "24px", "20px", "17px", "15px", "13px"]
-headingFontWeights = [650, 650, 600, 600, 600, 600]
+headingFontSizes = ["28px", "22px", "18px", "16px", "14px", "13px"]
+headingFontWeights = [650, 600, 600, 600, 600, 600]
 linkUnderline = false
 
 redColor = "#FF5C70"

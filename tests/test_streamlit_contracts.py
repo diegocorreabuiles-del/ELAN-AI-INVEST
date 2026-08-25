@@ -12,12 +12,28 @@ from elan_ai_invest.dashboard.safe import safe_render
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_all_dashboard_tabs_are_lazy() -> None:
+def test_all_dashboard_views_are_lazy() -> None:
     source = (ROOT / "app.py").read_text(encoding="utf-8")
 
-    assert 'on_change="rerun"' in source
-    guarded_tabs = {int(index) for index in re.findall(r"if tabs\[(\d+)\]\.open:", source)}
-    assert guarded_tabs == set(range(13))
+    assert "active_view = st.pills(" in source
+    assert "required=True" in source
+    guarded_views = set(re.findall(r'(?:if|elif) active_view == "([^"]+)":', source))
+    assert guarded_views == {
+        "Mercado",
+        "Inteligencia",
+        "Fundamental",
+        "Noticias y eventos",
+        "Ranking",
+        "Riesgo",
+        "Cartera",
+        "Institucional",
+        "Paper Trading",
+        "Backtesting",
+        "Histórico",
+        "Divisas",
+        "Sistema",
+    }
+    assert "st.tabs(" not in source
 
 
 def test_deprecated_streamlit_width_api_is_absent() -> None:

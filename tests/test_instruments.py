@@ -5,7 +5,9 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from elan_ai_invest.fx import load_currency_registry
 from elan_ai_invest.instruments import (
+    CRYPTO_ASSET_GROUP,
     load_instrument_catalog,
     normalize_custom_symbol,
     search_instruments,
@@ -127,12 +129,70 @@ def test_project_catalog_exposes_curated_crypto_groups() -> None:
     catalog = load_instrument_catalog(catalog_path)
 
     expected = {
-        "Crypto": {"BTC-USD", "ETH-USD", "BNB-USD", "SOL-USD", "XRP-USD"},
-        "Stablecoin": {"USDT-USD", "USDC-USD", "DAI-USD"},
-        "Memecoin": {"DOGE-USD", "SHIB-USD", "PEPE24478-USD", "BONK-USD"},
+        "Crypto": {
+            "BTC-USD",
+            "ETH-USD",
+            "BNB-USD",
+            "SOL-USD",
+            "XRP-USD",
+            "TRX-USD",
+            "SUI20947-USD",
+            "KAS-USD",
+        },
+        "Stablecoin": {
+            "USDT-USD",
+            "USDC-USD",
+            "DAI-USD",
+            "FDUSD-USD",
+            "PYUSD-USD",
+            "USDE29470-USD",
+        },
+        "Memecoin": {
+            "DOGE-USD",
+            "SHIB-USD",
+            "PEPE24478-USD",
+            "BONK-USD",
+            "WIF-USD",
+            "TRUMP35336-USD",
+            "PENGU34466-USD",
+        },
     }
+    expected_counts = {"Crypto": 30, "Stablecoin": 11, "Memecoin": 13}
     for asset_type, symbols in expected.items():
-        available = set(search_instruments(catalog, asset_type=asset_type)["symbol"])
-        assert symbols <= available
+        available = search_instruments(catalog, asset_type=asset_type)
+        assert symbols <= set(available["symbol"])
+        assert len(available) == expected_counts[asset_type]
 
+    cryptoassets = search_instruments(catalog, asset_type=CRYPTO_ASSET_GROUP)
+    assert len(cryptoassets) == 54
+    assert set(cryptoassets["asset_type"]) == {"Crypto", "Stablecoin", "Memecoin"}
+    assert {"USDT-USD", "USDC-USD"} <= set(cryptoassets["symbol"])
     assert search_instruments(catalog, "pepe").iloc[0]["symbol"] == "PEPE24478-USD"
+
+
+def test_project_catalog_replaces_legacy_forex_rows_with_fx_registry() -> None:
+    root = Path(__file__).parents[1]
+    currency_path = root / "config" / "currencies.csv"
+    catalog = load_instrument_catalog(
+        root / "config" / "instruments.csv",
+        currency_registry_path=currency_path,
+    )
+    registry = load_currency_registry(currency_path)
+    expected_symbols = {
+        currency.provider_symbol for currency in registry.enabled() if currency.provider_symbol
+    }
+    forex = search_instruments(catalog, asset_type="Forex", limit=len(expected_symbols) + 1)
+
+    assert set(forex["symbol"]) == expected_symbols
+    assert len(forex) == 127
+    assert "COP=X" in expected_symbols
+    assert "COPUSD=X" not in set(forex["symbol"])
+    assert search_instruments(
+        catalog,
+        asset_type="Forex",
+        country="NIGERIA",
+        exchange="FX",
+    )[
+        "symbol"
+    ].tolist() == ["NGN=X"]
+    assert search_instruments(catalog, "BCEAO", asset_type="Forex").iloc[0]["symbol"] == "XOF=X"

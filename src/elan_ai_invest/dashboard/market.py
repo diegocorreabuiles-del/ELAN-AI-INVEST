@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -9,6 +10,13 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+from elan_ai_invest.fx import (
+    HistoricalFxService,
+    YahooFxHistoryProvider,
+    is_fx_asset_id,
+    load_currency_registry,
+    normalize_fx_pair,
+)
 from elan_ai_invest.market.quality import assess_market_data_quality
 from elan_ai_invest.market_data import download_market_history
 from elan_ai_invest.providers.base import (
@@ -32,6 +40,11 @@ HORIZONS = {
 ANALYSIS_PERIOD_KEY = "analysis_period"
 MARKET_PERIOD_REQUEST_KEY = "market_period_request"
 CHART_VIEWS = ("Velas", "Línea", "Rentabilidad", "Volumen")
+PRICE_SCALES = ("Lineal", "Logarítmica")
+LONG_HORIZON_RESAMPLING = {
+    "10y": ("W-FRI", "semanal"),
+    "max": ("ME", "mensual"),
+}
 MAX_COMPARISON_INSTRUMENTS = 8
 QUALITY_STATUS_LABELS = {
     MarketDataQualityStatus.HEALTHY: "Saludable",
@@ -44,6 +57,9 @@ QUALITY_SOURCE_LABELS = {
     "provider": "Proveedor",
     "cache": "Caché local",
     "unavailable": "No disponible",
+    "fx:direct": "FX directa",
+    "fx:inverse": "FX inversa",
+    "fx:synthetic": "FX sintética",
 }
 
 
@@ -70,6 +86,17 @@ def _load_history(
     max_retries: int,
     backoff_seconds: float,
 ) -> pd.DataFrame:
+    if is_fx_asset_id(symbol):
+        root = Path(__file__).resolve().parents[3]
+        service = HistoricalFxService(
+            load_currency_registry(root / "config" / "currencies.csv"),
+            YahooFxHistoryProvider(
+                timeout_seconds=timeout_seconds,
+                max_retries=max_retries,
+                backoff_seconds=backoff_seconds,
+            ),
+        )
+        return service.get_history(normalize_fx_pair(symbol), period=period, interval="1d").prices
     return download_market_history(
         symbol,
         period=period,
@@ -174,15 +201,52 @@ def _format_price(value: float) -> str:
     return f"{value:,.{decimals}f}"
 
 
-def _history_chart(history: pd.DataFrame, symbol: str, view: str) -> go.Figure:
+def _resample_history_for_chart(history: pd.DataFrame, period: str | None) -> pd.DataFrame:
+    resampling = LONG_HORIZON_RESAMPLING.get(period or "")
+    if resampling is None:
+        return history
+
+    rule, _ = resampling
+    displayed = history.resample(rule).agg(
+        {
+            "Open": "first",
+            "High": "max",
+            "Low": "min",
+            "Close": "last",
+            "Volume": "sum",
+        }
+    )
+    displayed = displayed.dropna(subset=["Open", "High", "Low", "Close"])
+    observed_dates = history.index.to_series().resample(rule).max().reindex(displayed.index)
+    displayed.index = pd.DatetimeIndex(observed_dates.array)
+    return displayed
+
+
+def _display_close(history: pd.DataFrame, displayed: pd.DataFrame) -> pd.Series:
+    close = displayed["Close"].copy()
+    source_close = history["Close"].dropna()
+    close.loc[source_close.index[0]] = source_close.iloc[0]
+    close.loc[source_close.index[-1]] = source_close.iloc[-1]
+    return close.sort_index()
+
+
+def _history_chart(
+    history: pd.DataFrame,
+    symbol: str,
+    view: str,
+    *,
+    period: str | None = None,
+    price_scale: str = "Lineal",
+) -> go.Figure:
+    displayed = _resample_history_for_chart(history, period)
     if view == "Velas":
         figure = go.Figure(
             go.Candlestick(
-                x=history.index,
-                open=history["Open"],
-                high=history["High"],
-                low=history["Low"],
-                close=history["Close"],
+                x=displayed.index,
+                open=displayed["Open"],
+                high=displayed["High"],
+                low=displayed["Low"],
+                close=displayed["Close"],
                 increasing_line_color="#21C994",
                 decreasing_line_color="#FF5C70",
                 name=symbol,
@@ -190,20 +254,23 @@ def _history_chart(history: pd.DataFrame, symbol: str, view: str) -> go.Figure:
         )
         figure.update_layout(xaxis_rangeslider_visible=False)
     elif view == "Línea":
+        close = _display_close(history, displayed)
         figure = go.Figure(
             go.Scatter(
-                x=history.index,
-                y=history["Close"],
+                x=close.index,
+                y=close,
                 mode="lines",
                 line={"color": "#21C994", "width": 2},
                 name="Cierre",
             )
         )
     elif view == "Rentabilidad":
-        performance = history["Close"].div(history["Close"].iloc[0]).sub(1.0).mul(100.0)
+        close = _display_close(history, displayed)
+        baseline = float(history["Close"].dropna().iloc[0])
+        performance = close.div(baseline).sub(1.0).mul(100.0)
         figure = go.Figure(
             go.Scatter(
-                x=history.index,
+                x=performance.index,
                 y=performance,
                 mode="lines",
                 fill="tozeroy",
@@ -215,11 +282,11 @@ def _history_chart(history: pd.DataFrame, symbol: str, view: str) -> go.Figure:
         figure.add_hline(y=0, line_dash="dash", line_color="#8B98A5")
         figure.update_yaxes(ticksuffix="%")
     else:
-        colors = np.where(history["Close"].ge(history["Open"]), "#21C994", "#FF5C70")
+        colors = np.where(displayed["Close"].ge(displayed["Open"]), "#21C994", "#FF5C70")
         figure = go.Figure(
             go.Bar(
-                x=history.index,
-                y=history["Volume"],
+                x=displayed.index,
+                y=displayed["Volume"],
                 marker_color=colors,
                 name="Volumen",
                 hovertemplate="%{x|%d %b %Y}<br>%{y:,.0f}<extra></extra>",
@@ -233,6 +300,8 @@ def _history_chart(history: pd.DataFrame, symbol: str, view: str) -> go.Figure:
         hovermode="x unified" if view != "Velas" else "closest",
         legend={"orientation": "h", "y": 1.02, "x": 0},
     )
+    if view in {"Velas", "Línea"}:
+        figure.update_yaxes(type="log" if price_scale == "Logarítmica" else "linear")
     return figure
 
 
@@ -356,6 +425,67 @@ def _multi_comparison_figures(
     return normalized_chart, matrix
 
 
+def build_reference_correlation_data(
+    returns: pd.DataFrame,
+    reference_symbol: str,
+    symbols: list[str],
+    *,
+    window: int,
+) -> tuple[pd.Series, pd.DataFrame]:
+    selected = list(dict.fromkeys(symbols))
+    if reference_symbol not in selected:
+        raise ValueError("El activo de referencia debe estar entre los instrumentos focales.")
+    targets = [symbol for symbol in selected if symbol != reference_symbol]
+    if not targets:
+        raise ValueError("Selecciona al menos un comparable para el activo de referencia.")
+    if window < 2:
+        raise ValueError("La ventana de correlación debe ser de al menos 2 sesiones.")
+
+    correlations = pd.Series(
+        {symbol: float(returns[reference_symbol].corr(returns[symbol])) for symbol in targets},
+        name="Correlación",
+        dtype=float,
+    )
+    minimum_periods = min(20, window)
+    rolling = pd.DataFrame(
+        {
+            f"{reference_symbol} / {symbol}": returns[reference_symbol]
+            .rolling(window, min_periods=minimum_periods)
+            .corr(returns[symbol])
+            for symbol in targets
+        }
+    )
+    return correlations, rolling.dropna(how="all")
+
+
+def _reference_rolling_figure(
+    rolling: pd.DataFrame,
+    reference_symbol: str,
+    window: int,
+) -> go.Figure:
+    figure = go.Figure()
+    for pair in rolling.columns:
+        figure.add_trace(
+            go.Scatter(
+                x=rolling.index,
+                y=rolling[pair],
+                mode="lines",
+                name=pair,
+            )
+        )
+    figure.add_hline(y=0, line_dash="dash", line_color="#8B98A5")
+    figure.update_layout(
+        title=f"Correlación móvil frente a {reference_symbol} · {window} sesiones",
+        xaxis_title="Fecha",
+        yaxis_title="Correlación",
+        height=380,
+        margin={"l": 20, "r": 20, "t": 55, "b": 20},
+        legend_title_text="Par",
+    )
+    figure.update_yaxes(range=[-1, 1])
+    return figure
+
+
 def _format_observation(value) -> str:
     return value.strftime("%d/%m/%Y") if value is not None else "N/D"
 
@@ -371,9 +501,47 @@ def _quality_rows(report: MarketDataQualityReport) -> list[dict[str, str | int]]
             "Huecos": quality.missing_sessions,
             "Última sesión": _format_observation(quality.last_observation),
             "Antigüedad": (f"{quality.age_days} días" if quality.age_days is not None else "N/D"),
+            "Proveedor de ruta": quality.route_provider or "N/D",
+            "Ruta FX": quality.route_path or "N/D",
+            "Cobertura de ruta": (
+                f"{quality.route_coverage_ratio:.1%}"
+                if quality.route_coverage_ratio is not None
+                else "N/D"
+            ),
         }
         for quality in report.assets.values()
     ]
+
+
+def _render_fx_provenance(
+    symbol: str,
+    report: MarketDataQualityReport | None,
+) -> None:
+    if report is None or not is_fx_asset_id(symbol):
+        return
+    quality = report.assets.get(symbol)
+    if quality is None:
+        return
+
+    freshness = f"{quality.age_days} días" if quality.age_days is not None else "N/D"
+    route_coverage = (
+        f"{quality.route_coverage_ratio:.1%}" if quality.route_coverage_ratio is not None else "N/D"
+    )
+    with st.container(border=True):
+        st.markdown("**:material/route: Trazabilidad FX**")
+        with st.container(horizontal=True):
+            st.metric(
+                "Resolución",
+                QUALITY_SOURCE_LABELS.get(quality.source, quality.source),
+                border=True,
+            )
+            st.metric("Proveedor de ruta", quality.route_provider or "N/D", border=True)
+            st.metric("Cobertura temporal", f"{quality.coverage_ratio:.1%}", border=True)
+            st.metric("Frescura", freshness, border=True)
+        st.caption(
+            f"Cálculo: {quality.route_path or 'N/D'} · Cobertura de ruta: {route_coverage} · "
+            f"Última sesión: {_format_observation(quality.last_observation)}"
+        )
 
 
 def _render_quality_summary(report: MarketDataQualityReport | None) -> None:
@@ -438,11 +606,24 @@ def _render_history_detail(primary_symbol: str, market_settings) -> None:
             key="market_chart_view",
         )
 
+    selected_period = HORIZONS[horizon_label]
+    price_scale = "Lineal"
+    if selected_period in LONG_HORIZON_RESAMPLING and chart_view in {"Velas", "Línea"}:
+        price_scale = (
+            st.segmented_control(
+                "Escala de precio",
+                PRICE_SCALES,
+                default="Logarítmica",
+                key=f"market_price_scale_{selected_period}",
+            )
+            or "Logarítmica"
+        )
+
     try:
         with st.spinner(f"Cargando histórico de {primary_symbol}...", show_time=True):
             history = _load_history(
                 primary_symbol,
-                HORIZONS[horizon_label],
+                selected_period,
                 float(market_settings.timeout_seconds),
                 int(market_settings.max_retries),
                 float(market_settings.backoff_seconds),
@@ -459,7 +640,7 @@ def _render_history_detail(primary_symbol: str, market_settings) -> None:
         history[["Close"]].rename(columns={"Close": primary_symbol}),
         [primary_symbol],
         minimum_history=2,
-        provider="Yahoo",
+        provider="FX routing" if is_fx_asset_id(primary_symbol) else "Yahoo",
     )
     detail_quality = detail_quality_report.assets[primary_symbol]
     if detail_quality.status in {
@@ -505,15 +686,27 @@ def _render_history_detail(primary_symbol: str, market_settings) -> None:
         st.info("Yahoo no publica volumen para este instrumento en el horizonte seleccionado.")
     else:
         st.plotly_chart(
-            _history_chart(history, primary_symbol, chart_view or "Velas"),
+            _history_chart(
+                history,
+                primary_symbol,
+                chart_view or "Velas",
+                period=selected_period,
+                price_scale=price_scale,
+            ),
             width="stretch",
+        )
+    display_frequency = LONG_HORIZON_RESAMPLING.get(selected_period)
+    if display_frequency is not None:
+        st.caption(
+            f"Visualización {display_frequency[1]} para mejorar la legibilidad; "
+            "métricas calculadas con todas las sesiones diarias."
         )
     st.caption(
         "OHLCV ajustado de Yahoo · Los máximos y mínimos corresponden al horizonte seleccionado."
     )
 
 
-def _render_detail_panel(selected, labels, market_settings) -> str:
+def _render_detail_panel(selected, labels, market_settings, quality_report=None) -> str:
     st.subheader(":material/candlestick_chart: Desempeño del activo")
     options = list(selected)
     sync_widget_to_active(st.session_state, "market_primary_symbol", options)
@@ -525,6 +718,7 @@ def _render_detail_panel(selected, labels, market_settings) -> str:
         on_change=activate_from_widget,
         args=("market_primary_symbol", tuple(options)),
     )
+    _render_fx_provenance(primary_symbol, quality_report)
     _render_history_detail(primary_symbol, market_settings)
     return primary_symbol
 
@@ -547,44 +741,29 @@ def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> Non
         st.session_state["comparison_symbols"] = valid_stored
 
     selected_symbols = st.multiselect(
-        "Instrumentos a comparar",
+        "Instrumentos focales",
         available,
         max_selections=MAX_COMPARISON_INSTRUMENTS,
         format_func=lambda symbol: labels.get(symbol, symbol),
         key="comparison_symbols",
-        help="Selecciona entre 2 y 8 instrumentos para el desempeño y la matriz.",
+        help="Selecciona entre 2 y 8 instrumentos para desempeño, matriz y correlaciones móviles.",
     )
     if len(selected_symbols) < 2:
         st.info("Selecciona al menos dos instrumentos para comparar.")
         return
 
-    if st.session_state.get("comparison_first_symbol") not in selected_symbols:
-        st.session_state["comparison_first_symbol"] = selected_symbols[0]
-    if st.session_state.get(
-        "comparison_second_symbol"
-    ) not in selected_symbols or st.session_state.get(
-        "comparison_second_symbol"
-    ) == st.session_state.get(
-        "comparison_first_symbol"
-    ):
-        st.session_state["comparison_second_symbol"] = next(
-            symbol
-            for symbol in selected_symbols
-            if symbol != st.session_state["comparison_first_symbol"]
-        )
+    reference_default = (
+        primary_symbol if primary_symbol in selected_symbols else selected_symbols[0]
+    )
+    if st.session_state.get("comparison_reference_symbol") not in selected_symbols:
+        st.session_state["comparison_reference_symbol"] = reference_default
 
     with st.container(horizontal=True, vertical_alignment="bottom"):
-        first_symbol = st.selectbox(
-            "Instrumento focal A",
+        reference_symbol = st.selectbox(
+            "Activo de referencia",
             selected_symbols,
             format_func=lambda symbol: labels.get(symbol, symbol),
-            key="comparison_first_symbol",
-        )
-        second_symbol = st.selectbox(
-            "Instrumento focal B",
-            selected_symbols,
-            format_func=lambda symbol: labels.get(symbol, symbol),
-            key="comparison_second_symbol",
+            key="comparison_reference_symbol",
         )
         window = st.selectbox(
             "Ventana móvil",
@@ -600,32 +779,31 @@ def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> Non
         st.info(str(exc))
         return
 
-    correlation_value = float(group.correlation.loc[first_symbol, second_symbol])
-    minimum_periods = min(20, int(window))
-    rolling = (
-        group.returns[first_symbol]
-        .rolling(int(window), min_periods=minimum_periods)
-        .corr(group.returns[second_symbol])
-        .dropna()
+    correlations, rolling = build_reference_correlation_data(
+        group.returns,
+        reference_symbol,
+        selected_symbols,
+        window=int(window),
     )
-    rolling.name = "Correlación"
-    comparison = ComparisonData(group.normalized, group.returns, rolling, correlation_value)
-
-    correlation_text = f"{correlation_value:.3f}" if np.isfinite(correlation_value) else "N/D"
-    st.metric(
-        "Correlación de rendimientos diarios",
-        correlation_text,
-        _correlation_label(correlation_value),
-        border=True,
-    )
+    finite_correlations = correlations[np.isfinite(correlations)]
+    average_text = "N/D" if finite_correlations.empty else f"{finite_correlations.mean():.3f}"
+    strongest_text = "N/D"
+    weakest_text = "N/D"
+    if not finite_correlations.empty:
+        strongest = finite_correlations.abs().idxmax()
+        weakest = finite_correlations.abs().idxmin()
+        strongest_text = f"{strongest}: {finite_correlations[strongest]:.3f}"
+        weakest_text = f"{weakest}: {finite_correlations[weakest]:.3f}"
+    with st.container(horizontal=True):
+        st.metric(
+            "Activo de referencia", labels.get(reference_symbol, reference_symbol), border=True
+        )
+        st.metric("Comparables", str(len(correlations)), border=True)
+        st.metric("Correlación media", average_text, border=True)
+        st.metric("Relación más intensa", strongest_text, border=True)
+        st.metric("Relación más débil", weakest_text, border=True)
 
     group_chart, matrix = _multi_comparison_figures(group)
-    _, scatter, rolling_chart = _comparison_figures(
-        comparison,
-        first_symbol,
-        second_symbol,
-        int(window),
-    )
 
     left, right = st.columns(2)
     with left:
@@ -641,26 +819,18 @@ def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> Non
             key="market_comparator_matrix_svg_v4",
         )
 
-    focus_left, focus_right = st.columns(2)
-    with focus_left:
+    if rolling.empty:
+        st.info("Aún no hay suficientes sesiones para dibujar las correlaciones móviles.")
+    else:
         st.plotly_chart(
-            scatter,
+            _reference_rolling_figure(rolling, reference_symbol, int(window)),
             width="stretch",
-            key="market_comparator_scatter_svg_v4",
+            key="market_comparator_reference_rolling_svg_v1",
         )
-    with focus_right:
-        if comparison.rolling_correlation.empty:
-            st.info("Aún no hay suficientes sesiones para dibujar la correlación móvil.")
-        else:
-            st.plotly_chart(
-                rolling_chart,
-                width="stretch",
-                key="market_comparator_rolling_svg_v4",
-            )
     st.caption(
-        "Todos los instrumentos usan las mismas sesiones comunes y rendimientos diarios "
-        "consecutivos, sin rellenar datos. No implica causalidad ni garantiza que la "
-        "relación se mantenga."
+        "La matriz compara todos los instrumentos focales y la gráfica móvil contrasta el "
+        "activo de referencia con cada comparable. Se usan sesiones comunes y rendimientos "
+        "diarios consecutivos, sin rellenar datos. No implica causalidad."
     )
 
 
@@ -668,7 +838,7 @@ def render_market_tab(ranking, prices, selected, labels, market_settings, qualit
     _render_quality_summary(quality_report)
     if quality_report is not None:
         st.divider()
-    primary_symbol = _render_detail_panel(selected, labels, market_settings)
+    primary_symbol = _render_detail_panel(selected, labels, market_settings, quality_report)
     st.divider()
     _render_comparator(prices, primary_symbol, labels)
     st.divider()

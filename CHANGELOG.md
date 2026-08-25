@@ -1,13 +1,37 @@
 # Changelog
 
 ## Unreleased
-- Sustituido el universo FX fijo por un catálogo maestro de 36 monedas y pares
+- Ampliado el catálogo principal a 54 criptoactivos con histórico verificado
+  en Yahoo (30 crypto, 11 stablecoins y 13 memecoins), incluido USDT/USDC,
+  y añadido el filtro agregado `Criptoactivos (todos)`. Las CBDC quedan
+  explícitamente fuera al no ser instrumentos cotizados.
+- Movida la navegación de las 13 vistas a un selector superior compacto y
+  responsive; unificada la tipografía mediante el tema nativo de Streamlit,
+  sin CSS inyectado y conservando la carga perezosa.
+- Sustituido el universo FX fijo por un catálogo maestro de monedas y pares
   virtuales `FX_BASE_QUOTE`, sin almacenar combinaciones redundantes.
 - Añadidos routing directo/inverso/sintético, históricos OHLC alineados en UTC,
   log returns, cobertura, KPIs, validación triangular y caché CSV persistente.
 - Renovada la pestaña Divisas con búsqueda por moneda/país/par, botón invertir,
   trazabilidad de cálculo y comparador FX con acciones, índices, materias primas
   y criptomonedas.
+- Sincronizado el catálogo con 155 monedas ISO 4217 activas: 128 con histórico
+  mínimo utilizable en Yahoo, 27 visibles como no disponibles y 16.256 pares
+  virtuales generados bajo demanda.
+- Añadido un sincronizador reproducible contra SIX/Yahoo y un panel de cobertura
+  que distingue disponibilidad de datos de convertibilidad o negociabilidad.
+- Unificado el buscador principal con el catálogo FX maestro: los filtros de
+  divisa, país, mercado y texto exponen 127 pares directos derivados de las 128
+  monedas habilitadas y dejan de usar las cuatro filas Forex heredadas.
+- Integrados los pares virtuales `FX_BASE_QUOTE` en el buscador y el
+  `CoreEngine` mediante un proveedor compuesto Yahoo/FX: ahora participan en
+  calidad, ranking, riesgo, gráficos, correlaciones y Terminal de Decisión.
+- Mantenidas las divisas fuera de cartera y paper trading; Fundamental muestra
+  PER y métricas corporativas como `N/D`.
+- Añadida trazabilidad FX al motor principal: el panel Mercado distingue
+  resolución directa, inversa o sintética y muestra proveedor, ruta de cálculo,
+  cobertura de la ruta, cobertura temporal y frescura sin alterar precios,
+  scoring ni decisiones.
 - Añadida una decimotercera pestaña lazy para comparar entre dos y doce divisas.
 - Ampliado el universo FX a 15 monedas y el máximo seleccionable a 12.
 - Normalizadas las cotizaciones a USD por unidad de divisa antes de calcular
@@ -17,10 +41,15 @@
 - Mostrado el PER histórico en el panel principal y en Fundamental para la acción seleccionada.
 - Ampliado el catálogo curado con criptomonedas, stablecoins y memecoins principales compatibles con Yahoo; el PER queda limitado a acciones.
 - Movido el selector buscable del activo principal por encima de los KPI, aclarando que procede del Universo activo y sincronizándolo con todas las vistas.
-- Ampliado el comparador de Mercado a una selección simultánea de hasta ocho instrumentos, con desempeño conjunto, matriz de correlaciones y par focal.
+- Ampliado el comparador de Mercado a una selección simultánea de entre dos y
+  ocho instrumentos focales, con desempeño conjunto, matriz de correlaciones y
+  correlación móvil de una referencia frente a todos sus comparables.
 - Sincronizados los horizontes global y local de Mercado para que cambiar entre
   un mes, uno, dos, cinco o diez años y máximo recargue tanto el histórico del
   activo como el desempeño comparable.
+- Optimizada la visualización de diez años y máximo con agregación OHLCV
+  semanal/mensual y selector de escala lineal o logarítmica, manteniendo las
+  métricas sobre todas las sesiones diarias.
 
 - Conectado un activo global entre Mercado, Inteligencia, Fundamental, Noticias y Ranking.
 - Añadida selección por fila en Ranking e Inteligencia y una barra de contexto con precio, score, señal y volatilidad.
