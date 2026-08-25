@@ -29,6 +29,10 @@ class MarketDataAssetQuality:
     first_observation: datetime | None
     last_observation: datetime | None
     age_days: int | None
+    route_provider: str | None = None
+    route_path: str | None = None
+    route_coverage_ratio: float | None = None
+    received_at: datetime | None = None
 
 
 @dataclass(frozen=True)

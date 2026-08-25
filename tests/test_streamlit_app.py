@@ -394,19 +394,14 @@ def _assert_no_ui_failure(app: AppTest, context: str) -> None:
     assert not app.error, (context, [item.value for item in app.error])
 
 
-def _tab_widget_id(app: AppTest) -> str:
-    candidates = [
-        widget.id
-        for widget in app.session_state.get_widget_states()
-        if widget.WhichOneof("value") == "string_value" and widget.string_value in TAB_LABELS
-    ]
-    assert len(candidates) == 1
-    return candidates[0]
+def _view_selector(app: AppTest):
+    matches = [item for item in app.pills if item.label == "Navegación principal"]
+    assert len(matches) == 1
+    return matches[0]
 
 
-def _select_tab(app: AppTest, widget_id: str, label: str) -> None:
-    app.session_state[widget_id] = label
-    app.run(timeout=APP_TEST_TIMEOUT)
+def _select_view(app: AppTest, label: str) -> None:
+    _view_selector(app).set_value(label).run(timeout=APP_TEST_TIMEOUT)
     _assert_no_ui_failure(app, label)
 
 
@@ -458,7 +453,10 @@ def test_app_renders_every_view_and_simulated_actions(app_environment: FakeEngin
     app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
     _assert_no_ui_failure(app, "initial")
     assert app_environment.news_requests == []
-    assert [tab.label for tab in app.tabs] == list(TAB_LABELS)
+    navigation = _view_selector(app)
+    assert navigation.options == list(TAB_LABELS)
+    assert navigation.value == "Mercado"
+    assert not app.tabs
     assert app.title[0].value == "ELAN Quantum"
     assert len(app.metric) >= 10
     assert any(item.label == "Calidad global" for item in app.metric)
@@ -470,21 +468,21 @@ def test_app_renders_every_view_and_simulated_actions(app_environment: FakeEngin
     assert any("requieren atención" in item.value for item in app.warning)
     assert any(item.label == "Buscar o seleccionar activo" for item in app.selectbox)
     assert any("Procede de tu Universo activo" in item.value for item in app.caption)
-    assert any(item.label == "Instrumentos a comparar" for item in app.multiselect)
-    assert any(item.label == "Instrumento focal A" for item in app.selectbox)
-    assert any(item.label == "Instrumento focal B" for item in app.selectbox)
+    assert any(item.label == "Instrumentos focales" for item in app.multiselect)
+    assert any(item.label == "Activo de referencia" for item in app.selectbox)
 
-    tab_widget_id = _tab_widget_id(app)
     for label in TAB_LABELS:
-        _select_tab(app, tab_widget_id, label)
+        _select_view(app, label)
     assert app_environment.news_requests == ["AAPL"]
 
-    _select_tab(app, tab_widget_id, "Fundamental")
+    _select_view(app, "Fundamental")
     assert any(item.label == "PER histórico" and item.value == "28.0x" for item in app.metric)
 
-    _select_tab(app, tab_widget_id, "Divisas")
+    _select_view(app, "Divisas")
     assert any(item.label == "Precio actual" for item in app.metric)
     assert any(item.label == "Cobertura" for item in app.metric)
+    assert any(item.label == "Divisas con histórico" and item.value == "128" for item in app.metric)
+    assert any(item.label == "Pares virtuales" and item.value == "16.256" for item in app.metric)
     assert any("convención BASE/QUOTE" in item.value for item in app.caption)
 
     calls_before_refresh = len(app_environment.requests)
@@ -516,6 +514,15 @@ def test_market_chart_horizon_updates_full_analysis_and_history_loader(
     global_horizon = next(item for item in app.selectbox if item.label == "Horizonte histórico")
     assert global_horizon.value == "5y"
 
+    horizon = next(item for item in app.selectbox if item.label == "Horizonte del gráfico")
+    horizon.set_value("10 años").run(timeout=APP_TEST_TIMEOUT)
+
+    _assert_no_ui_failure(app, "long market horizon")
+    assert app_environment.requests[-1].period == "10y"
+    assert loaded_periods[-1] == "10y"
+    price_scale = next(item for item in app.segmented_control if item.label == "Escala de precio")
+    assert price_scale.value == "Logarítmica"
+
 
 def test_paper_view_executes_only_simulated_actions(app_environment: FakeEngine) -> None:
     latest_prices = {
@@ -528,11 +535,14 @@ def test_paper_view_executes_only_simulated_actions(app_environment: FakeEngine)
         args=(
             FakePaperTradingEngine(),
             latest_prices,
-            list(latest_prices),
+            [*latest_prices, "FX_EUR_GBP", "EURUSD=X"],
             app_environment.settings,
         ),
     ).run()
     _assert_no_ui_failure(app, "paper initial")
+    buy_selector = next(item for item in app.selectbox if item.label == "Activo a comprar")
+    assert "FX_EUR_GBP" not in buy_selector.options
+    assert "EURUSD=X" not in buy_selector.options
 
     _button(app, "Comprar en simulador").click().run(timeout=20)
     assert FakePaperTradingEngine.buy_calls == 1
@@ -549,6 +559,25 @@ def test_paper_view_executes_only_simulated_actions(app_environment: FakeEngine)
     _button(app, "Revisar stops y guardar snapshot").click().run(timeout=20)
     assert FakePaperTradingEngine.review_calls == 1
     assert any("Revisión simulada completada" in item.value for item in app.success)
+
+
+def test_paper_view_with_only_fx_keeps_positions_read_only(
+    app_environment: FakeEngine,
+) -> None:
+    app = AppTest.from_function(
+        _paper_view_script,
+        default_timeout=20,
+        args=(
+            FakePaperTradingEngine(),
+            {"FX_EUR_GBP": 0.85, "AAPL": 150.0},
+            ["FX_EUR_GBP"],
+            app_environment.settings,
+        ),
+    ).run()
+
+    _assert_no_ui_failure(app, "paper FX only")
+    assert not any(item.label == "Activo a comprar" for item in app.selectbox)
+    assert any("solo lectura" in item.value for item in app.info)
 
 
 def test_history_view_saves_only_through_fake_engine(app_environment: FakeEngine) -> None:
@@ -583,6 +612,53 @@ def test_app_searches_and_adds_global_instrument(app_environment: FakeEngine) ->
     primary = next(item for item in app.selectbox if item.label == "Buscar o seleccionar activo")
     assert primary.value == "EMAAR.DU"
     assert "EMAAR.DU" in app_environment.requests[-1].symbols
+    assert not app.exception
+
+
+def test_app_searches_virtual_fx_pair(app_environment: FakeEngine) -> None:
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
+    search = next(item for item in app.text_input if item.label == "Buscar instrumento")
+
+    search.set_value("NGN/XOF").run(timeout=APP_TEST_TIMEOUT)
+
+    results = next(item for item in app.selectbox if item.label == "Resultados")
+    assert results.value == "FX_NGN_XOF"
+    assert not app.exception
+
+
+def test_main_cryptoasset_filter_exposes_stablecoins_and_cbdc_scope(
+    app_environment: FakeEngine,
+) -> None:
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
+    asset_type = next(item for item in app.selectbox if item.label == "Tipo")
+
+    assert "Criptoactivos (todos)" in asset_type.options
+    asset_type.set_value("Cryptoasset").run(timeout=APP_TEST_TIMEOUT)
+    search = next(item for item in app.text_input if item.label == "Buscar instrumento")
+    search.set_value("USDT").run(timeout=APP_TEST_TIMEOUT)
+
+    results = next(item for item in app.selectbox if item.label == "Resultados")
+    assert any(option.startswith("USDT-USD ") for option in results.options)
+    search.set_value("USDC").run(timeout=APP_TEST_TIMEOUT)
+    results = next(item for item in app.selectbox if item.label == "Resultados")
+    assert any(option.startswith("USDC-USD ") for option in results.options)
+    search.set_value("CBDC").run(timeout=APP_TEST_TIMEOUT)
+    assert any("dinero digital emitido por bancos centrales" in item.value for item in app.caption)
+    assert not app.exception
+
+
+def test_app_main_filters_use_canonical_fx_registry(app_environment: FakeEngine) -> None:
+    app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
+
+    asset_type = next(item for item in app.selectbox if item.label == "Tipo")
+    asset_type.set_value("Forex").run(timeout=APP_TEST_TIMEOUT)
+    country = next(item for item in app.selectbox if item.label == "País")
+    country.set_value("NIGERIA").run(timeout=APP_TEST_TIMEOUT)
+    market = next(item for item in app.selectbox if item.label == "Bolsa o mercado")
+    market.set_value("FX").run(timeout=APP_TEST_TIMEOUT)
+
+    results = next(item for item in app.selectbox if item.label == "Resultados")
+    assert results.value == "NGN=X"
     assert not app.exception
 
 
@@ -642,7 +718,6 @@ def test_active_symbol_stays_synchronized_across_connected_views(
     active_metric = next(item for item in app.metric if item.label == "Activo")
     assert active_metric.value.startswith("MSFT ·")
 
-    tab_widget_id = _tab_widget_id(app)
     connected_views = {
         "Inteligencia": "Explicación profesional",
         "Fundamental": "Empresa",
@@ -650,7 +725,7 @@ def test_active_symbol_stays_synchronized_across_connected_views(
         "Ranking": "Detalle",
     }
     for tab_label, selector_label in connected_views.items():
-        _select_tab(app, tab_widget_id, tab_label)
+        _select_view(app, tab_label)
         selector = next(item for item in app.selectbox if item.label == selector_label)
         assert selector.value == "MSFT"
         assert app.session_state["active_symbol"] == "MSFT"
@@ -662,13 +737,13 @@ def test_market_comparator_accepts_multiple_instruments(
     app_environment: FakeEngine,
 ) -> None:
     app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
-    comparison = _multiselect(app, "Instrumentos a comparar")
+    comparison = _multiselect(app, "Instrumentos focales")
 
     comparison.set_value(["AAPL", "MSFT", "BTC-USD"]).run(timeout=APP_TEST_TIMEOUT)
 
     assert comparison.value == ["AAPL", "MSFT", "BTC-USD"]
-    assert any(item.label == "Instrumento focal A" for item in app.selectbox)
-    assert any(item.label == "Instrumento focal B" for item in app.selectbox)
+    assert any(item.label == "Activo de referencia" for item in app.selectbox)
+    assert not any(item.label.startswith("Instrumento focal") for item in app.selectbox)
     assert not app.exception
 
 
@@ -767,7 +842,10 @@ def test_decision_terminal_contains_history_failure(
 
     app = AppTest.from_file(APP_PATH, default_timeout=APP_TEST_TIMEOUT).run()
 
-    assert [tab.label for tab in app.tabs] == list(TAB_LABELS)
+    navigation = _view_selector(app)
+    assert navigation.options == list(TAB_LABELS)
+    assert navigation.value == "Mercado"
+    assert not app.tabs
     assert any("terminal de decisión" in item.value for item in app.error)
     assert any("Referencia:" in item.value for item in app.error)
     assert any(item.label == "Activo" for item in app.metric)

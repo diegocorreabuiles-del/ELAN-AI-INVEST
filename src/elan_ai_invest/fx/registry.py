@@ -95,6 +95,12 @@ class CurrencyRegistry:
     def enabled(self) -> tuple[Currency, ...]:
         return tuple(currency for currency in self._currencies.values() if currency.enabled)
 
+    def all(self) -> tuple[Currency, ...]:
+        return tuple(self._currencies.values())
+
+    def disabled(self) -> tuple[Currency, ...]:
+        return tuple(currency for currency in self._currencies.values() if not currency.enabled)
+
     def codes(self) -> tuple[str, ...]:
         return tuple(currency.code for currency in self.enabled())
 
@@ -156,6 +162,12 @@ def default_registry_path() -> Path:
     return Path(__file__).resolve().parents[3] / "config" / "currencies.csv"
 
 
-@lru_cache(maxsize=4)
 def load_currency_registry(path: Path | None = None) -> CurrencyRegistry:
-    return CurrencyRegistry.from_csv((path or default_registry_path()).resolve())
+    resolved = (path or default_registry_path()).resolve()
+    return _load_currency_registry(resolved, resolved.stat().st_mtime_ns)
+
+
+@lru_cache(maxsize=4)
+def _load_currency_registry(path: Path, modified_ns: int) -> CurrencyRegistry:
+    del modified_ns
+    return CurrencyRegistry.from_csv(path)

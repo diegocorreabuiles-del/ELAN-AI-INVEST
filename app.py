@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from elan_ai_invest.analysis import classify_asset
+from elan_ai_invest.analysis import AssetType, classify_asset
 from elan_ai_invest.core.bootstrap import build_core_engine
 from elan_ai_invest.core.models import AnalysisRequest
 from elan_ai_invest.dashboard import (
@@ -34,8 +34,15 @@ from elan_ai_invest.dashboard import (
     set_active_symbol,
     show_safe_error,
 )
+from elan_ai_invest.fx import (
+    build_virtual_fx_catalog,
+    load_currency_registry,
+    search_fx_pairs,
+)
 from elan_ai_invest.instruments import (
     ASSET_TYPE_LABELS,
+    CRYPTO_ASSET_GROUP,
+    CRYPTO_ASSET_TYPES,
     labels_by_symbol,
     load_instrument_catalog,
     normalize_custom_symbol,
@@ -47,11 +54,36 @@ from elan_ai_invest.storage import load_workspace_symbols, save_workspace_symbol
 
 ROOT = Path(__file__).resolve().parent
 configure_page()
+VIEW_LABELS = (
+    "Mercado",
+    "Inteligencia",
+    "Fundamental",
+    "Noticias y eventos",
+    "Ranking",
+    "Riesgo",
+    "Cartera",
+    "Institucional",
+    "Paper Trading",
+    "Backtesting",
+    "Histórico",
+    "Divisas",
+    "Sistema",
+)
 
 
 @st.cache_data(show_spinner=False)
-def load_catalog(curated_path: Path, open_catalog_path: Path) -> pd.DataFrame:
-    return load_instrument_catalog(curated_path, open_catalog_path)
+def load_catalog(
+    curated_path: Path,
+    open_catalog_path: Path,
+    currency_registry_path: Path,
+    currency_registry_modified_ns: int,
+) -> pd.DataFrame:
+    del currency_registry_modified_ns
+    return load_instrument_catalog(
+        curated_path,
+        open_catalog_path,
+        currency_registry_path,
+    )
 
 
 try:
@@ -64,12 +96,17 @@ try:
     missing_columns = required_columns.difference(watchlist.columns)
     if missing_columns:
         raise ValueError("Faltan columnas en watchlist.csv: " + ", ".join(sorted(missing_columns)))
+    currency_registry_path = ROOT / "config" / "currencies.csv"
     catalog = load_catalog(
         ROOT / "config" / "instruments.csv",
         ROOT / "config" / "catalog" / "adanos_tickers.csv.gz",
+        currency_registry_path,
+        currency_registry_path.stat().st_mtime_ns,
     )
     if catalog.empty:
         raise ValueError("El catálogo de instrumentos está vacío.")
+    currency_registry = load_currency_registry(currency_registry_path)
+    virtual_fx_catalog = build_virtual_fx_catalog(currency_registry)
 except Exception as exc:
     show_safe_error(
         "ELAN Quantum no pudo iniciar correctamente.",
@@ -81,6 +118,10 @@ except Exception as exc:
 
 catalog_labels = labels_by_symbol(catalog)
 name_map = dict(zip(catalog["symbol"], catalog["name"], strict=True))
+catalog_labels.update(
+    dict(zip(virtual_fx_catalog["asset_id"], virtual_fx_catalog["label"], strict=True))
+)
+name_map.update(dict(zip(virtual_fx_catalog["asset_id"], virtual_fx_catalog["name"], strict=True)))
 default_symbols = [
     symbol
     for symbol in watchlist["symbol"].astype(str).str.upper().tolist()
@@ -100,6 +141,16 @@ if persisted_symbols is None:
     _persist_workspace_symbols()
 
 render_header(ENGINE.settings.app.version)
+active_view = st.pills(
+    "Navegación principal",
+    VIEW_LABELS,
+    default="Mercado",
+    required=True,
+    key="active_view",
+    label_visibility="collapsed",
+    width="stretch",
+)
+assert active_view is not None
 
 with st.sidebar:
     st.subheader(":material/tune: Espacio de trabajo")
@@ -113,7 +164,8 @@ with st.sidebar:
         icon=":material/search:",
         key="instrument_search_query",
     )
-    asset_types = ["", *sorted(value for value in catalog["asset_type"].unique() if value)]
+    catalog_asset_types = sorted(value for value in catalog["asset_type"].unique() if value)
+    asset_types = ["", CRYPTO_ASSET_GROUP, *catalog_asset_types]
     selected_asset_type = st.selectbox(
         "Tipo",
         asset_types,
@@ -122,7 +174,9 @@ with st.sidebar:
     )
 
     country_scope = catalog
-    if selected_asset_type:
+    if selected_asset_type == CRYPTO_ASSET_GROUP:
+        country_scope = country_scope.loc[country_scope["asset_type"].isin(CRYPTO_ASSET_TYPES)]
+    elif selected_asset_type:
         country_scope = country_scope.loc[country_scope["asset_type"].eq(selected_asset_type)]
     countries = ["", *sorted(value for value in country_scope["country"].unique() if value)]
     selected_country = st.selectbox(
@@ -142,6 +196,12 @@ with st.sidebar:
         format_func=lambda value: value or "Todos",
         key="instrument_exchange",
     )
+    if selected_asset_type == CRYPTO_ASSET_GROUP or "cbdc" in search_query.casefold():
+        st.caption(
+            "Las CBDC son dinero digital emitido por bancos centrales, no "
+            "criptoactivos cotizados en Yahoo; se excluyen hasta disponer de una "
+            "fuente oficial de seguimiento no negociable."
+        )
 
     search_results = search_instruments(
         catalog,
@@ -151,6 +211,35 @@ with st.sidebar:
         selected_exchange or None,
         limit=100,
     )
+    include_virtual_fx = (
+        bool(search_query.strip())
+        and selected_asset_type in {"", "Forex"}
+        and not selected_country
+        and selected_exchange in {"", "FX"}
+    )
+    if include_virtual_fx:
+        fx_matches = search_fx_pairs(virtual_fx_catalog, search_query, limit=100)
+        if not fx_matches.empty:
+            fx_results = pd.DataFrame(
+                {
+                    "symbol": fx_matches["asset_id"],
+                    "ticker": fx_matches["pair"],
+                    "name": fx_matches["name"],
+                    "asset_type": "Forex",
+                    "country": "",
+                    "country_code": "",
+                    "exchange": "FX",
+                    "isin": "",
+                    "aliases": fx_matches["pair"],
+                    "source": "ELAN virtual FX",
+                    "_search": fx_matches["_search"],
+                }
+            )
+            search_results = (
+                pd.concat([fx_results, search_results], ignore_index=True)
+                .drop_duplicates("symbol", keep="first")
+                .head(100)
+            )
     result_symbols = search_results["symbol"].tolist()
     result_labels = labels_by_symbol(search_results)
     result_symbol = st.selectbox(
@@ -356,109 +445,91 @@ render_decision_terminal(
     catalog_labels,
 )
 
-tabs = st.tabs(
-    [
+if active_view == "Mercado":
+    safe_render(
         "Mercado",
-        "Inteligencia",
-        "Fundamental",
+        render_market_tab,
+        ranking,
+        prices,
+        selected,
+        catalog_labels,
+        ENGINE.settings.market,
+        analysis.quality,
+    )
+elif active_view == "Inteligencia":
+    safe_render("Inteligencia", render_intelligence_tab, ranking, selected)
+elif active_view == "Fundamental":
+    safe_render("Fundamental", render_fundamental_tab, ranking, selected)
+elif active_view == "Noticias y eventos":
+    safe_render(
         "Noticias y eventos",
-        "Ranking",
-        "Riesgo",
-        "Cartera",
-        "Institucional",
-        "Paper Trading",
-        "Backtesting",
-        "Histórico",
-        "Divisas",
-        "Sistema",
-    ],
-    on_change="rerun",
-)
-
-if tabs[0].open:
-    with tabs[0]:
-        safe_render(
-            "Mercado",
-            render_market_tab,
-            ranking,
-            prices,
-            selected,
-            catalog_labels,
-            ENGINE.settings.market,
-            analysis.quality,
+        render_news_events_tab,
+        ranking,
+        ENGINE.settings.news,
+        selected,
+    )
+elif active_view == "Ranking":
+    safe_render("Ranking", render_ranking_tab, ranking, prices, selected)
+elif active_view == "Riesgo":
+    safe_render("Riesgo", render_risk_tab, risk_report, ranking, capital, ENGINE.settings)
+elif active_view == "Cartera":
+    portfolio_symbols = [
+        symbol
+        for symbol in prices.columns
+        if classify_asset(symbol, catalog).asset_type is not AssetType.FOREX
+    ]
+    if not portfolio_symbols:
+        st.info("Las divisas son de solo lectura y no participan en la cartera propuesta.")
+    else:
+        portfolio_prices = prices.loc[:, portfolio_symbols]
+        portfolio_ranking = ranking.loc[ranking["symbol"].isin(portfolio_symbols)].copy()
+        portfolio_risk_report = calculate_risk_report(
+            portfolio_prices,
+            annualisation_days=ENGINE.settings.risk.annualisation_days,
         )
-if tabs[1].open:
-    with tabs[1]:
-        safe_render("Inteligencia", render_intelligence_tab, ranking, selected)
-if tabs[2].open:
-    with tabs[2]:
-        safe_render("Fundamental", render_fundamental_tab, ranking, selected)
-if tabs[3].open:
-    with tabs[3]:
-        safe_render(
-            "Noticias y eventos",
-            render_news_events_tab,
-            ranking,
-            ENGINE.settings.news,
-            selected,
-        )
-if tabs[4].open:
-    with tabs[4]:
-        safe_render("Ranking", render_ranking_tab, ranking, prices, selected)
-if tabs[5].open:
-    with tabs[5]:
-        safe_render("Riesgo", render_risk_tab, risk_report, ranking, capital, ENGINE.settings)
-if tabs[6].open:
-    with tabs[6]:
         safe_render(
             "Cartera",
             render_portfolio_tab,
-            ranking,
-            risk_report,
-            prices,
+            portfolio_ranking,
+            portfolio_risk_report,
+            portfolio_prices,
             capital,
             ENGINE.settings,
         )
-if tabs[7].open:
-    with tabs[7]:
-        safe_render("Institucional", render_institutional_tab, prices, capital)
-if tabs[8].open:
-    with tabs[8]:
-        paper_engine = None
-        if ENGINE.settings.paper_trading.enabled:
-            paper_engine = PaperTradingEngine(
-                ROOT / ENGINE.settings.paper_trading.database_path,
-                initial_capital=ENGINE.settings.paper_trading.initial_capital,
-                commission_pct=ENGINE.settings.paper_trading.commission_pct,
-                stop_loss_pct=ENGINE.settings.paper_trading.stop_loss_pct,
-                max_open_positions=ENGINE.settings.paper_trading.max_open_positions,
-            )
-        safe_render(
-            "Paper Trading",
-            render_paper_trading_tab,
-            paper_engine,
-            latest_prices,
-            selected,
-            ENGINE.settings,
+elif active_view == "Institucional":
+    safe_render("Institucional", render_institutional_tab, prices, capital)
+elif active_view == "Paper Trading":
+    paper_engine = None
+    if ENGINE.settings.paper_trading.enabled:
+        paper_engine = PaperTradingEngine(
+            ROOT / ENGINE.settings.paper_trading.database_path,
+            initial_capital=ENGINE.settings.paper_trading.initial_capital,
+            commission_pct=ENGINE.settings.paper_trading.commission_pct,
+            stop_loss_pct=ENGINE.settings.paper_trading.stop_loss_pct,
+            max_open_positions=ENGINE.settings.paper_trading.max_open_positions,
         )
-if tabs[9].open:
-    with tabs[9]:
-        safe_render(
-            "Backtesting",
-            render_backtesting_tab,
-            prices,
-            ENGINE.settings.backtest,
-            ENGINE.settings.market.benchmark,
-        )
-if tabs[10].open:
-    with tabs[10]:
-        safe_render("Histórico", render_history_tab, ENGINE, DB_PATH, selected, period)
-if tabs[11].open:
-    with tabs[11]:
-        safe_render("Divisas", render_forex_tab, ENGINE.settings.market, catalog)
-if tabs[12].open:
-    with tabs[12]:
-        safe_render("Sistema", render_system_tab, ROOT, ENGINE.settings)
+    safe_render(
+        "Paper Trading",
+        render_paper_trading_tab,
+        paper_engine,
+        latest_prices,
+        selected,
+        ENGINE.settings,
+    )
+elif active_view == "Backtesting":
+    safe_render(
+        "Backtesting",
+        render_backtesting_tab,
+        prices,
+        ENGINE.settings.backtest,
+        ENGINE.settings.market.benchmark,
+    )
+elif active_view == "Histórico":
+    safe_render("Histórico", render_history_tab, ENGINE, DB_PATH, selected, period)
+elif active_view == "Divisas":
+    safe_render("Divisas", render_forex_tab, ENGINE.settings.market, catalog)
+elif active_view == "Sistema":
+    safe_render("Sistema", render_system_tab, ROOT, ENGINE.settings)
 
 if analysis.errors:
     with st.expander("Errores parciales de descarga"):

@@ -34,7 +34,8 @@ core.pipeline
 
 - `app.py` es el único entrypoint.
 - `dashboard/__init__.py` importa todas las vistas y expone sus renderers.
-- `app.py` crea once `st.tabs`; Streamlit ejecuta el contenido de todas en cada rerun.
+- `app.py` presenta 13 vistas mediante un `st.pills` superior y solo renderiza
+  la vista seleccionada en cada rerun.
 - Estado de usuario: widgets y claves de Streamlit; no hay inicialización central de `st.session_state`.
 - Caché: análisis de mercado a una hora y fundamentales a seis horas.
 
@@ -150,7 +151,9 @@ Python resuelve el segundo. El primero no es accesible con el nombre público es
 
 - Aplicación local sin autenticación propia.
 - Fuente externa: Yahoo/yfinance.
-- El selector global usa `instruments.py` y un catálogo local independiente de Yahoo. La presencia de un instrumento en el catálogo no implica disponibilidad de histórico en el proveedor de mercado.
+- El selector global usa `instruments.py`, el catálogo curado/Adanos y las filas
+  Forex habilitadas de `config/currencies.csv`; no consulta Yahoo durante la
+  búsqueda. La presencia de un instrumento no garantiza disponibilidad actual.
 - Datos persistentes: SQLite local y logs.
 - No hay broker real.
 - `market.cache` usa pickle, aunque está fuera del flujo activo.

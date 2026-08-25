@@ -1,17 +1,23 @@
 from __future__ import annotations
 
+from functools import lru_cache
+
 import pandas as pd
 
 from elan_ai_invest.instruments import normalize_search_text
 
-from .models import FxPair, normalize_fx_pair
+from .models import Currency, FxPair, normalize_fx_pair
 from .registry import CurrencyRegistry
 
 DEFAULT_COUNTER_CURRENCIES = ("USD", "EUR")
 
 
 def build_virtual_fx_catalog(registry: CurrencyRegistry) -> pd.DataFrame:
-    currencies = registry.enabled()
+    return _build_virtual_fx_catalog(registry.enabled()).copy(deep=False)
+
+
+@lru_cache(maxsize=4)
+def _build_virtual_fx_catalog(currencies: tuple[Currency, ...]) -> pd.DataFrame:
     rows: list[dict[str, object]] = []
     for base in currencies:
         for quote in currencies:

@@ -52,6 +52,7 @@ ASSET_TYPE_LABELS = {
     "Bond": "Bono",
     "Commodity": "Materia prima",
     "Crypto": "Cripto",
+    "Cryptoasset": "Criptoactivos (todos)",
     "ETF": "ETF",
     "Forex": "Divisa",
     "Fund": "Fondo",
@@ -60,6 +61,9 @@ ASSET_TYPE_LABELS = {
     "Stablecoin": "Stablecoin",
     "Stock": "Acción",
 }
+
+CRYPTO_ASSET_GROUP = "Cryptoasset"
+CRYPTO_ASSET_TYPES = frozenset({"Crypto", "Memecoin", "Stablecoin"})
 
 US_EXCHANGES = {"AMEX", "NASDAQ", "NYSE", "NYSE ARCA", "NYSE MKT"}
 SAFE_SYMBOL_PATTERN = re.compile(r"^[A-Z0-9^=._-]{1,32}$")
@@ -143,14 +147,59 @@ def _read_adanos_catalog(path: Path) -> pd.DataFrame:
     return source.loc[:, CATALOG_COLUMNS]
 
 
+def _read_fx_currency_catalog(path: Path) -> pd.DataFrame:
+    from elan_ai_invest.fx.registry import load_currency_registry
+
+    rows: list[dict[str, str]] = []
+    for currency in load_currency_registry(path).enabled():
+        if not (currency.provider_symbol and currency.provider_base and currency.provider_quote):
+            continue
+        pair = f"{currency.provider_base}/{currency.provider_quote}"
+        aliases = " ".join(
+            dict.fromkeys(
+                (
+                    currency.code,
+                    currency.name,
+                    currency.region,
+                    pair,
+                    "forex",
+                    "fx",
+                    "divisa",
+                )
+            )
+        )
+        rows.append(
+            {
+                "symbol": currency.provider_symbol,
+                "ticker": currency.provider_symbol,
+                "name": f"{pair} - {currency.name}",
+                "asset_type": "Forex",
+                "country": currency.country,
+                "country_code": "",
+                "exchange": "FX",
+                "isin": "",
+                "aliases": aliases,
+                "source": "ELAN FX registry",
+            }
+        )
+    return pd.DataFrame(rows, columns=CATALOG_COLUMNS)
+
+
 def load_instrument_catalog(
     curated_path: Path,
     open_catalog_path: Path | None = None,
+    currency_registry_path: Path | None = None,
 ) -> pd.DataFrame:
     frames = [_read_curated_catalog(curated_path)]
     if open_catalog_path is not None:
         frames.append(_read_adanos_catalog(open_catalog_path))
     catalog = pd.concat(frames, ignore_index=True)
+    if currency_registry_path is not None:
+        catalog = catalog.loc[~catalog["asset_type"].str.strip().str.casefold().eq("forex")].copy()
+        catalog = pd.concat(
+            [catalog, _read_fx_currency_catalog(currency_registry_path)],
+            ignore_index=True,
+        )
     if catalog.empty:
         return _empty_catalog()
 
@@ -193,7 +242,9 @@ def search_instruments(
         return catalog.iloc[0:0].copy()
 
     mask = pd.Series(True, index=catalog.index)
-    if asset_type:
+    if asset_type == CRYPTO_ASSET_GROUP:
+        mask &= catalog["asset_type"].isin(CRYPTO_ASSET_TYPES)
+    elif asset_type:
         mask &= catalog["asset_type"].eq(asset_type)
     if country:
         mask &= catalog["country"].eq(country)

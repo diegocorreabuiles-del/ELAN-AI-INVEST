@@ -103,7 +103,37 @@ def _service(
 def test_registry_contains_requested_global_and_latam_currencies() -> None:
     registry = load_currency_registry()
 
-    assert len(registry.codes()) == 36
+    assert len(registry.all()) == 155
+    assert len(registry.codes()) == 128
+    assert {currency.code for currency in registry.disabled()} == {
+        "AMD",
+        "AOA",
+        "AZN",
+        "BAM",
+        "BTN",
+        "ERN",
+        "FKP",
+        "GEL",
+        "GIP",
+        "KGS",
+        "KPW",
+        "MMK",
+        "MNT",
+        "SBD",
+        "SHP",
+        "SLE",
+        "SRD",
+        "SSP",
+        "STN",
+        "SYP",
+        "TJS",
+        "TOP",
+        "VED",
+        "VUV",
+        "WST",
+        "XCG",
+        "ZWG",
+    }
     assert {
         "USD",
         "EUR",
@@ -123,7 +153,37 @@ def test_registry_contains_requested_global_and_latam_currencies() -> None:
         "HNL",
         "AED",
         "SAR",
+        "AFN",
+        "IDR",
+        "NGN",
+        "QAR",
+        "XAF",
+        "XCD",
+        "XOF",
+        "XPF",
     } <= set(registry.codes())
+    assert len(registry.provider_pairs()) == 127
+    assert all(
+        currency.provider_symbol and currency.provider_base and currency.provider_quote
+        for currency in registry.enabled()
+        if currency.code != "USD"
+    )
+
+
+def test_registry_cache_refreshes_after_catalog_file_changes(tmp_path: Path) -> None:
+    source = Path(__file__).parents[1] / "config" / "currencies.csv"
+    target = tmp_path / "currencies.csv"
+    frame = pd.read_csv(source, dtype=str, keep_default_na=False)
+    frame.to_csv(target, index=False)
+    first = load_currency_registry(target)
+
+    frame.loc[frame["code"].eq("AFN"), "enabled"] = "false"
+    frame.to_csv(target, index=False)
+    second = load_currency_registry(target)
+
+    assert first is not second
+    assert "AFN" in first.codes()
+    assert "AFN" not in second.codes()
 
 
 @pytest.mark.parametrize(
@@ -283,6 +343,8 @@ def test_virtual_catalog_searches_code_name_country_and_pair() -> None:
     assert required <= set(by_code["asset_id"])
     assert required <= set(by_name["asset_id"])
     assert exact.iloc[0]["asset_id"] == "FX_EUR_COP"
+    assert len(catalog) == 16_256
+    assert search_fx_pairs(catalog, "NGN/XOF", limit=1).iloc[0]["asset_id"] == "FX_NGN_XOF"
 
 
 def test_kpis_preserve_precision_and_produce_fx_indicators() -> None:

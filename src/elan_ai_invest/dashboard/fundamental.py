@@ -13,6 +13,7 @@ from elan_ai_invest.fundamental import (
     YahooFundamentalProvider,
     analyze_fundamentals,
 )
+from elan_ai_invest.fx import is_fx_asset_id
 
 from .workspace import activate_from_widget, symbol_options, sync_widget_to_active
 
@@ -70,6 +71,15 @@ def render_fundamental_tab(
         on_change=activate_from_widget,
         args=("fundamental_symbol", tuple(options)),
     )
+    if is_fx_asset_id(symbol) or str(symbol).upper().endswith("=X"):
+        st.markdown(f"### {symbol}")
+        with st.container(horizontal=True):
+            st.metric("Fundamental Score", "N/D")
+            st.metric("Confianza de datos", "N/D")
+            st.metric("PER histórico", "N/D")
+            st.metric("Capitalización", "N/D")
+        st.info("Los fundamentales corporativos no aplican a instrumentos Forex.")
+        return
 
     try:
         with st.spinner(f"Analizando fundamentales de {symbol}..."):

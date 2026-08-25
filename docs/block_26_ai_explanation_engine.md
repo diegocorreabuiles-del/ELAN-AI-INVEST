@@ -65,7 +65,7 @@ resultados ya calculados; no crea una recomendación nueva.
 3. Una regresión demuestra que el motor no cambia señal, score, confianza ni
    tablas de ranking.
 4. AppTest confirma que abrir Inteligencia no añade red ni mutaciones y que las
-   13 pestañas siguen siendo lazy.
+   13 vistas siguen siendo lazy mediante la navegación superior.
 5. Ruff, Black, mypy, suite completa con cobertura, healthcheck, lock y
    `pip check` pasan antes del cierre.
 

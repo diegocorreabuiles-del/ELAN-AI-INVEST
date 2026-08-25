@@ -32,6 +32,8 @@ def catalog():
         ("BTC-USD", AssetType.CRYPTO),
         ("DOGE-USD", AssetType.MEME_COIN),
         ("USDC-USD", AssetType.STABLECOIN),
+        ("RLUSD-USD", AssetType.STABLECOIN),
+        ("WIF-USD", AssetType.MEME_COIN),
         ("EURUSD=X", AssetType.FOREX),
     ],
 )
@@ -51,6 +53,9 @@ def test_us_equity_benchmark_depends_on_exchange(catalog) -> None:
 def test_manual_symbol_inference_is_conservative() -> None:
     assert classify_asset("1810.HK").asset_type is AssetType.EQUITY
     assert classify_asset("SOMECOIN-USD").asset_type is AssetType.CRYPTO
+    assert classify_asset("USDE29470-USD").asset_type is AssetType.STABLECOIN
+    assert classify_asset("TRUMP35336-USD").asset_type is AssetType.MEME_COIN
+    assert classify_asset("FX_EUR_GBP").asset_type is AssetType.FOREX
     unknown = classify_asset("UNLISTED")
     assert unknown.asset_type is AssetType.UNKNOWN
     assert unknown.classification_confidence == 0.0

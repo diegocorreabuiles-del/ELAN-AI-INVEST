@@ -22,13 +22,51 @@ ADA-USD,ADA-USD,Cardano USD,Crypto,Global,,CRYPTO,,cardano ada,ELAN curated
 AVAX-USD,AVAX-USD,Avalanche USD,Crypto,Global,,CRYPTO,,avalanche avax,ELAN curated
 LINK-USD,LINK-USD,Chainlink USD,Crypto,Global,,CRYPTO,,chainlink link,ELAN curated
 DOT-USD,DOT-USD,Polkadot USD,Crypto,Global,,CRYPTO,,polkadot dot,ELAN curated
+TRX-USD,TRX-USD,TRON USD,Crypto,Global,,CRYPTO,,tron trx,ELAN curated
+BCH-USD,BCH-USD,Bitcoin Cash USD,Crypto,Global,,CRYPTO,,bitcoin cash bch,ELAN curated
+HBAR-USD,HBAR-USD,Hedera USD,Crypto,Global,,CRYPTO,,hedera hashgraph hbar,ELAN curated
+XLM-USD,XLM-USD,Stellar USD,Crypto,Global,,CRYPTO,,stellar lumens xlm,ELAN curated
+LTC-USD,LTC-USD,Litecoin USD,Crypto,Global,,CRYPTO,,litecoin ltc,ELAN curated
+SUI20947-USD,SUI20947-USD,Sui USD,Crypto,Global,,CRYPTO,,sui network,ELAN curated
+UNI7083-USD,UNI7083-USD,Uniswap USD,Crypto,Global,,CRYPTO,,uniswap uni defi,ELAN curated
+APT21794-USD,APT21794-USD,Aptos USD,Crypto,Global,,CRYPTO,,aptos apt,ELAN curated
+NEAR-USD,NEAR-USD,NEAR Protocol USD,Crypto,Global,,CRYPTO,,near protocol,ELAN curated
+ICP-USD,ICP-USD,Internet Computer USD,Crypto,Global,,CRYPTO,,internet computer icp,ELAN curated
+FIL-USD,FIL-USD,Filecoin USD,Crypto,Global,,CRYPTO,,filecoin fil storage,ELAN curated
+CRO-USD,CRO-USD,Cronos USD,Crypto,Global,,CRYPTO,,cronos crypto com cro,ELAN curated
+ETC-USD,ETC-USD,Ethereum Classic USD,Crypto,Global,,CRYPTO,,ethereum classic etc,ELAN curated
+AAVE-USD,AAVE-USD,Aave USD,Crypto,Global,,CRYPTO,,aave defi,ELAN curated
+ARB11841-USD,ARB11841-USD,Arbitrum USD,Crypto,Global,,CRYPTO,,arbitrum arb layer 2,ELAN curated
+OP-USD,OP-USD,Optimism USD,Crypto,Global,,CRYPTO,,optimism op layer 2,ELAN curated
+POL28321-USD,POL28321-USD,POL USD,Crypto,Global,,CRYPTO,,polygon ecosystem token pol matic,ELAN curated
+ATOM-USD,ATOM-USD,Cosmos USD,Crypto,Global,,CRYPTO,,cosmos atom,ELAN curated
+ALGO-USD,ALGO-USD,Algorand USD,Crypto,Global,,CRYPTO,,algorand algo,ELAN curated
+VET-USD,VET-USD,VeChain USD,Crypto,Global,,CRYPTO,,vechain vet,ELAN curated
+KAS-USD,KAS-USD,Kaspa USD,Crypto,Global,,CRYPTO,,kaspa kas,ELAN curated
 USDT-USD,USDT-USD,Tether USD,Stablecoin,Global,,CRYPTO,,tether usdt stable coin stablecoin,ELAN curated
 USDC-USD,USDC-USD,USD Coin,Stablecoin,Global,,CRYPTO,,usd coin usdc stable coin stablecoin,ELAN curated
 DAI-USD,DAI-USD,Dai USD,Stablecoin,Global,,CRYPTO,,dai stable coin stablecoin,ELAN curated
+FDUSD-USD,FDUSD-USD,First Digital USD,Stablecoin,Global,,CRYPTO,,first digital usd fdusd stable coin stablecoin,ELAN curated
+PYUSD-USD,PYUSD-USD,PayPal USD,Stablecoin,Global,,CRYPTO,,paypal usd pyusd stable coin stablecoin,ELAN curated
+RLUSD-USD,RLUSD-USD,Ripple USD,Stablecoin,Global,,CRYPTO,,ripple usd rlusd stable coin stablecoin,ELAN curated
+USDD-USD,USDD-USD,USDD USD,Stablecoin,Global,,CRYPTO,,usdd tron stable coin stablecoin,ELAN curated
+TUSD-USD,TUSD-USD,TrueUSD,Stablecoin,Global,,CRYPTO,,trueusd tusd stable coin stablecoin,ELAN curated
+FRAX-USD,FRAX-USD,Frax USD,Stablecoin,Global,,CRYPTO,,frax stable coin stablecoin,ELAN curated
+GUSD-USD,GUSD-USD,Gemini Dollar USD,Stablecoin,Global,,CRYPTO,,gemini dollar gusd stable coin stablecoin,ELAN curated
+USDE29470-USD,USDE29470-USD,Ethena USDe USD,Stablecoin,Global,,CRYPTO,,ethena usde synthetic dollar stable coin stablecoin,ELAN curated
 DOGE-USD,DOGE-USD,Dogecoin USD,Memecoin,Global,,CRYPTO,,dogecoin doge meme coin memecoin,ELAN curated
 SHIB-USD,SHIB-USD,Shiba Inu USD,Memecoin,Global,,CRYPTO,,shiba inu shib meme coin memecoin,ELAN curated
 PEPE24478-USD,PEPE24478-USD,Pepe USD,Memecoin,Global,,CRYPTO,,pepe meme coin memecoin,ELAN curated
 BONK-USD,BONK-USD,Bonk USD,Memecoin,Global,,CRYPTO,,bonk meme coin memecoin,ELAN curated
+WIF-USD,WIF-USD,dogwifhat USD,Memecoin,Global,,CRYPTO,,dogwifhat wif meme coin memecoin,ELAN curated
+FLOKI-USD,FLOKI-USD,Floki USD,Memecoin,Global,,CRYPTO,,floki inu meme coin memecoin,ELAN curated
+TRUMP35336-USD,TRUMP35336-USD,OFFICIAL TRUMP USD,Memecoin,Global,,CRYPTO,,official trump meme coin memecoin,ELAN curated
+PENGU34466-USD,PENGU34466-USD,Pudgy Penguins USD,Memecoin,Global,,CRYPTO,,pudgy penguins pengu meme coin memecoin,ELAN curated
+SPX28081-USD,SPX28081-USD,SPX6900 USD,Memecoin,Global,,CRYPTO,,spx6900 spx meme coin memecoin,ELAN curated
+FARTCOIN-USD,FARTCOIN-USD,Fartcoin USD,Memecoin,Global,,CRYPTO,,fartcoin meme coin memecoin,ELAN curated
+BRETT29743-USD,BRETT29743-USD,Brett USD,Memecoin,Global,,CRYPTO,,brett base meme coin memecoin,ELAN curated
+MOG-USD,MOG-USD,Mog Coin USD,Memecoin,Global,,CRYPTO,,mog coin meme coin memecoin,ELAN curated
+TURBO-USD,TURBO-USD,Turbo USD,Memecoin,Global,,CRYPTO,,turbo meme coin memecoin,ELAN curated
 EURUSD=X,EURUSD=X,EUR/USD,Forex,Global,,FX,,euro dollar dolar,ELAN curated
 AEDUSD=X,AEDUSD=X,AED/USD,Forex,United Arab Emirates,AE,FX,,dirham emiratos,ELAN curated
 CNYUSD=X,CNYUSD=X,CNY/USD,Forex,China,CN,FX,,yuan renminbi china,ELAN curated
