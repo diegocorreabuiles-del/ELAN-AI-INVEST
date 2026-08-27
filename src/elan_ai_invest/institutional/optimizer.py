@@ -5,6 +5,7 @@ from math import ceil
 
 import numpy as np
 import pandas as pd
+from numpy.typing import NDArray
 
 
 @dataclass(frozen=True)
@@ -90,6 +91,7 @@ def optimize_portfolio(
     covariance = returns.cov().to_numpy() * 252
     volatilities = np.sqrt(np.clip(np.diag(covariance), 1e-12, None))
 
+    raw: NDArray[np.float64]
     if method == "equal_weight":
         raw = np.ones(len(volatilities))
     elif method == "minimum_variance":
