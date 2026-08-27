@@ -1,5 +1,7 @@
+from collections.abc import Sequence
 from functools import partial
 
+import pandas as pd
 import plotly.express as px
 import streamlit as st
 
@@ -11,7 +13,10 @@ from .workspace import (
 )
 
 
-def render_intelligence_tab(ranking, workspace_symbols=None):
+def render_intelligence_tab(
+    ranking: pd.DataFrame,
+    workspace_symbols: Sequence[object] | None = None,
+) -> None:
     st.subheader("Intelligence Engine Professional")
     st.caption("Ranking multifactor: tendencia, momentum, fuerza relativa y riesgo ajustado.")
 

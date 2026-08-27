@@ -8,9 +8,9 @@ if not exist ".venv\Scripts\python.exe" (
 )
 
 call .venv\Scripts\activate.bat
-python -m pip install --upgrade "pip==26.1.2"
-if errorlevel 1 goto :error
 python -m pip install -r requirements.txt
+if errorlevel 1 goto :error
+python -m pip install --no-deps --no-build-isolation -e .[dev]
 if errorlevel 1 goto :error
 python scripts\check_lock.py
 if errorlevel 1 goto :error

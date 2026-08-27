@@ -1,5 +1,7 @@
+from collections.abc import Sequence
 from functools import partial
 
+import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
@@ -11,7 +13,11 @@ from .workspace import (
 )
 
 
-def render_ranking_tab(ranking, prices, workspace_symbols=None):
+def render_ranking_tab(
+    ranking: pd.DataFrame,
+    prices: pd.DataFrame,
+    workspace_symbols: Sequence[object] | None = None,
+) -> None:
     columns = [
         c
         for c in [

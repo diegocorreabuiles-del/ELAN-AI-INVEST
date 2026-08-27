@@ -14,7 +14,7 @@ _METHODS = {
 }
 
 
-def render_institutional_tab(prices: pd.DataFrame, capital: float):
+def render_institutional_tab(prices: pd.DataFrame, capital: float) -> None:
     st.subheader("Portfolio Optimizer Institutional")
     st.caption("Asignación cuantitativa con restricciones de concentración.")
 

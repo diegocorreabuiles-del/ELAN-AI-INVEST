@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
+from typing import Any, cast
 
+import pandas as pd
 import streamlit as st
 
 from .safe import safe_render as safe_render
@@ -52,9 +55,9 @@ def render_main_metrics(
         )
 
 
-def _format_context_number(value, *, suffix: str = "", decimals: int = 1) -> str:
+def _format_context_number(value: object, *, suffix: str = "", decimals: int = 1) -> str:
     try:
-        numeric = float(value)
+        numeric = float(cast(Any, value))
     except (TypeError, ValueError):
         return "N/D"
     if not math.isfinite(numeric):
@@ -63,9 +66,9 @@ def _format_context_number(value, *, suffix: str = "", decimals: int = 1) -> str
 
 
 def render_active_asset_context(
-    ranking,
+    ranking: pd.DataFrame,
     active_symbol: str,
-    labels=None,
+    labels: Mapping[str, str] | None = None,
     *,
     trailing_pe: float | None = None,
 ) -> None:

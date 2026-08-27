@@ -13,6 +13,8 @@ from scripts.check_lock import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
+HASH_ZERO = "0" * 64
+HASH_ONE = "1" * 64
 
 
 @pytest.mark.parametrize(
@@ -81,8 +83,8 @@ def test_pull_request_requires_a_base(tmp_path) -> None:
 def test_lock_selects_the_python_specific_numpy_pin(tmp_path) -> None:
     lock = tmp_path / "requirements.lock"
     lock.write_text(
-        'numpy==2.2.6 ; python_version == "3.11"\n'
-        'numpy==2.5.1 ; python_version >= "3.12" and python_version < "3.15"\n',
+        f'numpy==2.2.6 ; python_version == "3.11" --hash=sha256:{HASH_ZERO}\n'
+        f'numpy==2.5.1 ; python_version >= "3.12" and python_version < "3.15" --hash=sha256:{HASH_ONE}\n',
         encoding="utf-8",
     )
 
@@ -95,17 +97,25 @@ def test_lock_selects_the_python_specific_numpy_pin(tmp_path) -> None:
 
 def test_lock_rejects_non_exact_versions(tmp_path) -> None:
     lock = tmp_path / "requirements.lock"
-    lock.write_text("pandas>=3.0\n", encoding="utf-8")
+    lock.write_text(f"pandas>=3.0 --hash=sha256:{HASH_ZERO}\n", encoding="utf-8")
 
     with pytest.raises(LockError, match="pin exacto"):
         parse_lock(lock)
 
 
-def test_requirements_file_must_consume_lock_and_dev_extra(tmp_path) -> None:
+def test_lock_rejects_missing_hash(tmp_path) -> None:
+    lock = tmp_path / "requirements.lock"
+    lock.write_text("pandas==3.0.3\n", encoding="utf-8")
+
+    with pytest.raises(LockError, match="hash SHA-256"):
+        parse_lock(lock)
+
+
+def test_requirements_file_must_consume_hashed_lock(tmp_path) -> None:
     requirements = tmp_path / "requirements.txt"
     requirements.write_text("-e .\n", encoding="utf-8")
 
-    with pytest.raises(LockError, match="requirements.lock"):
+    with pytest.raises(LockError, match="require-hashes"):
         validate_requirements_contract(requirements)
 
 

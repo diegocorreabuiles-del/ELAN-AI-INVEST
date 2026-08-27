@@ -3,10 +3,10 @@ import pandas as pd
 
 class PortfolioOptimizer:
 
-    def __init__(self, capital: float):
+    def __init__(self, capital: float) -> None:
         self.capital = capital
 
-    def optimize(self, ranking: pd.DataFrame):
+    def optimize(self, ranking: pd.DataFrame) -> pd.DataFrame:
 
         top = ranking.sort_values("score", ascending=False).head(8).copy()
 

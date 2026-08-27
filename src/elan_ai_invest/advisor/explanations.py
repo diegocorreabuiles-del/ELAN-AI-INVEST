@@ -1,4 +1,7 @@
-def explain(recommendation):
+from collections.abc import Mapping
+
+
+def explain(recommendation: Mapping[str, object]) -> str:
 
     return (
         f"ELAN recomienda comprar "

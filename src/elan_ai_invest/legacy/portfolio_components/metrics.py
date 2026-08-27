@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def portfolio_metrics(portfolio: pd.DataFrame):
+def portfolio_metrics(portfolio: pd.DataFrame) -> dict[str, float | int]:
 
     return {
         "positions": len(portfolio),

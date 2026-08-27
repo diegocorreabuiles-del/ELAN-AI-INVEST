@@ -1,10 +1,15 @@
+import pandas as pd
 import streamlit as st
 
 from elan_ai_invest.backtesting import BacktestEngine
 from elan_ai_invest.core.config import BacktestConfig
 
 
-def render_backtesting_tab(prices, config: BacktestConfig, benchmark_symbol: str):
+def render_backtesting_tab(
+    prices: pd.DataFrame,
+    config: BacktestConfig,
+    benchmark_symbol: str,
+) -> None:
     engine = BacktestEngine()
     a, b, c = st.columns(3)
     lookback_options = sorted({21, 63, 126, config.lookback})

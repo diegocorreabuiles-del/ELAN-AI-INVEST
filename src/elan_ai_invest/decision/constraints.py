@@ -1,4 +1,10 @@
-def apply_constraints(ranking, max_weight: float = 0.15):
+import pandas as pd
+
+
+def apply_constraints(
+    ranking: pd.DataFrame,
+    max_weight: float = 0.15,
+) -> pd.DataFrame:
     ranking = ranking.copy()
     if ranking.empty:
         return ranking

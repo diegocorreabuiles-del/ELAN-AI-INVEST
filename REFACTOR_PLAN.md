@@ -11,7 +11,7 @@
 | 4 — configuración | Parcial | Mercado —incluidos timeout, retry/backoff y caché—, cartera, backtest, paper y versión conectados; quedan campos secundarios |
 | 5 — Streamlit | Completada para estabilización | Render condicional, cachés acotadas, API de ancho, tema nativo y AppTest sin red de `app.py` y todas las vistas |
 | 6 — datos/paper | Completada para estabilización | Operaciones, stops y snapshots atómicos; WAL, timeout, rollback, concurrencia y ciclo UI manual probados |
-| 7 — calidad/dependencias | Parcial | Lock transitivo y cobertura de ramas con umbral 75 % conectados a CI; faltan tipos y auditoría de vulnerabilidades |
+| 7 — calidad/dependencias | Completada localmente | Mypy cubre 118 módulos; ciclo de vida clasificado 86/13/19; lock de 80 pins con hashes, auditoría y matriz Python 3.11–3.14 conectados a gates |
 | 8 — documentación/release | Parcial | Distribución y política Git completadas; integración autorizada y retirada de legacy siguen pendientes |
 
 No se retirará legacy en v1.2.2. La siguiente fase debe empezar por los P1 abiertos enumerados en `AUDIT_REPORT.md`, manteniendo un commit reversible por riesgo.
@@ -129,15 +129,15 @@ Criterio de salida: invariantes contables y concurrencia probadas. **Cumplido pa
 Objetivo: prevenir regresiones estructurales.
 
 - Añadir cobertura con umbral inicial basado en el baseline, subiendo por módulos críticos. **Completado: baseline 77,5 % y gate 75 % sobre líneas y ramas.**
-- Añadir mypy o pyright empezando por core, riesgo, cartera y paper.
-- Añadir auditoría de dependencias/código a CI.
-- Fijar dependencias transitivas y verificar que CI/instaladores usan el lock. **Completado con `requirements.lock` y `scripts/check_lock.py`.**
+- Añadir mypy o pyright empezando por core, riesgo, cartera y paper. **Completado en 7B: mypy estricto cubre los 118 módulos del paquete sin exclusiones globales.**
+- Añadir auditoría de dependencias/código a CI. **Fase 7A: `pip-audit` queda como job bloqueante, fijado por SHA y ejecutado contra `requirements.lock`; la auditoría local no encontró vulnerabilidades conocidas tras actualizar GitPython y pip.**
+- Fijar dependencias transitivas y verificar que CI/instaladores usan el lock. **Completado con 80 pins activos, hashes SHA-256, `--require-hashes`, regenerador y verificador reproducible.**
 - Confirmar y retirar `python-dotenv` solo si no hay consumidor externo.
 - Añadir Python 3.14 a CI o fijar versión máxima soportada.
-- Clasificar los 40 módulos no alcanzables: activo externo, legacy o eliminable.
+- Clasificar los módulos no alcanzables: activo externo, legacy o eliminable. **Completado sin borrado: 86 activos, 13 adaptadores de compatibilidad y 19 legacy; CI impide divergencias y verifica los imports de compatibilidad desde tests.**
 
 Reversibilidad: herramientas empiezan en modo informativo y se endurecen por área.  
-Criterio de salida: gates de CI documentados y sin excepciones globales.
+Criterio de salida: gates de CI documentados y sin excepciones globales. **Cumplido localmente en 7B; la PR debe confirmar la matriz remota Python 3.11–3.14 antes de integrar.**
 
 ## Fase 8 — documentación y limpieza final
 

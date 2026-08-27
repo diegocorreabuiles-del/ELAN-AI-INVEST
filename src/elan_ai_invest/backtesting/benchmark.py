@@ -23,7 +23,10 @@ def build_benchmark_curve(prices: pd.DataFrame, symbol: str | None) -> tuple[pd.
     return (1.0 + benchmark_returns).cumprod(), label
 
 
-def compare_against_benchmark(strategy, benchmark):
+def compare_against_benchmark(
+    strategy: pd.Series,
+    benchmark: pd.Series,
+) -> dict[str, float]:
     strategy_return = float(strategy.iloc[-1] / strategy.iloc[0] - 1)
     benchmark_return = float(benchmark.iloc[-1] / benchmark.iloc[0] - 1)
     return {

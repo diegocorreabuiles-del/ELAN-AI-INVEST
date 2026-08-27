@@ -5,7 +5,7 @@ from __future__ import annotations
 import pandas as pd
 
 
-def apply_costs(returns, commission: float = 0.001):
+def apply_costs(returns: pd.Series, commission: float = 0.001) -> pd.Series:
     """Legacy helper retained for compatibility with external callers."""
     return returns - commission
 

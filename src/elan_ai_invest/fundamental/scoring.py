@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from typing import cast
 
 import numpy as np
 
@@ -11,11 +12,18 @@ def _present(value: float | None) -> bool:
     return value is not None and not (isinstance(value, float) and math.isnan(value))
 
 
-def _percent(value: float | None) -> float | None:
+def _numeric(value: float | None) -> float | None:
     if not _present(value):
         return None
-    value = float(value)
-    return value * 100 if abs(value) <= 2 else value
+    assert value is not None
+    return float(value)
+
+
+def _percent(value: float | None) -> float | None:
+    numeric = _numeric(value)
+    if numeric is None:
+        return None
+    return numeric * 100 if abs(numeric) <= 2 else numeric
 
 
 def _bounded(value: float) -> float:
@@ -58,36 +66,40 @@ def _valuation(snapshot: FundamentalSnapshot) -> float:
         (snapshot.enterprise_to_ebitda, 12.0, 2.8),
         (snapshot.price_to_book, 3.0, 7.0),
     ):
-        if _present(value) and float(value) > 0:
-            points.append(_bounded(78 - abs(float(value) - optimum) * penalty))
-    if _present(snapshot.peg_ratio) and float(snapshot.peg_ratio) > 0:
-        points.append(_bounded(85 - abs(float(snapshot.peg_ratio) - 1.3) * 30))
+        numeric = _numeric(value)
+        if numeric is not None and numeric > 0:
+            points.append(_bounded(78 - abs(numeric - optimum) * penalty))
+    peg_ratio = _numeric(snapshot.peg_ratio)
+    if peg_ratio is not None and peg_ratio > 0:
+        points.append(_bounded(85 - abs(peg_ratio - 1.3) * 30))
     return float(np.mean(points)) if points else 50.0
 
 
 def _balance_sheet(snapshot: FundamentalSnapshot) -> float:
     points: list[float] = []
-    if _present(snapshot.debt_to_equity):
-        debt = float(snapshot.debt_to_equity)
+    debt = _numeric(snapshot.debt_to_equity)
+    if debt is not None:
         if debt > 10:
             debt /= 100
         points.append(_bounded(90 - debt * 35))
-    if _present(snapshot.current_ratio):
-        ratio = float(snapshot.current_ratio)
+    ratio = _numeric(snapshot.current_ratio)
+    if ratio is not None:
         points.append(_bounded(45 + min(ratio, 3.0) * 20))
     return float(np.mean(points)) if points else 50.0
 
 
 def _cash_flow(snapshot: FundamentalSnapshot) -> float:
     points: list[float] = []
-    if _present(snapshot.free_cash_flow):
-        points.append(85.0 if float(snapshot.free_cash_flow) > 0 else 20.0)
-    if _present(snapshot.operating_cash_flow):
-        points.append(85.0 if float(snapshot.operating_cash_flow) > 0 else 20.0)
-    if _present(snapshot.free_cash_flow) and _present(snapshot.operating_cash_flow):
-        operating = abs(float(snapshot.operating_cash_flow))
+    free_cash_flow = _numeric(snapshot.free_cash_flow)
+    operating_cash_flow = _numeric(snapshot.operating_cash_flow)
+    if free_cash_flow is not None:
+        points.append(85.0 if free_cash_flow > 0 else 20.0)
+    if operating_cash_flow is not None:
+        points.append(85.0 if operating_cash_flow > 0 else 20.0)
+    if free_cash_flow is not None and operating_cash_flow is not None:
+        operating = abs(operating_cash_flow)
         if operating > 0:
-            conversion = float(snapshot.free_cash_flow) / operating
+            conversion = free_cash_flow / operating
             points.append(_bounded(45 + conversion * 50))
     return float(np.mean(points)) if points else 50.0
 
@@ -103,7 +115,7 @@ def analyze_fundamentals(snapshot: FundamentalSnapshot) -> FundamentalAnalysis:
     )
 
     values = list(snapshot.as_dict().values())[4:]
-    available = sum(_present(value) for value in values)
+    available = sum(_present(cast(float | None, value)) for value in values)
     confidence = _bounded(35 + available / max(len(values), 1) * 65)
 
     if score >= 75:

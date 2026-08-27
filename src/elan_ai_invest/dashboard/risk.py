@@ -1,10 +1,17 @@
+import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from elan_ai_invest.risk import suggested_position_size_pct
+from elan_ai_invest.core.config import Settings
+from elan_ai_invest.risk import PortfolioRiskReport, suggested_position_size_pct
 
 
-def render_risk_tab(risk_report, ranking, capital, settings):
+def render_risk_tab(
+    risk_report: PortfolioRiskReport,
+    ranking: pd.DataFrame,
+    capital: float,
+    settings: Settings,
+) -> None:
     cols = st.columns(5)
     cols[0].metric("VaR 95%", f"{risk_report.var_95_pct:.2f}%")
     cols[1].metric("CVaR 95%", f"{risk_report.cvar_95_pct:.2f}%")

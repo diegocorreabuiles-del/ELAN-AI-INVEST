@@ -1,10 +1,19 @@
+import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+from elan_ai_invest.core.config import Settings
 from elan_ai_invest.portfolio import build_portfolio, portfolio_equity_curve
+from elan_ai_invest.risk import PortfolioRiskReport
 
 
-def render_portfolio_tab(ranking, risk_report, prices, capital, settings):
+def render_portfolio_tab(
+    ranking: pd.DataFrame,
+    risk_report: PortfolioRiskReport,
+    prices: pd.DataFrame,
+    capital: float,
+    settings: Settings,
+) -> None:
     profiles = ["conservador", "moderado", "agresivo"]
     configured_profile = settings.portfolio.profile.lower()
     if configured_profile not in profiles:
