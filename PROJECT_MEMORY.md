@@ -12,7 +12,7 @@
 ## Estado validado — 28 de agosto de 2026
 
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
-- Rama activa `feature/fx-correlation-module`, abierta desde `develop@4c19d28`.
+- PR #24 integrada en `develop@03c38d2865d48c5d189756b699abdaafbc012eb5`; la rama documental de cierre parte de ese estado.
 - Bloques 21 y 22 integrados; PR documental #21 fusionada y CI posterior `30698354050` verde.
 - Bloque 23 integrado en `develop@765f94b` mediante PR #22; las matrices CI `31490174578` y `31490212493` pasaron en Python 3.11–3.14.
 - Bloque 24 integrado en `develop@4c19d28` mediante PR #23; la lista de seguimiento se restaura y guarda en SQLite, y el CI posterior `31492357864` quedó verde.
@@ -25,7 +25,7 @@
 - Motor FX estructural integrado localmente: 155 monedas ISO activas, 128 habilitadas, 127 pares directos y 16.256 pares virtuales `FX_BASE_QUOTE`; el buscador dinámico y `FxAwareMarketDataProvider` los conectan a precios, calidad, scoring/ranking, riesgo, gráficos, correlaciones y Terminal de Decisión. Fundamental/PER degradan a `N/D`; Portfolio y paper trading los excluyen. Sin tablas nuevas, Supabase, brokers ni dinero real.
 - Fase 11 implementada localmente: Mercado expone para cada activo FX la resolución directa/inversa/sintética, proveedor, ruta de cálculo, cobertura de ruta, cobertura temporal y frescura. Es metadata opcional; no altera precios, scoring, decisiones, Portfolio ni paper trading.
 - Fase 7A implementada y validada localmente: mypy estricto cubre 62 archivos del producto activo; CI añade una auditoría bloqueante de `requirements.lock` con `pip-audit` fijado por SHA. GitPython y pip se actualizaron tras una auditoría roja inicial; la repetición aislada quedó sin vulnerabilidades conocidas. No cambia señales, scoring, cartera, riesgo ni paper trading.
-- Fase 7B cerrada localmente: mypy cubre los 118 módulos; `config/module_lifecycle.toml` y su gate clasifican 86 activos, 13 adaptadores de compatibilidad y 19 módulos legacy. El lock exige hashes SHA-256 para 80 pins activos y sus artefactos publicados, con instalación verificada para Python 3.11–3.14. No se borró legacy ni se alteraron scoring, cartera, riesgo o paper trading.
+- Fase 7B cerrada e integrada: mypy cubre los 118 módulos; `config/module_lifecycle.toml` y su gate clasifican 86 activos, 13 adaptadores de compatibilidad y 19 módulos legacy. El lock exige hashes SHA-256 para 80 pins activos y sus artefactos publicados, con instalación verificada para Python 3.11–3.14. No se borró legacy ni se alteraron scoring, cartera, riesgo o paper trading.
 
 Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea actual.
 
@@ -43,10 +43,10 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 - Catálogo cripto principal ampliado a 54 instrumentos: 30 criptomonedas, 11 stablecoins y 13 memecoins. Los 38 símbolos nuevos y USDT/USDC se verificaron con histórico mensual en Yahoo; 30/30 pruebas dirigidas, Ruff, Black, mypy, `git diff --check` y HTTP 200 en `8501` verdes. Las CBDC permanecen excluidas por no ser instrumentos cotizados; no cambió ejecución, cartera ni paper trading.
 - Gate local del punto estable acumulado: 326/326 pruebas seleccionadas y cobertura global de ramas 76,69 % (mínimo 75 %); flujo Git, lock, `pip check`, mypy, Ruff, Black global, `git diff --check` y HTTP 200 en `8501` verdes. Se excluyó únicamente el AppTest monolítico de las 13 vistas por su bloqueo conocido; el contrato lazy corregido pasó 6/6 y las vistas se validaron por lotes. Empaquetado reproducible pendiente del HEAD limpio previo al push.
 - Fase 7A: suite estable seleccionada al 100 % y cobertura global de ramas 76,81 % (mínimo 75 %); 41 pruebas enfocadas/contractuales, Ruff, Black, mypy sobre 62 archivos, flujo Git, lock de 78 pins, `pip check`, healthcheck, sintaxis YAML/imports, `git diff --check` y HTTP 200 en `8501` verdes. `pip-audit` 2.10.1 no encontró vulnerabilidades conocidas en el lock actualizado. Se mantiene excluido únicamente el AppTest monolítico por su bloqueo conocido; el árbol legacy/no alcanzable y el lock sin hashes quedan para 7B. No hay CI remoto, commit, push, fusión ni despliegue de este delta.
-- Fase 7B: lock reproducible y validado con 80 pins activos y hashes SHA-256; descargas Linux compatibles para Python 3.11–3.14, instalación aislada real en 3.14, `pip check` y `pip-audit` sin incidencias. Ciclo de vida 118/86/13/19, mypy global, Ruff, Black y contratos dirigidos verdes. Docker Desktop no estuvo disponible; la matriz remota de la PR será la evidencia Linux definitiva. Suite estable completa al 100 %, cobertura de ramas 76,75 % (mínimo 75 %), healthcheck, YAML/import principal y HTTP 200 en `8501` verdes.
+- Fase 7B: lock reproducible y validado con 80 pins activos y hashes SHA-256; descargas Linux compatibles para Python 3.11–3.14, instalación aislada real en 3.14, `pip check` y `pip-audit` sin incidencias. Ciclo de vida 118/86/13/19, mypy global, Ruff, Black y contratos dirigidos verdes. Docker Desktop no estuvo disponible; las matrices remotas de la PR #24 y el CI posterior de `develop` confirmaron Python 3.11–3.14. Suite estable completa al 100 %, cobertura de ramas 76,75 % (mínimo 75 %), healthcheck, YAML/import principal y HTTP 200 en `8501` verdes.
 - Linux/Docker sobre `0a23623`, Python 3.11–3.14: 178 pruebas por versión y paquete verdes para el cierre del Bloque 23.
 - Artefacto reproducible del Bloque 23 sobre `0a23623`: 171 archivos; SHA-256 `0d1275e36c945b8f3710fb42348fa91efac6a7e908b16a1f1f383e001e44eab1`.
-- Última evidencia remota: PR #23 fusionada en `develop@4c19d28`; CI posterior `31492357864` verde.
+- Última evidencia remota: PR #24 fusionada por rebase en `develop@03c38d2865d48c5d189756b699abdaafbc012eb5`; CI posterior `33122696303` verde en Python 3.11–3.14 y auditoría.
 - `develop` exige PR, checks estrictos, historial lineal y conversaciones resueltas; force-push y borrado deshabilitados.
 
 ## Decisiones canónicas
@@ -105,7 +105,7 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 
 ## Siguiente paso
 
-- Publicar el cierre 7B en la PR #24, exigir la matriz CI remota y fusionar únicamente hacia `develop` si todos los checks quedan verdes.
-- Identificar y autorizar por separado el destino real de despliegue; no promover a `main`, crear tags o inventar un proveedor.
+- Definir el destino y el modelo de despliegue: GitHub registra 0 entornos y 0 deployments y el repositorio no contiene workflow ni manifiesto de hosting.
+- No promover a `main`, crear tags, publicar releases ni desplegar hasta elegir y configurar explícitamente el destino.
 - Mantener las Fases 3–9 aisladas del scoring productivo y conservar FX fuera de Portfolio y paper trading; no añadir proveedores ni APIs sin inventario de fuente, campo, disponibilidad y fallback.
 - Publicar o integrar los cambios solo mediante PR hacia `develop` y con autorización explícita; mantener fuera brokers/dinero real y cualquier promoción a `main`, release o despliegue.
