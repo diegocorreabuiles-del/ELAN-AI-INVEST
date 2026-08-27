@@ -1,6 +1,21 @@
 # Changelog
 
 ## Unreleased
+- Cerrada la Fase 7B: mypy estricto cubre los 118 módulos del paquete y un
+  manifiesto verificable clasifica 86 activos, 13 adaptadores de compatibilidad
+  y 19 módulos legacy, sin borrar ni alterar sus contratos públicos.
+- Endurecido `requirements.lock` con hashes SHA-256 para sus 80 pins activos;
+  CI, instaladores y matriz local instalan primero el cierre verificado y luego
+  el proyecto editable sin resolver dependencias.
+- Añadidos el regenerador/comprobador del lock y el gate de ciclo de vida; la
+  compatibilidad de artefactos se comprobó para Python 3.11–3.14 y la auditoría
+  final no encontró vulnerabilidades conocidas.
+- Ampliado el gate de mypy a 62 archivos del producto activo, incluidos
+  dashboard, fundamental, market y backtesting, sin modificar scoring,
+  cartera, riesgo ni paper trading.
+- Añadida a CI una auditoría bloqueante de `requirements.lock` con
+  `pip-audit` fijado por SHA; actualizados GitPython y pip a versiones sin
+  vulnerabilidades conocidas en la auditoría local.
 - Ampliado el catálogo principal a 54 criptoactivos con histórico verificado
   en Yahoo (30 crypto, 11 stablecoins y 13 memecoins), incluido USDT/USDC,
   y añadido el filtro agregado `Criptoactivos (todos)`. Las CBDC quedan

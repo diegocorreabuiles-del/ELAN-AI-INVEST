@@ -1,2 +1,2 @@
--c requirements.lock
--e .[dev]
+--require-hashes
+-r requirements.lock

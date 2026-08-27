@@ -1,0 +1,41 @@
+schema_version = 1
+entry_point = "app.py"
+expected_total_modules = 118
+expected_active_modules = 86
+expected_compatibility_modules = 13
+expected_legacy_modules = 19
+
+[[classification]]
+root = "elan_ai_invest.backtest"
+state = "compatibility"
+reason = "Historical import path delegating to the canonical backtesting package; covered by architecture tests."
+
+[[classification]]
+root = "elan_ai_invest.core.pipeline"
+state = "compatibility"
+reason = "Historical InvestmentPipeline import path delegating to legacy.pipeline_v1; covered by compatibility tests."
+
+[[classification]]
+root = "elan_ai_invest.indicators"
+state = "compatibility"
+reason = "Indicator API retained for InvestmentPipeline and direct compatibility tests; not reached by app.py."
+
+[[classification]]
+root = "elan_ai_invest.intelligence"
+state = "compatibility"
+reason = "Decision API retained for InvestmentPipeline and direct compatibility tests; not reached by app.py."
+
+[[classification]]
+root = "elan_ai_invest.advisor"
+state = "legacy"
+reason = "Prototype tree with no app, test, script, or internal production consumer."
+
+[[classification]]
+root = "elan_ai_invest.decision"
+state = "legacy"
+reason = "Alternate allocation tree used only by legacy.pipeline_v1; canonical product decisions live under analysis."
+
+[[classification]]
+root = "elan_ai_invest.legacy"
+state = "legacy"
+reason = "Explicit compatibility archive; preserved for one deprecation cycle and never reachable from app.py."

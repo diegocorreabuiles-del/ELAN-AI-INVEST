@@ -1,4 +1,7 @@
-def rank_assets(ranking):
+import pandas as pd
+
+
+def rank_assets(ranking: pd.DataFrame) -> pd.DataFrame:
 
     return ranking.sort_values(
         "score",

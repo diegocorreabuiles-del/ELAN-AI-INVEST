@@ -9,7 +9,7 @@
 3. Continuar desde «Siguiente paso» sin reabrir decisiones cerradas salvo evidencia nueva.
 4. Al cerrar un bloque, registrar únicamente estado, gates, decisiones nuevas y próximo paso.
 
-## Estado validado — 26 de agosto de 2026
+## Estado validado — 28 de agosto de 2026
 
 - Repositorio: `diegocorreabuiles-del/ELAN-AI-INVEST`.
 - Rama activa `feature/fx-correlation-module`, abierta desde `develop@4c19d28`.
@@ -24,6 +24,8 @@
 - Refactorización incremental de la Terminal de Decisión: Fases 3–9 implementadas localmente. `analysis/` ensambla clasificación, técnico/riesgo, Score Engine, Data Confidence, decisión, Trade Plan y modelos específicos Crypto/Meme Coin/Stablecoin; la UI los presenta sin alterar scoring productivo, cartera ni paper trading.
 - Motor FX estructural integrado localmente: 155 monedas ISO activas, 128 habilitadas, 127 pares directos y 16.256 pares virtuales `FX_BASE_QUOTE`; el buscador dinámico y `FxAwareMarketDataProvider` los conectan a precios, calidad, scoring/ranking, riesgo, gráficos, correlaciones y Terminal de Decisión. Fundamental/PER degradan a `N/D`; Portfolio y paper trading los excluyen. Sin tablas nuevas, Supabase, brokers ni dinero real.
 - Fase 11 implementada localmente: Mercado expone para cada activo FX la resolución directa/inversa/sintética, proveedor, ruta de cálculo, cobertura de ruta, cobertura temporal y frescura. Es metadata opcional; no altera precios, scoring, decisiones, Portfolio ni paper trading.
+- Fase 7A implementada y validada localmente: mypy estricto cubre 62 archivos del producto activo; CI añade una auditoría bloqueante de `requirements.lock` con `pip-audit` fijado por SHA. GitPython y pip se actualizaron tras una auditoría roja inicial; la repetición aislada quedó sin vulnerabilidades conocidas. No cambia señales, scoring, cartera, riesgo ni paper trading.
+- Fase 7B cerrada localmente: mypy cubre los 118 módulos; `config/module_lifecycle.toml` y su gate clasifican 86 activos, 13 adaptadores de compatibilidad y 19 módulos legacy. El lock exige hashes SHA-256 para 80 pins activos y sus artefactos publicados, con instalación verificada para Python 3.11–3.14. No se borró legacy ni se alteraron scoring, cartera, riesgo o paper trading.
 
 Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea actual.
 
@@ -40,6 +42,8 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 - Navegación superior y tipografía homogénea: 6/6 pruebas dirigidas, Ruff, Black y `git diff --check` verdes. El recorrido monolítico de 13 vistas conserva su bloqueo conocido; render inicial, cambio entre vistas conectadas y Mercado se validaron por separado.
 - Catálogo cripto principal ampliado a 54 instrumentos: 30 criptomonedas, 11 stablecoins y 13 memecoins. Los 38 símbolos nuevos y USDT/USDC se verificaron con histórico mensual en Yahoo; 30/30 pruebas dirigidas, Ruff, Black, mypy, `git diff --check` y HTTP 200 en `8501` verdes. Las CBDC permanecen excluidas por no ser instrumentos cotizados; no cambió ejecución, cartera ni paper trading.
 - Gate local del punto estable acumulado: 326/326 pruebas seleccionadas y cobertura global de ramas 76,69 % (mínimo 75 %); flujo Git, lock, `pip check`, mypy, Ruff, Black global, `git diff --check` y HTTP 200 en `8501` verdes. Se excluyó únicamente el AppTest monolítico de las 13 vistas por su bloqueo conocido; el contrato lazy corregido pasó 6/6 y las vistas se validaron por lotes. Empaquetado reproducible pendiente del HEAD limpio previo al push.
+- Fase 7A: suite estable seleccionada al 100 % y cobertura global de ramas 76,81 % (mínimo 75 %); 41 pruebas enfocadas/contractuales, Ruff, Black, mypy sobre 62 archivos, flujo Git, lock de 78 pins, `pip check`, healthcheck, sintaxis YAML/imports, `git diff --check` y HTTP 200 en `8501` verdes. `pip-audit` 2.10.1 no encontró vulnerabilidades conocidas en el lock actualizado. Se mantiene excluido únicamente el AppTest monolítico por su bloqueo conocido; el árbol legacy/no alcanzable y el lock sin hashes quedan para 7B. No hay CI remoto, commit, push, fusión ni despliegue de este delta.
+- Fase 7B: lock reproducible y validado con 80 pins activos y hashes SHA-256; descargas Linux compatibles para Python 3.11–3.14, instalación aislada real en 3.14, `pip check` y `pip-audit` sin incidencias. Ciclo de vida 118/86/13/19, mypy global, Ruff, Black y contratos dirigidos verdes. Docker Desktop no estuvo disponible; la matriz remota de la PR será la evidencia Linux definitiva. Suite estable completa al 100 %, cobertura de ramas 76,75 % (mínimo 75 %), healthcheck, YAML/import principal y HTTP 200 en `8501` verdes.
 - Linux/Docker sobre `0a23623`, Python 3.11–3.14: 178 pruebas por versión y paquete verdes para el cierre del Bloque 23.
 - Artefacto reproducible del Bloque 23 sobre `0a23623`: 171 archivos; SHA-256 `0d1275e36c945b8f3710fb42348fa91efac6a7e908b16a1f1f383e001e44eab1`.
 - Última evidencia remota: PR #23 fusionada en `develop@4c19d28`; CI posterior `31492357864` verde.
@@ -55,7 +59,7 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 6. **Paper trading:** SQLite local, `BEGIN IMMEDIATE`, mutaciones atómicas, fallo cerrado y stops manuales/confirmados.
 7. **Streamlit:** workspace grafito con navegación superior `st.pills` para 13 vistas y render condicional lazy; tipografía centralizada en el tema nativo, sin CSS inyectado ni `use_container_width`.
 8. **Errores:** UI neutra con referencia; detalle técnico solo en logs.
-9. **Versión y dependencias:** `pyproject.toml` es la fuente de versión; `requirements.lock` fija el entorno exacto.
+9. **Versión y dependencias:** `pyproject.toml` es la fuente de versión; `requirements.lock` fija el entorno exacto con hashes SHA-256 y se instala antes del proyecto editable sin dependencias.
 10. **Instrumentos:** catálogo MIT de Adanos más `config/instruments.csv`; las filas Forex del buscador principal se reemplazan en carga por los símbolos habilitados de `config/currencies.csv`, sin lista FX paralela. USD permanece como pivote y no genera un par consigo misma. Históricos en Yahoo; catálogo disponible no garantiza histórico; no añadir `financedatabase` al runtime.
 11. **Market Data:** detalle OHLCV solo para activo/horizonte visible, caché de 15 minutos y comparaciones con rendimientos consecutivos alineados. Calidad es metadata aditiva y no altera precios.
 12. **Noticias:** Yahoo solo al abrir la pestaña, con caché y límites; contexto de solo lectura, sin efecto en scoring, señales, riesgo, cartera ni paper trading.
@@ -93,14 +97,15 @@ Estos datos son dinámicos: volver a comprobarlos solo cuando afecten la tarea a
 ## Deuda abierta relevante
 
 - TD-012: completar matriz configuración/consumidor.
-- TD-021: inventariar módulos no alcanzables antes de deprecarlos.
-- TD-026: ampliar mypy más allá de los 12 módulos críticos.
+- TD-021: mantener actualizado el manifiesto 86 activos/13 compatibilidad/19 legacy antes de cualquier retirada.
+- TD-026: mantener mypy estricto sobre los 118 módulos sin exclusiones globales.
 - TD-035: sustituir pruebas de backtest redundantes por casos nuevos.
 - TD-036: considerar multipágina solo cuando el tamaño lo justifique.
 - TD-037: ampliar invariantes/property tests de pesos, cash y contabilidad.
 
 ## Siguiente paso
 
-- Verificar la matriz CI de la PR #24 para el punto estable publicado en `feature/fx-correlation-module` y mantenerla sin fusionar; no promover a `main`, crear tags ni desplegar.
+- Publicar el cierre 7B en la PR #24, exigir la matriz CI remota y fusionar únicamente hacia `develop` si todos los checks quedan verdes.
+- Identificar y autorizar por separado el destino real de despliegue; no promover a `main`, crear tags o inventar un proveedor.
 - Mantener las Fases 3–9 aisladas del scoring productivo y conservar FX fuera de Portfolio y paper trading; no añadir proveedores ni APIs sin inventario de fuente, campo, disponibilidad y fallback.
 - Publicar o integrar los cambios solo mediante PR hacia `develop` y con autorización explícita; mantener fuera brokers/dinero real y cualquier promoción a `main`, release o despliegue.

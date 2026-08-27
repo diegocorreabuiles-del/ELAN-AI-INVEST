@@ -1,6 +1,7 @@
 """Legacy analysis pipeline preserved behind ``core.pipeline`` compatibility."""
 
 import warnings
+from typing import Protocol
 
 import pandas as pd
 
@@ -16,18 +17,22 @@ from elan_ai_invest.intelligence.models import (
 from elan_ai_invest.market.providers import ProviderManager
 
 
+class MarketDataProvider(Protocol):
+    def get_data(self, symbol: str, period: str = "2y") -> pd.DataFrame: ...
+
+
 class InvestmentPipeline:
-    def __init__(self, provider=None):
+    def __init__(self, provider: MarketDataProvider | None = None) -> None:
         warnings.warn(
             "InvestmentPipeline is legacy; use elan_ai_invest.core.CoreEngine",
             DeprecationWarning,
             stacklevel=2,
         )
-        self.provider = provider or ProviderManager()
+        self.provider: MarketDataProvider = provider or ProviderManager()
         self.intelligence = IntelligenceEngine()
         self.decision_engine = DecisionEngine()
 
-    def analyze_symbol(self, symbol: str, period: str = "2y") -> dict:
+    def analyze_symbol(self, symbol: str, period: str = "2y") -> dict[str, object]:
         data = self.provider.get_data(symbol, period)
 
         if data is None or data.empty:
@@ -82,7 +87,7 @@ class InvestmentPipeline:
         symbols: list[str],
         period: str = "2y",
     ) -> pd.DataFrame:
-        results = []
+        results: list[dict[str, object]] = []
 
         for symbol in symbols:
             try:

@@ -105,7 +105,7 @@ def selected_symbol_from_table_state(
     if selection is None and hasattr(table_state, "get"):
         selection = table_state.get("selection", {})
     rows = getattr(selection, "rows", None)
-    if rows is None and hasattr(selection, "get"):
+    if rows is None and selection is not None and hasattr(selection, "get"):
         rows = selection.get("rows", [])
     if not rows:
         return None

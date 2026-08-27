@@ -1,9 +1,12 @@
+from pathlib import Path
+
 import streamlit as st
 
+from elan_ai_invest.core.config import Settings
 from elan_ai_invest.system_status import collect_system_status
 
 
-def render_system_tab(root, settings):
+def render_system_tab(root: Path, settings: Settings) -> None:
     status = collect_system_status(root, settings)
     cols = st.columns(4)
     cols[0].metric("Versión", status.version)

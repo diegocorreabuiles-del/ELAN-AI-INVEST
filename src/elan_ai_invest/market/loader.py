@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import pandas as pd
+
 
 class MarketLoader:
-    def download(self, symbol: str, period: str = "2y"):
+    def download(self, symbol: str, period: str = "2y") -> pd.DataFrame:
         try:
             import yfinance as yf
         except ImportError as exc:

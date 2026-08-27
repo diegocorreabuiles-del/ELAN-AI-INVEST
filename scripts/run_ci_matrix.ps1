@@ -30,9 +30,10 @@ rm -rf /var/lib/apt/lists/*
 git config --global --add safe.directory /workspace
 git clone --quiet --no-hardlinks /workspace /work
 cd /work
-python -m pip install --quiet --upgrade "pip==26.1.2"
 python -m pip install --quiet -r requirements.txt
+python -m pip install --quiet --no-deps --no-build-isolation -e .[dev]
 python scripts/check_git_flow.py
+python scripts/check_module_lifecycle.py
 python scripts/check_lock.py
 python -m pip check
 python -m ruff check .

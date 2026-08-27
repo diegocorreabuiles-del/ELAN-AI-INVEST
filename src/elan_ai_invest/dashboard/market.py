@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -10,6 +12,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+from elan_ai_invest.core.config import MarketConfig
 from elan_ai_invest.fx import (
     HistoricalFxService,
     YahooFxHistoryProvider,
@@ -114,6 +117,8 @@ def clear_market_history_cache() -> None:
 
 def _request_market_period() -> None:
     horizon_label = st.session_state.get("market_detail_horizon")
+    if not isinstance(horizon_label, str):
+        return
     requested_period = HORIZONS.get(horizon_label)
     if requested_period is None:
         return
@@ -486,7 +491,7 @@ def _reference_rolling_figure(
     return figure
 
 
-def _format_observation(value) -> str:
+def _format_observation(value: datetime | None) -> str:
     return value.strftime("%d/%m/%Y") if value is not None else "N/D"
 
 
@@ -584,7 +589,7 @@ def _render_quality_summary(report: MarketDataQualityReport | None) -> None:
 
 
 @st.fragment
-def _render_history_detail(primary_symbol: str, market_settings) -> None:
+def _render_history_detail(primary_symbol: str, market_settings: MarketConfig) -> None:
     active_period = str(st.session_state.get(ANALYSIS_PERIOD_KEY, market_settings.period))
     period_to_label = {period: label for label, period in HORIZONS.items()}
     active_horizon_label = period_to_label.get(active_period, "1 año")
@@ -706,7 +711,12 @@ def _render_history_detail(primary_symbol: str, market_settings) -> None:
     )
 
 
-def _render_detail_panel(selected, labels, market_settings, quality_report=None) -> str:
+def _render_detail_panel(
+    selected: Sequence[str],
+    labels: Mapping[str, str],
+    market_settings: MarketConfig,
+    quality_report: MarketDataQualityReport | None = None,
+) -> str:
     st.subheader(":material/candlestick_chart: Desempeño del activo")
     options = list(selected)
     sync_widget_to_active(st.session_state, "market_primary_symbol", options)
@@ -724,7 +734,11 @@ def _render_detail_panel(selected, labels, market_settings, quality_report=None)
 
 
 @st.fragment
-def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> None:
+def _render_comparator(
+    prices: pd.DataFrame,
+    primary_symbol: str,
+    labels: Mapping[str, str],
+) -> None:
     available = [symbol for symbol in prices.columns if not prices[symbol].dropna().empty]
     st.subheader(":material/compare_arrows: Comparador y correlación")
     if len(available) < 2:
@@ -834,7 +848,14 @@ def _render_comparator(prices: pd.DataFrame, primary_symbol: str, labels) -> Non
     )
 
 
-def render_market_tab(ranking, prices, selected, labels, market_settings, quality_report=None):
+def render_market_tab(
+    ranking: pd.DataFrame,
+    prices: pd.DataFrame,
+    selected: Sequence[str],
+    labels: Mapping[str, str],
+    market_settings: MarketConfig,
+    quality_report: MarketDataQualityReport | None = None,
+) -> None:
     _render_quality_summary(quality_report)
     if quality_report is not None:
         st.divider()
